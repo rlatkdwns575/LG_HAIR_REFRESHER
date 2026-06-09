@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../shared/widgets/feature_sub_page_scaffold.dart';
+import '../../../../app/router/app_navigation.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_spacing.dart';
+import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_chip_tab_bar.dart';
+import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/custom_mode_store.dart';
+import '../../data/model/refresh_mode.dart';
+import '../widgets/refresh_mode_card.dart';
+import '../widgets/refresh_section_header.dart';
 
 class RefreshPage extends StatefulWidget {
   const RefreshPage({super.key});
@@ -10,12 +20,186 @@ class RefreshPage extends StatefulWidget {
 }
 
 class _RefreshPageState extends State<RefreshPage> {
+  static const List<RefreshMode> _modes = RefreshMode.samples;
+
+  late final List<String> _chipTabs = [
+    '전체',
+    for (final category in RefreshModeCategory.values) category.label,
+  ];
+
+  int _selectedChipIndex = 0;
+
+  RefreshMode get _recommended => _modes.first;
+
+  /// 기본 샘플 모드 + 사용자가 생성한 커스텀 모드.
+  List<RefreshMode> get _allModes => [
+    ..._modes,
+    ...CustomModeStore.instance.modes,
+  ];
+
+  RefreshModeCategory? get _selectedCategory => _selectedChipIndex == 0
+      ? null
+      : RefreshModeCategory.values[_selectedChipIndex - 1];
+
+  List<RefreshMode> get _filteredModes {
+    final category = _selectedCategory;
+    if (category == null) {
+      return _allModes;
+    }
+    return _allModes.where((mode) => mode.category == category).toList();
+  }
+
+  Future<void> _openCustomCreate() async {
+    final created = await context.pushRefreshCustomCreate();
+    if (!mounted || created != true) {
+      return;
+    }
+    setState(() {});
+  }
+
+  void _onModeTap(RefreshMode mode) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('${mode.name} 모드를 선택했어요'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const FeatureSubPageScaffold(
-      title: '리프레시',
-      description: '추천 모드 또는 전체 모드에서 케어를 실행합니다.',
-      items: ['퀵 리프레시', '미팅 케어', '취침 케어', '외출 케어'],
+    return Scaffold(
+      backgroundColor: AppColors.gray0,
+      appBar: AppCommonTopHeader(
+        variant: AppCommonTopHeaderVariant.gnb,
+        title: '리프레시',
+        onBack: () => context.pop(),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+        children: [
+          _buildRecommendedSection(),
+          const SizedBox(height: AppSpacing.lg),
+          _buildModeListSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendedSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const RefreshSectionHeader(
+          title: '맞춤 리프레시',
+          subtitle: '측정 결과를 바탕으로 추천한 모드예요',
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: RefreshModeCard(
+            mode: _recommended,
+            variant: RefreshModeCardVariant.featured,
+            badgeLabel: 'AI 추천',
+            onTap: () => _onModeTap(_recommended),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModeListSection() {
+    final modes = _filteredModes;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        RefreshSectionHeader(
+          title: '리프레시 모드',
+          trailingLabel: '커스텀하기',
+          onTrailingTap: _openCustomCreate,
+        ),
+        _buildChipTabBar(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 0),
+          child: modes.isEmpty
+              ? _buildEmptyState()
+              : Column(
+                  children: [
+                    for (var i = 0; i < modes.length; i++) ...[
+                      if (i > 0) const SizedBox(height: AppSpacing.md),
+                      RefreshModeCard(
+                        mode: modes[i],
+                        onTap: () => _onModeTap(modes[i]),
+                      ),
+                    ],
+                  ],
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    final isCustom = _selectedCategory == RefreshModeCategory.customMode;
+    final message = isCustom ? '아직 제작된 커스텀 모드가 없어요' : '해당 분류의 모드가 아직 없어요';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 56),
+      child: Center(
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChipTabBar() {
+    return SizedBox(
+      height: 52,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 18, left: 15, right: 15),
+            child: AppChipTabBar(
+              tabs: _chipTabs,
+              selectedIndex: _selectedChipIndex,
+              onChanged: (index) => setState(() => _selectedChipIndex = index),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: Row(
+                children: [
+                  Container(
+                    width: 20,
+                    height: 52,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0x00FFFFFF), AppColors.gray0],
+                      ),
+                    ),
+                  ),
+                  const ColoredBox(
+                    color: AppColors.gray0,
+                    child: SizedBox(width: 10, height: 52),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
