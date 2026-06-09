@@ -5,7 +5,11 @@ import '../../core/constants/route_paths.dart';
 import '../../features/history/ui/page/history_page.dart';
 import '../../features/home/ui/page/home_page.dart';
 import '../../features/measure/ui/page/measure_page.dart';
+import '../../features/measure/ui/page/measure_result_page.dart';
+import '../../features/measure/ui/page/measure_run_page.dart';
 import '../../features/refresh/ui/page/refresh_page.dart';
+import '../../features/refresh/ui/page/refresh_progress_page.dart';
+import '../../features/refresh/ui/page/refresh_result_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
 import '../../shared/widgets/shared_widget_gallery_page.dart';
 
@@ -23,11 +27,35 @@ final appRouter = GoRouter(
       name: AppRouteNames.measure,
       path: AppRoutePaths.measure,
       builder: (context, state) => const MeasurePage(),
+      routes: [
+        GoRoute(
+          name: AppRouteNames.measureRun,
+          path: 'run',
+          builder: (context, state) => const MeasureRunPage(),
+        ),
+        GoRoute(
+          name: AppRouteNames.measureResult,
+          path: 'result',
+          builder: (context, state) => const MeasureResultPage(),
+        ),
+      ],
     ),
     GoRoute(
       name: AppRouteNames.refresh,
       path: AppRoutePaths.refresh,
       builder: (context, state) => const RefreshPage(),
+      routes: [
+        GoRoute(
+          name: AppRouteNames.refreshProgress,
+          path: 'progress',
+          builder: (context, state) => const RefreshProgressPage(),
+        ),
+        GoRoute(
+          name: AppRouteNames.refreshResult,
+          path: 'result',
+          builder: (context, state) => const RefreshResultPage(),
+        ),
+      ],
     ),
     GoRoute(
       name: AppRouteNames.history,
