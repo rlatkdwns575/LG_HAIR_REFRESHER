@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_colors.dart';
+import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 
@@ -24,17 +26,38 @@ class FeaturePlaceholderPage extends StatelessWidget {
     return ListView(
       padding: spacing.pagePadding,
       children: [
-        Text(title, style: AppTextStyles.headlineMedium),
+        Text(
+          title,
+          style: AppTextStyles.headlineMedium.copyWith(
+            color: AppColors.gray900,
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
-        Text(description, style: AppTextStyles.bodyMedium),
+        Text(
+          description,
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray600),
+        ),
         const SizedBox(height: AppSpacing.lg),
         for (final item in items)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Card(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.gray0,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.gray200),
+              ),
               child: ListTile(
-                leading: const Icon(Icons.check_circle_outline),
-                title: Text(item),
+                leading: const Icon(
+                  Icons.check_circle_outline,
+                  color: AppColors.primary500,
+                ),
+                title: Text(
+                  item,
+                  style: AppTextStyles.titleS.copyWith(
+                    color: AppComponentColors.listTitle,
+                  ),
+                ),
               ),
             ),
           ),

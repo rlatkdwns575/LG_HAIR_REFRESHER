@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_colors.dart';
+import 'app_top_header.dart';
 import 'feature_placeholder_page.dart';
 
 /// 홈 허브에서 push로 진입하는 feature 화면용 스캐폴드.
@@ -18,7 +20,11 @@ class FeatureSubPageScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(leading: const BackButton(), title: Text(title)),
+      backgroundColor: AppColors.gray50,
+      appBar: AppTopHeader(
+        title: title,
+        leading: BackButton(color: AppColors.gray800),
+      ),
       body: FeaturePlaceholderPage(
         title: title,
         description: description,
