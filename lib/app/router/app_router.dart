@@ -7,6 +7,7 @@ import '../../features/home/ui/page/home_page.dart';
 import '../../features/measure/ui/page/measure_page.dart';
 import '../../features/measure/ui/page/measure_result_page.dart';
 import '../../features/measure/ui/page/measure_run_page.dart';
+import '../../features/refresh/ui/page/refresh_custom_create_page.dart';
 import '../../features/refresh/ui/page/refresh_page.dart';
 import '../../features/refresh/ui/page/refresh_progress_page.dart';
 import '../../features/refresh/ui/page/refresh_result_page.dart';
@@ -56,6 +57,11 @@ final appRouter = GoRouter(
           builder: (context, state) => const RefreshResultPage(),
         ),
       ],
+    ),
+    GoRoute(
+      name: AppRouteNames.refreshCustomCreate,
+      path: AppRoutePaths.refreshCustomCreate,
+      builder: (context, state) => const RefreshCustomCreatePage(),
     ),
     GoRoute(
       name: AppRouteNames.history,

@@ -169,7 +169,7 @@ class AppCommonTopHeader extends StatelessWidget
                   onPressed: onBack,
                   size: 20,
                 ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 2),
               Expanded(
                 child: Text(
                   title ?? '타이틀',

@@ -21,6 +21,10 @@ extension AppNavigation on BuildContext {
 
   void pushRefreshResult() => push(AppRoutePaths.refreshResult);
 
+  /// 커스텀 모드 생성 화면으로 이동하고, 저장 성공 여부를 반환합니다.
+  Future<bool?> pushRefreshCustomCreate() =>
+      push<bool>(AppRoutePaths.refreshCustomCreate);
+
   void pushHistory() => push(AppRoutePaths.history);
 
   void pushSettings() => push(AppRoutePaths.settings);
