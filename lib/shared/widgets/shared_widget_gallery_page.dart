@@ -5,22 +5,31 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'app_badge.dart';
+import 'app_bottom_button_bar.dart';
 import 'app_box_button.dart';
+import 'app_box_mini_button.dart';
 import 'app_calendar_day_strip.dart';
 import 'app_calendar_item.dart';
 import 'app_calendar_top_header.dart';
 import 'app_calendar_week_strip.dart';
 import 'app_capsule_button.dart';
+import 'app_capsule_icon_button.dart';
 import 'app_checkbox.dart';
 import 'app_chip_tab_bar.dart';
 import 'app_common_top_header.dart';
 import 'app_confirm_dialog.dart';
 import 'app_list_item.dart';
+import 'app_page_indicator.dart';
 import 'app_radio.dart';
+import 'app_recommend_card.dart';
+import 'app_refresh_card.dart';
+import 'app_result_card.dart';
 import 'app_search_text_field.dart';
 import 'app_section_title.dart';
 import 'app_segmented_tab_bar.dart';
 import 'app_text_field.dart';
+import 'app_text_link_button.dart';
 import 'app_toggle.dart';
 import 'app_top_header.dart';
 
@@ -37,6 +46,8 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
   int _chipIndex = 0;
   int _weekIndex = 2;
   int _dayIndex = 2;
+  int _pageIndicatorIndex = 0;
+  int _boxMiniIndex = 0;
   bool _checkbox = true;
   bool _toggle = true;
   String _radioGroup = 'a';
@@ -46,8 +57,12 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
   final _searchFieldController = TextEditingController();
 
   static const _widgetFiles = <(String, String)>[
+    ('AppBadge', 'app_badge.dart'),
     ('AppBoxButton', 'app_box_button.dart'),
+    ('AppBoxMiniButton', 'app_box_mini_button.dart'),
+    ('AppBottomButtonBar', 'app_bottom_button_bar.dart'),
     ('AppCapsuleButton', 'app_capsule_button.dart'),
+    ('AppCapsuleIconButton', 'app_capsule_icon_button.dart'),
     ('AppCheckbox', 'app_checkbox.dart'),
     ('AppRadio', 'app_radio.dart'),
     ('AppToggle', 'app_toggle.dart'),
@@ -64,6 +79,11 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
     ('AppSegmentedTabBar', 'app_segmented_tab_bar.dart'),
     ('AppChipTabBar', 'app_chip_tab_bar.dart'),
     ('AppConfirmDialog', 'app_confirm_dialog.dart'),
+    ('AppPageIndicator', 'app_page_indicator.dart'),
+    ('AppRecommendCard', 'app_recommend_card.dart'),
+    ('AppRefreshCard', 'app_refresh_card.dart'),
+    ('AppResultCard', 'app_result_card.dart'),
+    ('AppTextLinkButton', 'app_text_link_button.dart'),
   ];
 
   @override
@@ -147,6 +167,44 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
                 const AppCapsuleButton(label: 'Disabled', onPressed: null),
               ],
             ),
+          ),
+          _section(
+            'AppCapsuleIconButton',
+            'Button_Capsule_IconOnly · 24×24',
+            Row(
+              children: [
+                AppCapsuleIconButton(onPressed: () {}),
+                const SizedBox(width: AppSpacing.sm),
+                AppCapsuleIconButton(
+                  onPressed: () {},
+                  variant: AppCapsuleIconButtonVariant.secondary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                const AppCapsuleIconButton(onPressed: null),
+              ],
+            ),
+          ),
+          _section(
+            'AppBoxMiniButton',
+            'Button_Box_mini · 42×32',
+            Row(
+              children: [
+                for (var i = 0; i < 3; i++)
+                  Padding(
+                    padding: EdgeInsets.only(right: i < 2 ? AppSpacing.sm : 0),
+                    child: AppBoxMiniButton(
+                      label: '${i + 1}',
+                      selected: _boxMiniIndex == i,
+                      onPressed: () => setState(() => _boxMiniIndex = i),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          _section(
+            'AppTextLinkButton',
+            'Button_text · #8B939E',
+            AppTextLinkButton(label: '텍스트 링크', onPressed: () {}),
           ),
           _section(
             'Controls',
@@ -435,6 +493,143 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
                     ],
                     onDaySelected: (i) => setState(() => _dayIndex = i),
                   ),
+                ),
+              ],
+            ),
+          ),
+          _groupTitle('Badges & Cards'),
+          _section(
+            'AppBadge',
+            'badge_small / badge_large',
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                const AppBadge(
+                  label: 'Gray',
+                  smallVariant: AppBadgeSmallVariant.gray,
+                ),
+                const AppBadge(
+                  label: 'Primary',
+                  smallVariant: AppBadgeSmallVariant.primary,
+                ),
+                const AppBadge(
+                  label: 'High',
+                  smallVariant: AppBadgeSmallVariant.high,
+                  style: AppBadgeStyle.filled,
+                ),
+                const AppBadge(
+                  label: '리프레시 불필요',
+                  size: AppBadgeSize.large,
+                  largeVariant: AppBadgeLargeVariant.refreshNotNeeded,
+                ),
+                const AppBadge(
+                  label: '집중 리프레시 추천',
+                  size: AppBadgeSize.large,
+                  largeVariant: AppBadgeLargeVariant.focusedRecommend,
+                ),
+              ],
+            ),
+          ),
+          _section(
+            'AppRefreshCard',
+            'card_refresh · default / compact / small',
+            Column(
+              children: [
+                AppRefreshCard(
+                  title: '모이스처 리프레시',
+                  description: '건조한 모발에 수분을 공급하는 리프레시 모드입니다.',
+                  captionItems: const ['약 5분', '중간 강도'],
+                  badgeLabel: '추천',
+                  badgeVariant: AppBadgeSmallVariant.primary,
+                  onTrailingPressed: () {},
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                AppRefreshCard(
+                  title: '볼륨 리프레시',
+                  description: '가벼운 볼륨 케어',
+                  captionItems: const ['약 3분'],
+                  badgeLabel: 'NEW',
+                  badgeVariant: AppBadgeSmallVariant.primaryLight,
+                  variant: AppRefreshCardVariant.compact,
+                  onTrailingPressed: () {},
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                AppRefreshCard(
+                  title: '집중 케어',
+                  description: '손상 모발 집중 케어',
+                  variant: AppRefreshCardVariant.small,
+                  onTrailingPressed: () {},
+                ),
+              ],
+            ),
+          ),
+          _section(
+            'AppRecommendCard',
+            'card_recommend · gradient border',
+            AppRecommendCard(
+              message: '오늘은 모이스처 리프레시를 추천해요.',
+              actionLabel: '리프레시 시작',
+              onActionPressed: () {},
+            ),
+          ),
+          _section(
+            'AppResultCard',
+            'card_result · default / withAction',
+            Column(
+              children: [
+                AppResultCard(
+                  title: '진단 결과',
+                  tags: const [
+                    AppResultCardTag(
+                      label: '수분',
+                      badgeLabel: '낮음',
+                      badgeVariant: AppBadgeSmallVariant.low,
+                    ),
+                    AppResultCardTag(
+                      label: '손상',
+                      badgeLabel: '높음',
+                      badgeVariant: AppBadgeSmallVariant.high,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                AppResultCard(
+                  title: '리프레시 완료',
+                  variant: AppResultCardVariant.withAction,
+                  actionLabel: '기록 보러가기',
+                  onActionPressed: () {},
+                  tags: const [AppResultCardTag(label: '모이스처 리프레시')],
+                ),
+              ],
+            ),
+          ),
+          _groupTitle('Layout'),
+          _section(
+            'AppPageIndicator',
+            'indicator · active #4E5561',
+            AppPageIndicator(
+              count: 5,
+              selectedIndex: _pageIndicatorIndex,
+              onDotTap: (i) => setState(() => _pageIndicatorIndex = i),
+            ),
+          ),
+          _section(
+            'AppBottomButtonBar',
+            'button_bottom · 1 or 2 buttons',
+            Column(
+              children: [
+                AppBottomButtonBar(
+                  primaryLabel: '시작하기',
+                  onPrimaryPressed: () {},
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                AppBottomButtonBar(
+                  type: AppBottomButtonBarType.twoButtons,
+                  primaryLabel: '확인',
+                  onPrimaryPressed: () {},
+                  secondaryLabel: '취소',
+                  onSecondaryPressed: () {},
                 ),
               ],
             ),
