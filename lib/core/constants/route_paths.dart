@@ -8,7 +8,12 @@ class AppRoutePaths {
   /// 홈 허브 (하단 탭 없음 — 홈에서 버튼/리스트로 이동)
   static const home = '/';
   static const measure = '/measure';
+  static const measureRun = '/measure/run';
+  static const measureResult = '/measure/result';
+
   static const refresh = '/refresh';
+  static const refreshProgress = '/refresh/progress';
+  static const refreshResult = '/refresh/result';
   static const history = '/history';
   static const settings = '/settings';
 
@@ -20,7 +25,12 @@ class AppRouteNames {
 
   static const home = 'home';
   static const measure = 'measure';
+  static const measureRun = 'measureRun';
+  static const measureResult = 'measureResult';
+
   static const refresh = 'refresh';
+  static const refreshProgress = 'refreshProgress';
+  static const refreshResult = 'refreshResult';
   static const history = 'history';
   static const settings = 'settings';
   static const widgetGallery = 'widgetGallery';

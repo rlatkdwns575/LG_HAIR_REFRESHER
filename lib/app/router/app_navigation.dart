@@ -11,7 +11,15 @@ extension AppNavigation on BuildContext {
 
   void pushMeasure() => push(AppRoutePaths.measure);
 
+  void pushMeasureRun() => push(AppRoutePaths.measureRun);
+
+  void pushMeasureResult() => push(AppRoutePaths.measureResult);
+
   void pushRefresh() => push(AppRoutePaths.refresh);
+
+  void pushRefreshProgress() => push(AppRoutePaths.refreshProgress);
+
+  void pushRefreshResult() => push(AppRoutePaths.refreshResult);
 
   void pushHistory() => push(AppRoutePaths.history);
 
@@ -23,7 +31,15 @@ extension AppNavigation on BuildContext {
 
   void pushMeasureNamed() => pushNamed(AppRouteNames.measure);
 
+  void pushMeasureRunNamed() => pushNamed(AppRouteNames.measureRun);
+
+  void pushMeasureResultNamed() => pushNamed(AppRouteNames.measureResult);
+
   void pushRefreshNamed() => pushNamed(AppRouteNames.refresh);
+
+  void pushRefreshProgressNamed() => pushNamed(AppRouteNames.refreshProgress);
+
+  void pushRefreshResultNamed() => pushNamed(AppRouteNames.refreshResult);
 
   void pushHistoryNamed() => pushNamed(AppRouteNames.history);
 
