@@ -18,13 +18,6 @@ LG Hair Refresher는 헤어 리프레셔 디바이스와 연동해 모발/두피
 | Backend | Supabase |
 | Design | Figma 기반 디자인 시스템 |
 
-사용하지 않는 기술:
-
-- Riverpod
-- freezed / freezed_annotation
-- build_runner 기반 모델 생성
-- json_serializable 기반 모델 생성
-
 ## 폴더 구조
 
 ```text
