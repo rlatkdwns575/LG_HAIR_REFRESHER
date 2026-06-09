@@ -1,9 +1,27 @@
-class RoutePaths {
-  const RoutePaths._();
+/// 앱 전역 route path·name 상수.
+///
+/// path는 [GoRouter] 등록과 [context.go]/[context.push]에 사용하고,
+/// name은 [context.goNamed] / [context.pushNamed]에 사용합니다.
+class AppRoutePaths {
+  const AppRoutePaths._();
 
+  /// 홈 허브 (하단 탭 없음 — 홈에서 버튼/리스트로 이동)
   static const home = '/';
   static const measure = '/measure';
   static const refresh = '/refresh';
   static const history = '/history';
   static const settings = '/settings';
+
+  static const widgetGallery = '/dev/widgets';
+}
+
+class AppRouteNames {
+  const AppRouteNames._();
+
+  static const home = 'home';
+  static const measure = 'measure';
+  static const refresh = 'refresh';
+  static const history = 'history';
+  static const settings = 'settings';
+  static const widgetGallery = 'widgetGallery';
 }

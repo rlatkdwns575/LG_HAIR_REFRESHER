@@ -21,6 +21,7 @@ Accepted
 
 ## Consequences
 
-- Supabase 관련 초기화는 `core/services/supabase_service.dart`에서 시작합니다.
-- 테이블명과 storage key는 `core/constants/`에 둡니다.
-- 특정 feature의 쿼리와 변환 로직은 해당 feature의 `data/` 계층에 둡니다.
+- Supabase 초기화는 `core/services/supabase_service.dart`에서 시작합니다.
+- table name과 storage key는 `core/constants/`에서 관리합니다.
+- feature별 쿼리와 변환 로직은 `features/{feature}/data/api/`에 둡니다.
+- 화면 위젯과 `ui/widgets/`에서는 Supabase Client를 직접 호출하지 않습니다.

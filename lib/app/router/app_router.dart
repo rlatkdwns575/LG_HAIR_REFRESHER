@@ -1,54 +1,85 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/history/presentation/pages/history_page.dart';
-import '../../features/home/presentation/pages/home_page.dart';
-import '../../features/measure/presentation/pages/measure_page.dart';
-import '../../features/refresh/presentation/pages/refresh_page.dart';
-import '../../features/settings/presentation/pages/settings_page.dart';
-import '../navigation/bottom_nav_shell.dart';
+import '../../core/constants/route_paths.dart';
+import '../../features/history/ui/page/history_page.dart';
+import '../../features/home/ui/page/home_page.dart';
+import '../../features/measure/ui/page/measure_page.dart';
+import '../../features/refresh/ui/page/refresh_page.dart';
+import '../../features/settings/ui/page/settings_page.dart';
+import '../../shared/widgets/shared_widget_gallery_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutePaths.home,
+  debugLogDiagnostics: false,
+  errorBuilder: (context, state) => _RouteErrorPage(error: state.error),
   routes: [
-    ShellRoute(
-      builder: (context, state, child) => BottomNavShell(child: child),
-      routes: [
-        GoRoute(
-          path: AppRoutePaths.home,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HomePage()),
-        ),
-        GoRoute(
-          path: AppRoutePaths.measure,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: MeasurePage()),
-        ),
-        GoRoute(
-          path: AppRoutePaths.refresh,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: RefreshPage()),
-        ),
-        GoRoute(
-          path: AppRoutePaths.history,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HistoryPage()),
-        ),
-        GoRoute(
-          path: AppRoutePaths.settings,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SettingsPage()),
-        ),
-      ],
+    GoRoute(
+      name: AppRouteNames.home,
+      path: AppRoutePaths.home,
+      builder: (context, state) => const HomePage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.measure,
+      path: AppRoutePaths.measure,
+      builder: (context, state) => const MeasurePage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.refresh,
+      path: AppRoutePaths.refresh,
+      builder: (context, state) => const RefreshPage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.history,
+      path: AppRoutePaths.history,
+      builder: (context, state) => const HistoryPage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.settings,
+      path: AppRoutePaths.settings,
+      builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.widgetGallery,
+      path: AppRoutePaths.widgetGallery,
+      builder: (context, state) => const SharedWidgetGalleryPage(),
     ),
   ],
 );
 
-class AppRoutePaths {
-  const AppRoutePaths._();
+class _RouteErrorPage extends StatelessWidget {
+  const _RouteErrorPage({this.error});
 
-  static const home = '/';
-  static const measure = '/measure';
-  static const refresh = '/refresh';
-  static const history = '/history';
-  static const settings = '/settings';
+  final Exception? error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('페이지를 찾을 수 없습니다')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('요청한 경로가 존재하지 않습니다.'),
+              if (error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () => context.go(AppRoutePaths.home),
+                child: const Text('홈으로'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -1,0 +1,300 @@
+---
+description: LG Hair Refresher Flutter/Dart 코딩·구조·UI·Supabase 규칙. lib/ 작업 시 항상 적용.
+globs: lib/**/*.dart
+alwaysApply: true
+---
+
+# LG Hair Refresher — Flutter Guidelines
+
+이 규칙은 `AGENTS.md`를 보완하는 **실무 코드 작성 규칙**입니다. 충돌 시 우선순위: **현재 코드베이스 > AGENTS.md > 이 규칙 > docs/**.
+
+## 1. 프로젝트 정체성
+
+| 항목 | 선택 |
+|------|------|
+| 앱 | Flutter 모바일 (Dart SDK ^3.10) |
+| 상태 관리 | `StatefulWidget` + `setState` (Riverpod 금지) |
+| 라우팅 | `go_router` (`lib/app/router/app_router.dart`) |
+| 백엔드 | Supabase (`supabase_flutter`) |
+| 모델 | 수동 Dart 클래스 (`fromJson`/`toJson`/`copyWith` 직접 작성) |
+| 코드 생성 | `freezed`, `json_serializable`, `build_runner` **사용 금지** |
+
+MVP feature만 유지: `home`, `measure`, `refresh`, `history`, `settings`.  
+`auth`, `device`, `recommendation`, `notification`, `consumable`은 **구현 요청 전까지 폴더 생성 금지**.
+
+## 2. 폴더 구조와 파일 배치
+
+```text
+lib/
+ ├─ main.dart                 # SupabaseService.initialize() 후 runApp
+ ├─ app/                      # 앱 설정, 라우터, 테마, 하단 네비
+ ├─ core/                     # constants, services, utils
+ ├─ features/{name}/          # feature-first
+ └─ shared/                   # 2개 이상 feature에서 실제 재사용 시
+```
+
+### Feature 내부 (기본 구조 — 변경 시 문서화 필수)
+
+```text
+features/{feature_name}/
+ ├─ data/
+ │   ├─ model/     # 요청/응답/화면 데이터 모델
+ │   └─ api/       # Supabase, 외부 API, 디바이스 통신
+ └─ ui/
+     ├─ page/      # 화면 단위 ({feature}_page.dart)
+     └─ widgets/   # 해당 feature 전용 UI
+```
+
+**금지**: `domain/`, `presentation/`, `repository/`, `usecase/`, `controller/` 폴더를 기본으로 생성하지 않음.
+
+### 파일 네이밍
+
+| 종류 | 패턴 | 예시 |
+|------|------|------|
+| Page | `{feature}_page.dart` | `measure_page.dart` |
+| Feature widget | `{role}_{type}.dart` | `result_card.dart` |
+| API | `{feature}_api.dart` | `history_api.dart` |
+| Model | 명사 기반 | `measure_result.dart` |
+| Shared widget | `app_{component}.dart` | `app_box_button.dart` |
+
+클래스: `PascalCase` · 변수/함수/enum 값: `lowerCamelCase` · 파일: `lower_snake_case.dart`
+
+## 3. Import 규칙
+
+```dart
+// ✅ 같은 feature 내부 import 우선
+import '../widgets/result_card.dart';
+
+// ✅ 공유 모델/위젯
+import '../../../shared/widgets/app_box_button.dart';
+
+// ✅ 라우트·상수는 중앙에서
+import '../../../app/router/app_router.dart';
+import '../../../core/constants/supabase_tables.dart';
+
+// ❌ 다른 feature의 data/api 직접 import
+import '../../history/data/api/history_api.dart';  // 금지
+
+// ❌ UI에서 Supabase 직접 import
+import 'package:supabase_flutter/supabase_flutter.dart';  // ui/ 에서 금지
+```
+
+feature 간 데이터 공유가 필요하면 `shared/models/`로 이동하거나 공통 API를 `core/services/`에 둠.
+
+## 4. 상태 관리
+
+- **기본**: `StatefulWidget` + `setState`
+- **범위**: 탭 인덱스, 필터, 폼 입력, 로딩/에러는 해당 `page`의 `State`에 유지
+- **끌어올리기**: 형제 위젯 간 공유가 필요할 때만 `page`로 state 이동
+- **전역 서비스**: `core/services/` (예: `SupabaseService`, `NotificationService`)
+- **금지**: Riverpod `Provider`/`ConsumerWidget`, `ChangeNotifierProvider` 기본 도입
+
+```dart
+// ✅ Page 패턴
+class MeasurePage extends StatefulWidget {
+  const MeasurePage({super.key});
+  @override
+  State<MeasurePage> createState() => _MeasurePageState();
+}
+
+class _MeasurePageState extends State<MeasurePage> {
+  bool _isLoading = false;
+
+  Future<void> _startMeasure() async {
+    setState(() => _isLoading = true);
+    try {
+      // data/api 호출은 page에서 api 클래스를 통해
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+  // ...
+}
+```
+
+## 5. 라우팅 (go_router)
+
+- 경로 상수: `AppRoutePaths` (`lib/app/router/app_router.dart`)
+- 하단 탭: `ShellRoute` + `BottomNavShell`
+- 탭 전환: `NoTransitionPage` 사용 (기존 패턴 유지)
+- **금지**: 화면 위젯 안에 `'/measure'` 같은 문자열 하드코딩
+
+```dart
+// ✅
+context.go(AppRoutePaths.measure);
+
+// ❌
+context.go('/measure');
+```
+
+새 route 추가 시: `AppRoutePaths`에 상수 추가 → `appRouter` routes 등록 → `bottom_nav_shell.dart` 탭 연동(필요 시).
+
+## 6. 디자인 시스템과 UI
+
+### Theme 파일 (`lib/app/theme/`)
+
+| 파일 | 역할 |
+|------|------|
+| `app_colors.dart` | Figma Color Style 라이브러리 (Gray, Primary, Safe 등) |
+| `app_component_colors.dart` | Figma **Component** 섹션 hex (공용 위젯 전용) |
+| `app_text_styles.dart` | Pretendard 텍스트 스타일 (SystemName, size, line height, weight) |
+| `app_spacing.dart` | 간격 토큰 |
+| `app_radius.dart` | 반경 토큰 (button, field, chip, dialog 등) |
+| `app_shadows.dart` | 그림자 토큰 |
+| `app_theme.dart` | `ThemeData` 조합, `fontFamily: 'Pretendard'` |
+
+### 색상 사용 원칙
+
+- **일반 화면/레이아웃**: `AppColors`
+- **Figma Component 기반 공용 위젯**: `AppComponentColors` (hex 정확도)
+- **금지**: `Color(0xFF...)` 를 page/widget에 직접 하드코딩
+
+### 위젯 배치
+
+| 재사용 범위 | 위치 |
+|-------------|------|
+| 2개 이상 feature | `lib/shared/widgets/` |
+| 1개 feature 전용 | `features/{name}/ui/widgets/` |
+| 화면 본체 | `features/{name}/ui/page/` |
+
+기존 공용 위젯 (`shared/widgets/`): `AppBoxButton`, `AppCapsuleButton`, `AppCheckbox`, `AppRadio`, `AppToggle`, `AppTextField`, `AppListItem`, `AppSectionTitle`, `AppTopHeader`, `AppSegmentedTabBar`, `AppChipTabBar`, `AppConfirmDialog`  
+→ barrel: `shared_widgets.dart`
+
+```dart
+// ✅ 공용 버튼
+AppBoxButton(
+  label: '측정 시작',
+  onPressed: _onStart,
+  variant: AppBoxButtonVariant.active,
+);
+
+// ❌ Material Button + 하드코딩 색상으로 Figma 컴포넌트 재구현
+ElevatedButton(
+  style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF5D70FF)),
+  // ...
+);
+```
+
+Figma 작업 시: Design System → `app/theme/` 반영 후, Component → `shared/widgets/` 구현.
+
+## 7. Supabase
+
+### 접근 위치 (이외 금지)
+
+```text
+core/services/supabase_service.dart   # 초기화, client getter
+features/{feature}/data/api/          # feature별 쿼리·변환
+```
+
+### API 클래스 패턴
+
+```dart
+// features/history/data/api/history_api.dart
+class HistoryApi {
+  const HistoryApi();
+
+  Future<List<HistoryEntry>> fetchRecent({int limit = 20}) async {
+    final rows = await SupabaseService.client
+        .from(SupabaseTables.refreshSessions)
+        .select()
+        .limit(limit);
+    return rows.map(HistoryEntry.fromJson).toList();
+  }
+}
+```
+
+- 테이블/스토리지 키: `core/constants/` (하드코딩 금지)
+- `.env`: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` — **커밋 금지**
+- service role key: 클라이언트 앱에 넣지 않음
+- RLS 전제로 쿼리 설계
+
+Page는 API 클래스를 호출하고, `ui/widgets/`는 props만 받음.
+
+## 8. 모델
+
+```dart
+class MeasureResult {
+  const MeasureResult({
+    required this.id,
+    required this.score,
+    required this.measuredAt,
+  });
+
+  final String id;
+  final int score;
+  final DateTime measuredAt;
+
+  factory MeasureResult.fromJson(Map<String, dynamic> json) {
+    return MeasureResult(
+      id: json['id'] as String,
+      score: json['score'] as int,
+      measuredAt: DateTime.parse(json['measured_at'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'score': score,
+    'measured_at': measuredAt.toIso8601String(),
+  };
+}
+```
+
+- Supabase 컬럼: `snake_case` · Dart 필드: `lowerCamelCase`
+- `*.g.dart`, `*.freezed.dart` 생성 시 **직접 수정 금지** — 생성 의존성 도입 여부 먼저 검토
+
+## 9. 테스트
+
+- 실행 위치: 루트 `test/` (문서/전략: `tests/`)
+- 배치: `test/features/{feature}/`, `test/core/`, `test/shared/`
+- Supabase/디바이스: fake·mock 사용, 실제 호출 금지
+
+작업 후 필수:
+
+```bash
+dart format .
+flutter analyze
+flutter test
+```
+
+## 10. 패키지·플랫폼
+
+- `pubspec.yaml` 패키지 추가: **사용자 요청 없이 금지**
+- 추가 시 설명: 패키지명, 이유, 대체 불가 이유, 영향 feature, 플랫폼 설정 필요 여부
+- 명시 요청 없이 `android/`, `ios/`, `windows/`, `macos/`, `linux/`, `web/` 수정 금지
+
+## 11. Agent 작업 원칙
+
+### 시작 전
+
+1. Git 상태·관련 feature 기존 패턴 확인
+2. `AGENTS.md`, `docs/decisions/`, `docs/conventions/flutter.md` 참고
+3. 변경 범위를 요청된 feature 안으로 제한
+
+### 작업 중
+
+- 작은 diff, 기존 스타일 유지, 타인 변경 되돌리지 않음
+- 대규모 리팩터링·구조 변경은 요청 없이 하지 않음
+- feature 책임을 넘는 변경은 PR/문서에 이유 기록
+
+### 작업 후
+
+- format · analyze · test 실행
+- 검증 못 한 항목 명시
+- 커밋/PR은 **사용자 요청 시에만**
+
+### 절대 금지
+
+- Widget에서 Supabase 직접 호출
+- route/table name 하드코딩
+- secret·API key 커밋
+- Riverpod / freezed / build_runner 기본 도입
+- 빈 MVP 이후 feature 폴더 선제 생성
+
+## 12. 빠른 참조 — 핵심 사용자 흐름
+
+```text
+측정(measure) → 상태 분석 → 모드 추천 → 리프레시(refresh) → 결과 확인 → 기록(history)
+```
+
+홈(home)에서 최근 결과·추천 요약, 설정(settings)에서 계정·알림·권한 관리.

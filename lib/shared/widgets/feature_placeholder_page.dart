@@ -8,12 +8,14 @@ class FeaturePlaceholderPage extends StatelessWidget {
     required this.title,
     required this.description,
     required this.items,
+    this.footer,
     super.key,
   });
 
   final String title;
   final String description;
   final List<String> items;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class FeaturePlaceholderPage extends StatelessWidget {
               ),
             ),
           ),
+        if (footer != null) ...[const SizedBox(height: AppSpacing.md), footer!],
       ],
     );
   }

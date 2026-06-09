@@ -1,4 +1,4 @@
-# 0001. Feature-first Architecture
+# 0001. Simple Feature-first Architecture
 
 ## Status
 
@@ -6,17 +6,43 @@ Accepted
 
 ## Context
 
-LG Hair Refresher는 홈, 측정, 리프레시, 기록, 설정, 디바이스, 추천, 알림, 소모품처럼 기능 경계가 뚜렷합니다. 4인 이상이 동시에 개발할 예정이므로 기능별 작업 범위를 분리하고 Git 충돌을 줄이는 구조가 필요합니다.
+초기 구조는 `data`, `domain`, `presentation` 안에 `datasources`, `models`, `repositories`, `entities`, `usecases`, `controllers`까지 미리 만드는 방식이었습니다. 현재 프로젝트 규모에서는 이 구조가 실제 구현보다 먼저 복잡도를 만들고, 팀원이 화면을 빠르게 이해하기 어렵게 만든다는 평가가 있었습니다.
+
+또한 상태 관리는 Riverpod 대신 Flutter 기본 `StatefulWidget`을 사용하기로 했고, 모델 생성도 freezed 계열을 사용하지 않기로 했습니다.
 
 ## Decision
 
-`lib/features/{feature_name}/` 중심의 feature-first 구조를 사용합니다. 각 feature 내부는 `data`, `domain`, `presentation` 계층으로 나눕니다.
+feature-first는 유지하되 각 feature 내부 구조를 아래처럼 단순화합니다.
 
-공통 앱 설정은 `lib/app/`, 전역 기반 코드는 `lib/core/`, 여러 feature에서 재사용되는 요소는 `lib/shared/`에 둡니다.
+```text
+features/{feature_name}/
+ ├─ data/
+ │  ├─ model/
+ │  └─ api/
+ └─ ui/
+    ├─ page/
+    └─ widgets/
+```
+
+복잡한 domain/usecase/repository 계층은 기본으로 만들지 않습니다. 특정 feature가 커져서 분리가 필요해진 경우에만 해당 feature 안에서 필요한 만큼 추가합니다.
+
+MVP에서는 아래 feature만 실제 폴더로 유지합니다.
+
+```text
+features/
+ ├─ home/
+ ├─ measure/
+ ├─ refresh/
+ ├─ history/
+ └─ settings/
+```
+
+`auth`, `device`, `recommendation`, `notification`, `consumable`은 MVP 이후 확장 후보로 두고, 실제 구현 시점에 추가합니다.
 
 ## Consequences
 
-- 팀원별 feature 브랜치 작업 범위가 명확해집니다.
-- 특정 feature에만 필요한 코드가 전역 폴더로 퍼지는 것을 줄입니다.
-- 공통화가 필요한 코드는 실제 재사용이 확인된 뒤 `shared/`로 이동합니다.
-- feature 간 직접 참조를 남발하면 구조가 흐려지므로 PR에서 import 방향을 확인해야 합니다.
+- 새 기능의 초기 파일 수가 줄어듭니다.
+- 화면과 데이터 연동 위치가 더 직관적으로 보입니다.
+- 작은 팀과 초기 구현 단계에서 개발 속도가 빨라집니다.
+- 복잡한 비즈니스 로직이 생긴 feature는 별도 문서화 후 구조를 확장해야 합니다.
+- 구현하지 않는 feature의 빈 폴더가 줄어 MVP 범위가 더 명확해집니다.
