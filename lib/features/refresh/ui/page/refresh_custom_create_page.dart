@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_toggle.dart';
+import '../../data/care_duration_split.dart';
 import '../../data/custom_mode_store.dart';
 import '../../data/model/refresh_mode.dart';
 
@@ -33,6 +34,12 @@ enum _CareLevel {
   const _CareLevel(this.label);
 
   final String label;
+
+  CareIntensity get intensity => switch (this) {
+    _CareLevel.intensive => CareIntensity.intensive,
+    _CareLevel.normal => CareIntensity.normal,
+    _CareLevel.simple => CareIntensity.simple,
+  };
 }
 
 class RefreshCustomCreatePage extends StatefulWidget {
@@ -191,17 +198,33 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     _CareType.scent,
   ];
 
-  /// 전체 소요시간([_durationMinutes])을 선택된 케어 수만큼 균등 분배합니다.
-  ///
-  /// 나누어떨어지지 않으면 앞쪽 케어부터 1분씩 더 배분해 합계가 전체 시간과 같도록 합니다.
-  /// 예: 3분 / 3개 → [1, 1, 1], 5분 / 3개 → [2, 2, 1].
-  int _splitDuration(int index, int count) {
-    if (count <= 0) {
-      return _durationMinutes;
+  List<int> _previewDurationsSeconds(List<_CareType> selected) {
+    final weights = selected
+        .map(
+          (type) => _levels[type] == null
+              ? 0
+              : CareDurationSplit.getCareRatio(_levels[type]!.intensity),
+        )
+        .toList();
+
+    final positiveIndices = <int>[
+      for (var i = 0; i < weights.length; i++)
+        if (weights[i] > 0) i,
+    ];
+    if (positiveIndices.isEmpty) {
+      return List.filled(selected.length, 0);
     }
-    final base = _durationMinutes ~/ count;
-    final remainder = _durationMinutes % count;
-    return base + (index < remainder ? 1 : 0);
+
+    final split = CareDurationSplit.splitSeconds(
+      totalMinutes: _durationMinutes,
+      weights: [for (final i in positiveIndices) weights[i]],
+    );
+
+    final results = List<int>.filled(selected.length, 0);
+    for (var i = 0; i < positiveIndices.length; i++) {
+      results[positiveIndices[i]] = split[i];
+    }
+    return results;
   }
 
   Widget _buildPreview() {
@@ -211,6 +234,8 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     if (selected.isEmpty) {
       return const Divider(height: 1, color: AppColors.gray100);
     }
+
+    final durationsSeconds = _previewDurationsSeconds(selected);
 
     return Stack(
       children: [
@@ -228,7 +253,9 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
               Expanded(
                 child: _PreviewItem(
                   careLabel: selected[i].label,
-                  durationMinutes: _splitDuration(i, selected.length),
+                  durationLabel: CareDurationSplit.formatKoreanTime(
+                    durationsSeconds[i],
+                  ),
                   level: _levels[selected[i]],
                 ),
               ),
@@ -338,12 +365,12 @@ class _SectionTitle extends StatelessWidget {
 class _PreviewItem extends StatelessWidget {
   const _PreviewItem({
     required this.careLabel,
-    required this.durationMinutes,
+    required this.durationLabel,
     required this.level,
   });
 
   final String careLabel;
-  final int durationMinutes;
+  final String durationLabel;
   final _CareLevel? level;
 
   @override
@@ -369,7 +396,7 @@ class _PreviewItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$durationMinutes분',
+              durationLabel,
               style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
             ),
             if (level != null) ...[

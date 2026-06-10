@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../data/model/measure_prepare_step.dart';
@@ -76,9 +77,8 @@ class _MeasurePreparePageState extends State<MeasurePreparePage> {
   bool get _isStartEnabled => _currentStep == MeasurePrepareStep.ready;
 
   void _onStartPressed() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('진단을 시작합니다. (Mock)')));
+    _mockTimer?.cancel();
+    context.pushMeasureRun();
   }
 
   @override

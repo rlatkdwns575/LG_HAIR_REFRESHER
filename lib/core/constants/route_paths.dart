@@ -9,6 +9,7 @@ class AppRoutePaths {
   static const home = '/';
   static const measure = '/measure';
   static const measureRun = '/measure/run';
+  static const measureAnalyzing = '/measure/analyzing';
   static const measureResult = '/measure/result';
 
   static const refresh = '/refresh';
@@ -27,6 +28,7 @@ class AppRouteNames {
   static const home = 'home';
   static const measure = 'measure';
   static const measureRun = 'measureRun';
+  static const measureAnalyzing = 'measureAnalyzing';
   static const measureResult = 'measureResult';
 
   static const refresh = 'refresh';

@@ -5,6 +5,7 @@ import '../../core/constants/route_paths.dart';
 import '../../features/history/ui/page/history_page.dart';
 import '../../features/home/ui/page/home_page.dart';
 import '../../features/measure/ui/page/measure_page.dart';
+import '../../features/measure/ui/page/measure_analyzing_page.dart';
 import '../../features/measure/ui/page/measure_result_page.dart';
 import '../../features/measure/ui/page/measure_run_page.dart';
 import '../../features/refresh/ui/page/refresh_custom_create_page.dart';
@@ -33,6 +34,11 @@ final appRouter = GoRouter(
           name: AppRouteNames.measureRun,
           path: 'run',
           builder: (context, state) => const MeasureRunPage(),
+        ),
+        GoRoute(
+          name: AppRouteNames.measureAnalyzing,
+          path: 'analyzing',
+          builder: (context, state) => const MeasureAnalyzingPage(),
         ),
         GoRoute(
           name: AppRouteNames.measureResult,

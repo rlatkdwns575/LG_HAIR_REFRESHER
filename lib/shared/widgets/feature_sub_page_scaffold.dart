@@ -10,12 +10,14 @@ class FeatureSubPageScaffold extends StatelessWidget {
     required this.title,
     required this.description,
     required this.items,
+    this.onBack,
     super.key,
   });
 
   final String title;
   final String description;
   final List<String> items;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,12 @@ class FeatureSubPageScaffold extends StatelessWidget {
       backgroundColor: AppColors.gray50,
       appBar: AppTopHeader(
         title: title,
-        leading: BackButton(color: AppColors.gray800),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.gray800),
+                onPressed: onBack,
+              )
+            : BackButton(color: AppColors.gray800),
       ),
       body: FeaturePlaceholderPage(
         title: title,
