@@ -60,6 +60,7 @@ flutter:
 
   assets:
     - .env
+    - lib/features/measure/data/image.png
 
   fonts:
     - family: Pretendard

@@ -13,6 +13,8 @@ extension AppNavigation on BuildContext {
 
   void pushMeasureRun() => push(AppRoutePaths.measureRun);
 
+  void pushMeasureAnalyzing() => push(AppRoutePaths.measureAnalyzing);
+
   void pushMeasureResult() => push(AppRoutePaths.measureResult);
 
   void pushRefresh() => push(AppRoutePaths.refresh);
@@ -36,6 +38,8 @@ extension AppNavigation on BuildContext {
   void pushMeasureNamed() => pushNamed(AppRouteNames.measure);
 
   void pushMeasureRunNamed() => pushNamed(AppRouteNames.measureRun);
+
+  void pushMeasureAnalyzingNamed() => pushNamed(AppRouteNames.measureAnalyzing);
 
   void pushMeasureResultNamed() => pushNamed(AppRouteNames.measureResult);
 
