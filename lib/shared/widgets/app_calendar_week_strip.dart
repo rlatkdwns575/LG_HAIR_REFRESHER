@@ -24,23 +24,28 @@ class AppCalendarWeekStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 24,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (var i = 0; i < weeks.length; i++)
-            GestureDetector(
-              onTap: onWeekSelected == null ? null : () => onWeekSelected!(i),
-              child: Text(
-                weeks[i].label,
-                style: AppTextStyles.titleS.copyWith(
-                  color: weeks[i].isSelected
-                      ? AppComponentColors.calendarAccent
-                      : AppComponentColors.calendarPrimaryText,
+      height: 22,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        child: Row(
+          children: [
+            for (var i = 0; i < weeks.length; i++) ...[
+              if (i > 0) const SizedBox(width: 16),
+              GestureDetector(
+                onTap: onWeekSelected == null ? null : () => onWeekSelected!(i),
+                child: Text(
+                  weeks[i].label,
+                  style: AppTextStyles.titleS.copyWith(
+                    color: weeks[i].isSelected
+                        ? AppComponentColors.calendarAccent
+                        : AppComponentColors.calendarPrimaryText,
+                  ),
                 ),
               ),
-            ),
-        ],
+            ],
+          ],
+        ),
       ),
     );
   }

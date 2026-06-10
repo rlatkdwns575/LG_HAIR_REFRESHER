@@ -272,11 +272,7 @@ class _ArrowButton extends StatelessWidget {
         child: const SizedBox(
           width: 36,
           height: 36,
-          child: Icon(
-            Icons.arrow_forward,
-            size: 20,
-            color: AppColors.gray0,
-          ),
+          child: Icon(Icons.arrow_forward, size: 20, color: AppColors.gray0),
         ),
       ),
     );

@@ -5,34 +5,32 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_bottom_button_bar.dart';
 import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
-import '../../data/model/refresh_mode.dart';
-import '../../data/refresh_mode_catalog.dart';
-import '../widgets/refresh_mode_card.dart';
-import '../widgets/refresh_section_header.dart';
+import '../../../refresh/data/model/refresh_mode.dart';
+import '../../../refresh/data/refresh_mode_catalog.dart';
+import '../../../refresh/ui/widgets/refresh_section_header.dart';
+import '../widgets/refresh_shortcut_select_card.dart';
 
-class RefreshPage extends StatefulWidget {
-  const RefreshPage({super.key});
+/// Figma `리프레시 바로가기 추가` — 홈 즐겨찾기 모드 선택 화면.
+class HomeRefreshShortcutAddPage extends StatefulWidget {
+  const HomeRefreshShortcutAddPage({super.key});
 
   @override
-  State<RefreshPage> createState() => _RefreshPageState();
+  State<HomeRefreshShortcutAddPage> createState() =>
+      _HomeRefreshShortcutAddPageState();
 }
 
-class _RefreshPageState extends State<RefreshPage> {
-  static const List<RefreshMode> _modes = RefreshMode.samples;
-
+class _HomeRefreshShortcutAddPageState
+    extends State<HomeRefreshShortcutAddPage> {
   late final List<String> _chipTabs = [
     '전체',
     for (final category in RefreshModeCategory.values) category.label,
   ];
 
   int _selectedChipIndex = 0;
-
-  RefreshMode get _recommended => _modes.first;
-
-  /// 기본 샘플 모드 + [CustomModeStore] 커스텀 모드.
-  List<RefreshMode> get _allModes => getAllRefreshModes();
+  String? _selectedModeId;
 
   RefreshModeCategory? get _selectedCategory => _selectedChipIndex == 0
       ? null
@@ -40,10 +38,20 @@ class _RefreshPageState extends State<RefreshPage> {
 
   List<RefreshMode> get _filteredModes {
     final category = _selectedCategory;
+    final modes = getAllRefreshModes();
     if (category == null) {
-      return _allModes;
+      return modes;
     }
-    return _allModes.where((mode) => mode.category == category).toList();
+    return modes.where((mode) => mode.category == category).toList();
+  }
+
+  RefreshShortcutSelectState _stateFor(RefreshMode mode) {
+    if (_selectedModeId == null) {
+      return RefreshShortcutSelectState.normal;
+    }
+    return mode.id == _selectedModeId
+        ? RefreshShortcutSelectState.selected
+        : RefreshShortcutSelectState.dimmed;
   }
 
   Future<void> _openCustomCreate() async {
@@ -54,81 +62,76 @@ class _RefreshPageState extends State<RefreshPage> {
     setState(() {});
   }
 
-  void _onModeTap(RefreshMode mode) {
-    context.pushRefreshProgress(mode: mode);
+  void _confirmSelection() {
+    RefreshMode? selected;
+    for (final mode in getAllRefreshModes()) {
+      if (mode.id == _selectedModeId) {
+        selected = mode;
+        break;
+      }
+    }
+
+    if (selected == null) {
+      return;
+    }
+
+    context.pop(selected);
   }
 
   @override
   Widget build(BuildContext context) {
+    final modes = _filteredModes;
+
     return Scaffold(
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시',
+        title: '리프레시 추가',
         onBack: () => context.pop(),
       ),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+      body: Column(
         children: [
-          _buildRecommendedSection(),
-          const SizedBox(height: AppSpacing.lg),
-          _buildModeListSection(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              children: [
+                RefreshSectionHeader(
+                  title: '리프레시 모드',
+                  subtitle: '홈 바로가기에 추가할 모드를 선택하세요',
+                  trailingLabel: '커스텀하기',
+                  onTrailingTap: _openCustomCreate,
+                ),
+                _buildChipTabBar(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 0),
+                  child: modes.isEmpty
+                      ? _buildEmptyState()
+                      : Column(
+                          children: [
+                            for (var i = 0; i < modes.length; i++) ...[
+                              if (i > 0) const SizedBox(height: AppSpacing.md),
+                              RefreshShortcutSelectCard(
+                                mode: modes[i],
+                                state: _stateFor(modes[i]),
+                                onTap: () => setState(
+                                  () => _selectedModeId = modes[i].id,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                ),
+              ],
+            ),
+          ),
+          AppBottomButtonBar(
+            primaryLabel: '추가하기',
+            onPrimaryPressed: _selectedModeId == null
+                ? null
+                : _confirmSelection,
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRecommendedSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const RefreshSectionHeader(
-          title: '맞춤 리프레시',
-          subtitle: '측정 결과를 바탕으로 추천한 모드예요',
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: RefreshModeCard(
-            mode: _recommended,
-            variant: RefreshModeCardVariant.featured,
-            badgeLabel: 'AI 추천',
-            onTap: () => _onModeTap(_recommended),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildModeListSection() {
-    final modes = _filteredModes;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        RefreshSectionHeader(
-          title: '리프레시 모드',
-          trailingLabel: '커스텀하기',
-          onTrailingTap: _openCustomCreate,
-        ),
-        _buildChipTabBar(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 0),
-          child: modes.isEmpty
-              ? _buildEmptyState()
-              : Column(
-                  children: [
-                    for (var i = 0; i < modes.length; i++) ...[
-                      if (i > 0) const SizedBox(height: AppSpacing.md),
-                      RefreshModeCard(
-                        mode: modes[i],
-                        onTap: () => _onModeTap(modes[i]),
-                      ),
-                    ],
-                  ],
-                ),
-        ),
-      ],
     );
   }
 

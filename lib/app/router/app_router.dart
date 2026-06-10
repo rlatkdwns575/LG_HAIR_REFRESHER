@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/route_paths.dart';
 import '../../features/history/ui/page/history_page.dart';
 import '../../features/home/ui/page/home_page.dart';
+import '../../features/home/ui/page/home_refresh_shortcut_add_page.dart';
 import '../../features/measure/ui/page/measure_page.dart';
 import '../../features/measure/ui/page/measure_analyzing_page.dart';
 import '../../features/measure/ui/page/measure_result_page.dart';
@@ -55,7 +56,9 @@ final appRouter = GoRouter(
         GoRoute(
           name: AppRouteNames.refreshProgress,
           path: 'progress',
-          builder: (context, state) => const RefreshProgressPage(),
+          builder: (context, state) => RefreshProgressPage(
+            mode: resolveRefreshProgressMode(state.extra),
+          ),
         ),
         GoRoute(
           name: AppRouteNames.refreshResult,
@@ -68,6 +71,11 @@ final appRouter = GoRouter(
       name: AppRouteNames.refreshCustomCreate,
       path: AppRoutePaths.refreshCustomCreate,
       builder: (context, state) => const RefreshCustomCreatePage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.refreshShortcutAdd,
+      path: AppRoutePaths.refreshShortcutAdd,
+      builder: (context, state) => const HomeRefreshShortcutAddPage(),
     ),
     GoRoute(
       name: AppRouteNames.history,

@@ -7,6 +7,7 @@ class AppColors {
   // Gray
   static const gray0 = Color(0xFFFFFFFF);
   static const gray50 = Color(0xFFF5F7FA);
+  static const homeBackground = Color(0xFFF2F2F5);
   static const gray100 = Color(0xFFEFF1F4);
   static const gray200 = Color(0xFFE6E9ED);
   static const gray300 = Color(0xFFDADEE3);
