@@ -33,6 +33,9 @@ import 'app_text_link_button.dart';
 import 'app_toggle.dart';
 import 'app_top_header.dart';
 
+/// Medium Phone (360×800) 기준 위젯 미리보기 폭.
+const double _phonePreviewWidth = 360;
+
 class SharedWidgetGalleryPage extends StatefulWidget {
   const SharedWidgetGalleryPage({super.key});
 
@@ -106,43 +109,46 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          _groupTitle('Buttons & Inputs'),
-          _section(
-            'AppBoxButton',
-            'Active #5D70FF · Line border #EFF1F4 · Text #323EA6',
-            Column(
-              children: [
-                AppBoxButton(label: '버튼명', onPressed: () {}),
-                const SizedBox(height: AppSpacing.sm),
-                AppBoxButton(
-                  label: '버튼명',
-                  onPressed: () {},
-                  variant: AppBoxButtonVariant.line,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppBoxButton(
-                  label: '버튼명',
-                  onPressed: () {},
-                  variant: AppBoxButtonVariant.text,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                const AppBoxButton(
-                  label: '버튼명',
-                  onPressed: null,
-                  variant: AppBoxButtonVariant.disabled,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _phonePreviewWidth),
+          child: ListView(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            children: [
+              _phoneFrameLabel('Medium Phone · 360dp'),
+              _groupTitle('Buttons & Inputs'),
+              _section(
+                'AppBoxButton',
+                'Active #5D70FF · Line border #EFF1F4 · Text #323EA6',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    AppBoxButton(label: '버튼명', onPressed: () {}),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppBoxButton(
+                      label: '버튼명',
+                      onPressed: () {},
+                      variant: AppBoxButtonVariant.line,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppBoxButton(
+                      label: '버튼명',
+                      onPressed: () {},
+                      variant: AppBoxButtonVariant.text,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    const AppBoxButton(
+                      label: '버튼명',
+                      onPressed: null,
+                      variant: AppBoxButtonVariant.disabled,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
                     AppBoxButton(
                       label: 'Medium',
                       onPressed: () {},
                       size: AppBoxButtonSize.medium,
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    const SizedBox(height: AppSpacing.sm),
                     AppBoxButton(
                       label: 'Small',
                       onPressed: () {},
@@ -150,556 +156,603 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          _section(
-            'AppCapsuleButton',
-            'Gradient #5D70FF → #8694FF',
-            Row(
-              children: [
-                AppCapsuleButton(
-                  label: 'Text',
-                  icon: Icons.add,
-                  onPressed: () {},
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                const AppCapsuleButton(label: 'Disabled', onPressed: null),
-              ],
-            ),
-          ),
-          _section(
-            'AppCapsuleIconButton',
-            'Button_Capsule_IconOnly · 24×24',
-            Row(
-              children: [
-                AppCapsuleIconButton(onPressed: () {}),
-                const SizedBox(width: AppSpacing.sm),
-                AppCapsuleIconButton(
-                  onPressed: () {},
-                  variant: AppCapsuleIconButtonVariant.secondary,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                const AppCapsuleIconButton(onPressed: null),
-              ],
-            ),
-          ),
-          _section(
-            'AppBoxMiniButton',
-            'Button_Box_mini · 42×32',
-            Row(
-              children: [
-                for (var i = 0; i < 3; i++)
-                  Padding(
-                    padding: EdgeInsets.only(right: i < 2 ? AppSpacing.sm : 0),
-                    child: AppBoxMiniButton(
-                      label: '${i + 1}',
-                      selected: _boxMiniIndex == i,
-                      onPressed: () => setState(() => _boxMiniIndex = i),
+              ),
+              _section(
+                'AppCapsuleButton',
+                'Gradient #5D70FF → #8694FF',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AppCapsuleButton(
+                      label: 'Text',
+                      icon: Icons.add,
+                      onPressed: () {},
                     ),
-                  ),
-              ],
-            ),
-          ),
-          _section(
-            'AppTextLinkButton',
-            'Button_text · #8B939E',
-            AppTextLinkButton(label: '텍스트 링크', onPressed: () {}),
-          ),
-          _section(
-            'Controls',
-            'Radio #B3BAC4/#323EA6 · Checkbox #8B939E · Toggle #5D70FF',
-            Row(
-              children: [
-                AppCheckbox(
-                  value: _checkbox,
-                  onChanged: (v) => setState(() => _checkbox = v),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                AppRadio<String>(
-                  value: 'a',
-                  groupValue: _radioGroup,
-                  onChanged: (v) => setState(() => _radioGroup = v!),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                AppRadio<String>(
-                  value: 'b',
-                  groupValue: _radioGroup,
-                  onChanged: (v) => setState(() => _radioGroup = v!),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                AppToggle(
-                  value: _toggle,
-                  onChanged: (v) => setState(() => _toggle = v),
-                  size: AppToggleSize.large,
-                ),
-              ],
-            ),
-          ),
-          _section(
-            'AppTextField',
-            'Background #F7F7F7 · Placeholder #8B939E',
-            Column(
-              children: [
-                AppTextField(
-                  controller: _emptyFieldController,
-                  hintText: 'text',
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppTextField(
-                  controller: _fieldController,
-                  state: AppTextFieldState.completed,
-                  onClear: () => setState(() => _fieldController.clear()),
-                ),
-              ],
-            ),
-          ),
-          _section(
-            'AppSearchTextField',
-            'Text Field_Search · Background #F5F7FA',
-            AppSearchTextField(controller: _searchFieldController),
-          ),
-          _groupTitle('Lists'),
-          _section(
-            'AppListItem',
-            'List_Common_* · Title #000000 · Caption #8B939E',
-            Column(
-              children: [
-                AppListItem(title: 'Text', caption: 'Caption', onTap: () {}),
-                AppListItem(
-                  title: 'Text',
-                  rightLabel: 'Label',
-                  variant: AppListItemVariant.chevronWithRightLabel,
-                  onTap: () {},
-                ),
-                AppListItem(
-                  title: 'Text',
-                  caption: 'Caption',
-                  variant: AppListItemVariant.noChevron,
-                  showInfoIcon: true,
-                  onTap: () {},
-                ),
-                AppListItem(
-                  title: 'Text',
-                  variant: AppListItemVariant.checkbox,
-                  rightLabel: '(Sub Text)',
-                  checked: _checkbox,
-                  onChanged: (v) => setState(() => _checkbox = v),
-                ),
-                AppListItem(
-                  title: 'Text',
-                  variant: AppListItemVariant.toggle,
-                  toggleValue: _toggle,
-                  onChanged: (v) => setState(() => _toggle = v),
-                ),
-              ],
-            ),
-          ),
-          _groupTitle('Headers · Common'),
-          _section(
-            'AppSectionTitle',
-            'Title #313842 · Subtitle #8B939E',
-            const AppSectionTitle(
-              title: '컨텐츠 타이틀 최대 2줄',
-              subtitle: '서브 타이틀 최대 1줄',
-            ),
-          ),
-          _section(
-            'AppTopHeader',
-            'Legacy simple header',
-            const ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              child: AppTopHeader(title: 'LG ThinQ'),
-            ),
-          ),
-          _section(
-            'AppCommonTopHeader',
-            'Top_Header_Common · Game / Home / GNB / Search',
-            Column(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
-                  child: AppCommonTopHeader(
-                    variant: AppCommonTopHeaderVariant.game,
-                    featureName: '기능명',
-                    pageName: '페이지명',
-                    onAlarm: () {},
-                    onShare: () {},
-                    onClose: () {},
-                  ),
-                ),
-                AppCommonTopHeader(
-                  variant: AppCommonTopHeaderVariant.home,
-                  title: 'LG ThinQ',
-                  onSearch: () {},
-                  onMenu: () {},
-                ),
-                AppCommonTopHeader(
-                  variant: AppCommonTopHeaderVariant.gnb,
-                  title: '타이틀',
-                  onBack: () {},
-                  onSettings: () {},
-                  onClose: () {},
-                ),
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(8),
-                  ),
-                  child: AppCommonTopHeader(
-                    variant: AppCommonTopHeaderVariant.search,
-                    searchController: _searchHeaderController,
-                    onBack: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _groupTitle('Headers · Calendar'),
-          _section(
-            'AppCalendarItem',
-            'Item/Calendar · #222222 · accent #E11956',
-            AppCalendarItem(
-              value: '2024.12',
-              onPrevious: () {},
-              onNext: () {},
-              onToday: () {},
-              onCalendar: () {},
-            ),
-          ),
-          _section(
-            'AppCalendarWeekStrip',
-            'Top_Header_Calendar Weekly · Down',
-            AppCalendarWeekStrip(
-              weeks:
-                  const [
-                        AppCalendarWeekCell(label: '4월 1주차'),
-                        AppCalendarWeekCell(label: '4월 2주차'),
-                        AppCalendarWeekCell(label: '4월 3주차'),
-                        AppCalendarWeekCell(label: '4월 4주차'),
-                        AppCalendarWeekCell(label: '4월 5주차'),
-                      ]
-                      .asMap()
-                      .entries
-                      .map(
-                        (e) => AppCalendarWeekCell(
-                          label: e.value.label,
-                          isSelected: e.key == _weekIndex,
-                        ),
-                      )
-                      .toList(),
-              onWeekSelected: (i) => setState(() => _weekIndex = i),
-            ),
-          ),
-          _section(
-            'AppCalendarDayStrip',
-            'Top_Header_Calendar Daily · Down',
-            AppCalendarDayStrip(
-              days:
-                  const [
-                        AppCalendarDayCell(weekdayLabel: '금', dayLabel: '23'),
-                        AppCalendarDayCell(weekdayLabel: '토', dayLabel: '24'),
-                        AppCalendarDayCell(weekdayLabel: '오늘', dayLabel: '25'),
-                        AppCalendarDayCell(weekdayLabel: '월', dayLabel: '26'),
-                        AppCalendarDayCell(weekdayLabel: '화', dayLabel: '27'),
-                        AppCalendarDayCell(weekdayLabel: '수', dayLabel: '28'),
-                        AppCalendarDayCell(weekdayLabel: '목', dayLabel: '29'),
-                        AppCalendarDayCell(weekdayLabel: '금', dayLabel: '30'),
-                      ]
-                      .asMap()
-                      .entries
-                      .map(
-                        (e) => AppCalendarDayCell(
-                          weekdayLabel: e.value.weekdayLabel,
-                          dayLabel: e.value.dayLabel,
-                          isSelected: e.key == _dayIndex,
-                        ),
-                      )
-                      .toList(),
-              onDaySelected: (i) => setState(() => _dayIndex = i),
-            ),
-          ),
-          _section(
-            'AppCalendarTopHeader',
-            'Top_Header_Calendar · None / Weekly / Daily',
-            Column(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
-                  child: AppCalendarTopHeader(
-                    variant: AppCalendarTopHeaderVariant.none,
-                    monthValue: '2024.12',
-                  ),
-                ),
-                AppCalendarTopHeader(
-                  variant: AppCalendarTopHeaderVariant.weekly,
-                  monthValue: '2024.12',
-                  weeks: [
-                    const AppCalendarWeekCell(label: '4월 1주차'),
-                    const AppCalendarWeekCell(label: '4월 2주차'),
-                    AppCalendarWeekCell(
-                      label: '4월 3주차',
-                      isSelected: _weekIndex == 2,
-                    ),
-                    const AppCalendarWeekCell(label: '4월 4주차'),
-                    const AppCalendarWeekCell(label: '4월 5주차'),
+                    const SizedBox(height: AppSpacing.sm),
+                    const AppCapsuleButton(label: 'Disabled', onPressed: null),
                   ],
+                ),
+              ),
+              _section(
+                'AppCapsuleIconButton',
+                'Button_Capsule_IconOnly · 24×24',
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    AppCapsuleIconButton(onPressed: () {}),
+                    AppCapsuleIconButton(
+                      onPressed: () {},
+                      variant: AppCapsuleIconButtonVariant.secondary,
+                    ),
+                    const AppCapsuleIconButton(onPressed: null),
+                  ],
+                ),
+              ),
+              _section(
+                'AppBoxMiniButton',
+                'Button_Box_mini · 42×32',
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    for (var i = 0; i < 3; i++)
+                      AppBoxMiniButton(
+                        label: '${i + 1}',
+                        selected: _boxMiniIndex == i,
+                        onPressed: () => setState(() => _boxMiniIndex = i),
+                      ),
+                  ],
+                ),
+              ),
+              _section(
+                'AppTextLinkButton',
+                'Button_text · #8B939E',
+                AppTextLinkButton(label: '텍스트 링크', onPressed: () {}),
+              ),
+              _section(
+                'Controls',
+                'Radio #B3BAC4/#323EA6 · Checkbox #8B939E · Toggle #5D70FF',
+                Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.sm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    AppCheckbox(
+                      value: _checkbox,
+                      onChanged: (v) => setState(() => _checkbox = v),
+                    ),
+                    AppRadio<String>(
+                      value: 'a',
+                      groupValue: _radioGroup,
+                      onChanged: (v) => setState(() => _radioGroup = v!),
+                    ),
+                    AppRadio<String>(
+                      value: 'b',
+                      groupValue: _radioGroup,
+                      onChanged: (v) => setState(() => _radioGroup = v!),
+                    ),
+                    AppToggle(
+                      value: _toggle,
+                      onChanged: (v) => setState(() => _toggle = v),
+                      size: AppToggleSize.large,
+                    ),
+                  ],
+                ),
+              ),
+              _section(
+                'AppTextField',
+                'Background #F7F7F7 · Placeholder #8B939E',
+                Column(
+                  children: [
+                    AppTextField(
+                      controller: _emptyFieldController,
+                      hintText: 'text',
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppTextField(
+                      controller: _fieldController,
+                      state: AppTextFieldState.completed,
+                      onClear: () => setState(() => _fieldController.clear()),
+                    ),
+                  ],
+                ),
+              ),
+              _section(
+                'AppSearchTextField',
+                'Text Field_Search · Background #F5F7FA',
+                AppSearchTextField(controller: _searchFieldController),
+              ),
+              _groupTitle('Lists'),
+              _section(
+                'AppListItem',
+                'List_Common_* · Title #000000 · Caption #8B939E',
+                Column(
+                  children: [
+                    AppListItem(
+                      title: 'Text',
+                      caption: 'Caption',
+                      onTap: () {},
+                    ),
+                    AppListItem(
+                      title: 'Text',
+                      rightLabel: 'Label',
+                      variant: AppListItemVariant.chevronWithRightLabel,
+                      onTap: () {},
+                    ),
+                    AppListItem(
+                      title: 'Text',
+                      caption: 'Caption',
+                      variant: AppListItemVariant.noChevron,
+                      showInfoIcon: true,
+                      onTap: () {},
+                    ),
+                    AppListItem(
+                      title: 'Text',
+                      variant: AppListItemVariant.checkbox,
+                      rightLabel: '(Sub Text)',
+                      checked: _checkbox,
+                      onChanged: (v) => setState(() => _checkbox = v),
+                    ),
+                    AppListItem(
+                      title: 'Text',
+                      variant: AppListItemVariant.toggle,
+                      toggleValue: _toggle,
+                      onChanged: (v) => setState(() => _toggle = v),
+                    ),
+                  ],
+                ),
+              ),
+              _groupTitle('Headers · Common'),
+              _section(
+                'AppSectionTitle',
+                'Title #313842 · Subtitle #8B939E',
+                const AppSectionTitle(
+                  title: '컨텐츠 타이틀 최대 2줄',
+                  subtitle: '서브 타이틀 최대 1줄',
+                ),
+              ),
+              _section(
+                'AppTopHeader',
+                'Legacy simple header',
+                const ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  child: AppTopHeader(title: 'LG ThinQ'),
+                ),
+              ),
+              _section(
+                'AppCommonTopHeader',
+                'Top_Header_Common · Game / Home / GNB / Search',
+                Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                      child: AppCommonTopHeader(
+                        variant: AppCommonTopHeaderVariant.game,
+                        featureName: '기능명',
+                        pageName: '페이지명',
+                        onAlarm: () {},
+                        onShare: () {},
+                        onClose: () {},
+                      ),
+                    ),
+                    AppCommonTopHeader(
+                      variant: AppCommonTopHeaderVariant.home,
+                      title: 'LG ThinQ',
+                      onSearch: () {},
+                      onMenu: () {},
+                    ),
+                    AppCommonTopHeader(
+                      variant: AppCommonTopHeaderVariant.gnb,
+                      title: '타이틀',
+                      onBack: () {},
+                      onSettings: () {},
+                      onClose: () {},
+                    ),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(8),
+                      ),
+                      child: AppCommonTopHeader(
+                        variant: AppCommonTopHeaderVariant.search,
+                        searchController: _searchHeaderController,
+                        onBack: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _groupTitle('Headers · Calendar'),
+              _section(
+                'AppCalendarItem',
+                'Item/Calendar · #222222 · accent #E11956',
+                AppCalendarItem(
+                  value: '2024.12',
+                  onPrevious: () {},
+                  onNext: () {},
+                  onToday: () {},
+                  onCalendar: () {},
+                ),
+              ),
+              _section(
+                'AppCalendarWeekStrip',
+                'Top_Header_Calendar Weekly · Down',
+                AppCalendarWeekStrip(
+                  weeks:
+                      const [
+                            AppCalendarWeekCell(label: '4월 1주차'),
+                            AppCalendarWeekCell(label: '4월 2주차'),
+                            AppCalendarWeekCell(label: '4월 3주차'),
+                            AppCalendarWeekCell(label: '4월 4주차'),
+                            AppCalendarWeekCell(label: '4월 5주차'),
+                          ]
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => AppCalendarWeekCell(
+                              label: e.value.label,
+                              isSelected: e.key == _weekIndex,
+                            ),
+                          )
+                          .toList(),
                   onWeekSelected: (i) => setState(() => _weekIndex = i),
                 ),
+              ),
+              _section(
+                'AppCalendarDayStrip',
+                'Top_Header_Calendar Daily · Down',
+                AppCalendarDayStrip(
+                  days:
+                      const [
+                            AppCalendarDayCell(
+                              weekdayLabel: '금',
+                              dayLabel: '23',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '토',
+                              dayLabel: '24',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '오늘',
+                              dayLabel: '25',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '월',
+                              dayLabel: '26',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '화',
+                              dayLabel: '27',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '수',
+                              dayLabel: '28',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '목',
+                              dayLabel: '29',
+                            ),
+                            AppCalendarDayCell(
+                              weekdayLabel: '금',
+                              dayLabel: '30',
+                            ),
+                          ]
+                          .asMap()
+                          .entries
+                          .map(
+                            (e) => AppCalendarDayCell(
+                              weekdayLabel: e.value.weekdayLabel,
+                              dayLabel: e.value.dayLabel,
+                              isSelected: e.key == _dayIndex,
+                            ),
+                          )
+                          .toList(),
+                  onDaySelected: (i) => setState(() => _dayIndex = i),
+                ),
+              ),
+              _section(
+                'AppCalendarTopHeader',
+                'Top_Header_Calendar · None / Weekly / Daily',
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(8),
-                  ),
-                  child: AppCalendarTopHeader(
-                    variant: AppCalendarTopHeaderVariant.daily,
-                    monthValue: '2024.12',
-                    days: [
-                      const AppCalendarDayCell(
-                        weekdayLabel: '금',
-                        dayLabel: '23',
+                  borderRadius: BorderRadius.circular(8),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      AppCalendarTopHeader(
+                        variant: AppCalendarTopHeaderVariant.none,
+                        monthValue: '2024.12',
                       ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '토',
-                        dayLabel: '24',
+                      AppCalendarTopHeader(
+                        variant: AppCalendarTopHeaderVariant.weekly,
+                        monthValue: '2024.12',
+                        weeks: [
+                          const AppCalendarWeekCell(label: '4월 1주차'),
+                          const AppCalendarWeekCell(label: '4월 2주차'),
+                          AppCalendarWeekCell(
+                            label: '4월 3주차',
+                            isSelected: _weekIndex == 2,
+                          ),
+                          const AppCalendarWeekCell(label: '4월 4주차'),
+                          const AppCalendarWeekCell(label: '4월 5주차'),
+                        ],
+                        onWeekSelected: (i) => setState(() => _weekIndex = i),
                       ),
-                      AppCalendarDayCell(
-                        weekdayLabel: '오늘',
-                        dayLabel: '25',
-                        isSelected: _dayIndex == 2,
-                      ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '월',
-                        dayLabel: '26',
-                      ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '화',
-                        dayLabel: '27',
-                      ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '수',
-                        dayLabel: '28',
-                      ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '목',
-                        dayLabel: '29',
-                      ),
-                      const AppCalendarDayCell(
-                        weekdayLabel: '금',
-                        dayLabel: '30',
+                      AppCalendarTopHeader(
+                        variant: AppCalendarTopHeaderVariant.daily,
+                        monthValue: '2024.12',
+                        days: [
+                          const AppCalendarDayCell(
+                            weekdayLabel: '금',
+                            dayLabel: '23',
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '토',
+                            dayLabel: '24',
+                          ),
+                          AppCalendarDayCell(
+                            weekdayLabel: '오늘',
+                            dayLabel: '25',
+                            isSelected: _dayIndex == 2,
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '월',
+                            dayLabel: '26',
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '화',
+                            dayLabel: '27',
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '수',
+                            dayLabel: '28',
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '목',
+                            dayLabel: '29',
+                          ),
+                          const AppCalendarDayCell(
+                            weekdayLabel: '금',
+                            dayLabel: '30',
+                          ),
+                        ],
+                        onDaySelected: (i) => setState(() => _dayIndex = i),
                       ),
                     ],
-                    onDaySelected: (i) => setState(() => _dayIndex = i),
                   ),
                 ),
-              ],
-            ),
-          ),
-          _groupTitle('Badges & Cards'),
-          _section(
-            'AppBadge',
-            'badge_small / badge_large',
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                const AppBadge(
-                  label: 'Gray',
-                  smallVariant: AppBadgeSmallVariant.gray,
-                ),
-                const AppBadge(
-                  label: 'Primary',
-                  smallVariant: AppBadgeSmallVariant.primary,
-                ),
-                const AppBadge(
-                  label: 'High',
-                  smallVariant: AppBadgeSmallVariant.high,
-                  style: AppBadgeStyle.filled,
-                ),
-                const AppBadge(
-                  label: '리프레시 불필요',
-                  size: AppBadgeSize.large,
-                  largeVariant: AppBadgeLargeVariant.refreshNotNeeded,
-                ),
-                const AppBadge(
-                  label: '집중 리프레시 추천',
-                  size: AppBadgeSize.large,
-                  largeVariant: AppBadgeLargeVariant.focusedRecommend,
-                ),
-              ],
-            ),
-          ),
-          _section(
-            'AppRefreshCard',
-            'card_refresh · default / compact / small',
-            Column(
-              children: [
-                AppRefreshCard(
-                  title: '모이스처 리프레시',
-                  description: '건조한 모발에 수분을 공급하는 리프레시 모드입니다.',
-                  captionItems: const ['약 5분', '중간 강도'],
-                  badgeLabel: '추천',
-                  badgeVariant: AppBadgeSmallVariant.primary,
-                  onTrailingPressed: () {},
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppRefreshCard(
-                  title: '볼륨 리프레시',
-                  description: '가벼운 볼륨 케어',
-                  captionItems: const ['약 3분'],
-                  badgeLabel: 'NEW',
-                  badgeVariant: AppBadgeSmallVariant.primaryLight,
-                  variant: AppRefreshCardVariant.compact,
-                  onTrailingPressed: () {},
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppRefreshCard(
-                  title: '집중 케어',
-                  description: '손상 모발 집중 케어',
-                  variant: AppRefreshCardVariant.small,
-                  onTrailingPressed: () {},
-                ),
-              ],
-            ),
-          ),
-          _section(
-            'AppRecommendCard',
-            'card_recommend · gradient border',
-            AppRecommendCard(
-              message: '오늘은 모이스처 리프레시를 추천해요.',
-              actionLabel: '리프레시 시작',
-              onActionPressed: () {},
-            ),
-          ),
-          _section(
-            'AppResultCard',
-            'card_result · default / withAction',
-            Column(
-              children: [
-                AppResultCard(
-                  title: '진단 결과',
-                  tags: const [
-                    AppResultCardTag(
-                      label: '수분',
-                      badgeLabel: '낮음',
-                      badgeVariant: AppBadgeSmallVariant.low,
+              ),
+              _groupTitle('Badges & Cards'),
+              _section(
+                'AppBadge',
+                'badge_small / badge_large',
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    const AppBadge(
+                      label: 'Gray',
+                      smallVariant: AppBadgeSmallVariant.gray,
                     ),
-                    AppResultCardTag(
-                      label: '손상',
-                      badgeLabel: '높음',
-                      badgeVariant: AppBadgeSmallVariant.high,
+                    const AppBadge(
+                      label: 'Primary',
+                      smallVariant: AppBadgeSmallVariant.primary,
+                    ),
+                    const AppBadge(
+                      label: 'High',
+                      smallVariant: AppBadgeSmallVariant.high,
+                      style: AppBadgeStyle.filled,
+                    ),
+                    const AppBadge(
+                      label: '리프레시 불필요',
+                      size: AppBadgeSize.large,
+                      largeVariant: AppBadgeLargeVariant.refreshNotNeeded,
+                    ),
+                    const AppBadge(
+                      label: '집중 리프레시 추천',
+                      size: AppBadgeSize.large,
+                      largeVariant: AppBadgeLargeVariant.focusedRecommend,
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                AppResultCard(
-                  title: '리프레시 완료',
-                  variant: AppResultCardVariant.withAction,
-                  actionLabel: '기록 보러가기',
-                  onActionPressed: () {},
-                  tags: const [AppResultCardTag(label: '모이스처 리프레시')],
-                ),
-              ],
-            ),
-          ),
-          _groupTitle('Layout'),
-          _section(
-            'AppPageIndicator',
-            'indicator · active #4E5561',
-            AppPageIndicator(
-              count: 5,
-              selectedIndex: _pageIndicatorIndex,
-              onDotTap: (i) => setState(() => _pageIndicatorIndex = i),
-            ),
-          ),
-          _section(
-            'AppBottomButtonBar',
-            'button_bottom · 1 or 2 buttons',
-            Column(
-              children: [
-                AppBottomButtonBar(
-                  primaryLabel: '시작하기',
-                  onPrimaryPressed: () {},
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppBottomButtonBar(
-                  type: AppBottomButtonBarType.twoButtons,
-                  primaryLabel: '확인',
-                  onPrimaryPressed: () {},
-                  secondaryLabel: '취소',
-                  onSecondaryPressed: () {},
-                ),
-              ],
-            ),
-          ),
-          _groupTitle('Tabs & Dialog'),
-          _section(
-            'AppSegmentedTabBar',
-            'Bg #E6E9ED · Selected #FFFFFF/#313842',
-            AppSegmentedTabBar(
-              tabs: const ['Selected', 'Normal', 'Normal'],
-              selectedIndex: _segmentedIndex,
-              onChanged: (i) => setState(() => _segmentedIndex = i),
-            ),
-          ),
-          _section(
-            'AppChipTabBar',
-            'Selected #052C66 · Normal #F5F7FA/#B3BAC4',
-            AppChipTabBar(
-              tabs: const ['Selected', 'Normal', 'Normal', 'Normal'],
-              selectedIndex: _chipIndex,
-              onChanged: (i) => setState(() => _chipIndex = i),
-            ),
-          ),
-          _section(
-            'AppConfirmDialog',
-            'Overlay_Popup_Confirmation',
-            AppBoxButton(
-              label: '다이얼로그 열기',
-              onPressed: () => AppConfirmDialog.show(
-                context,
-                title: '타이틀을 입력해주세요.',
-                message: '텍스트가 한 줄일 경우 높이\n값은 두 줄로 유지합니다.',
               ),
-              size: AppBoxButtonSize.medium,
-            ),
-          ),
-          _section(
-            'Widget file map',
-            'lib/shared/widgets/',
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final entry in _widgetFiles)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 180,
-                          child: Text(
-                            entry.$1,
-                            style: AppTextStyles.labelM.copyWith(
-                              color: AppComponentColors.sectionTitle,
-                            ),
-                          ),
+              _section(
+                'AppRefreshCard',
+                'card_refresh · default / compact / small',
+                Column(
+                  children: [
+                    AppRefreshCard(
+                      title: '모이스처 리프레시',
+                      description: '건조한 모발에 수분을 공급하는 리프레시 모드입니다.',
+                      captionItems: const ['약 5분', '중간 강도'],
+                      badgeLabel: '추천',
+                      badgeVariant: AppBadgeSmallVariant.primary,
+                      onTrailingPressed: () {},
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppRefreshCard(
+                      title: '볼륨 리프레시',
+                      description: '가벼운 볼륨 케어',
+                      captionItems: const ['약 3분'],
+                      badgeLabel: 'NEW',
+                      badgeVariant: AppBadgeSmallVariant.primaryLight,
+                      variant: AppRefreshCardVariant.compact,
+                      onTrailingPressed: () {},
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppRefreshCard(
+                        title: '집중 케어',
+                        description: '손상 모발 집중 케어',
+                        variant: AppRefreshCardVariant.small,
+                        onTrailingPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _section(
+                'AppRecommendCard',
+                'card_recommend · gradient border',
+                AppRecommendCard(
+                  message: '오늘은 모이스처 리프레시를 추천해요.',
+                  actionLabel: '리프레시 시작',
+                  onActionPressed: () {},
+                ),
+              ),
+              _section(
+                'AppResultCard',
+                'card_result · default / withAction',
+                Column(
+                  children: [
+                    AppResultCard(
+                      title: '진단 결과',
+                      tags: const [
+                        AppResultCardTag(
+                          label: '수분',
+                          badgeLabel: '낮음',
+                          badgeVariant: AppBadgeSmallVariant.low,
                         ),
-                        Text(
-                          entry.$2,
-                          style: AppTextStyles.bodyXs.copyWith(
-                            color: AppColors.gray500,
-                          ),
+                        AppResultCardTag(
+                          label: '손상',
+                          badgeLabel: '높음',
+                          badgeVariant: AppBadgeSmallVariant.high,
                         ),
                       ],
                     ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppResultCard(
+                      title: '리프레시 완료',
+                      variant: AppResultCardVariant.withAction,
+                      actionLabel: '기록 보러가기',
+                      onActionPressed: () {},
+                      tags: const [AppResultCardTag(label: '모이스처 리프레시')],
+                    ),
+                  ],
+                ),
+              ),
+              _groupTitle('Layout'),
+              _section(
+                'AppPageIndicator',
+                'indicator · active #4E5561',
+                Center(
+                  child: AppPageIndicator(
+                    count: 5,
+                    selectedIndex: _pageIndicatorIndex,
+                    onDotTap: (i) => setState(() => _pageIndicatorIndex = i),
                   ),
-              ],
-            ),
+                ),
+              ),
+              _section(
+                'AppBottomButtonBar',
+                'button_bottom · 1 or 2 buttons',
+                Column(
+                  children: [
+                    AppBottomButtonBar(
+                      primaryLabel: '시작하기',
+                      onPrimaryPressed: () {},
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppBottomButtonBar(
+                      type: AppBottomButtonBarType.twoButtons,
+                      primaryLabel: '확인',
+                      onPrimaryPressed: () {},
+                      secondaryLabel: '취소',
+                      onSecondaryPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+              _groupTitle('Tabs & Dialog'),
+              _section(
+                'AppSegmentedTabBar',
+                'Bg #E6E9ED · Selected #FFFFFF/#313842',
+                AppSegmentedTabBar(
+                  tabs: const ['Selected', 'Normal', 'Normal'],
+                  selectedIndex: _segmentedIndex,
+                  onChanged: (i) => setState(() => _segmentedIndex = i),
+                ),
+              ),
+              _section(
+                'AppChipTabBar',
+                'Selected #052C66 · Normal #F5F7FA/#B3BAC4',
+                AppChipTabBar(
+                  tabs: const ['Selected', 'Normal', 'Normal', 'Normal'],
+                  selectedIndex: _chipIndex,
+                  onChanged: (i) => setState(() => _chipIndex = i),
+                ),
+              ),
+              _section(
+                'AppConfirmDialog',
+                'Overlay_Popup_Confirmation',
+                AppBoxButton(
+                  label: '다이얼로그 열기',
+                  onPressed: () => AppConfirmDialog.show(
+                    context,
+                    title: '타이틀을 입력해주세요.',
+                    message: '텍스트가 한 줄일 경우 높이\n값은 두 줄로 유지합니다.',
+                  ),
+                  size: AppBoxButtonSize.medium,
+                ),
+              ),
+              _section(
+                'Widget file map',
+                'lib/shared/widgets/',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final entry in _widgetFiles)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.$1,
+                              style: AppTextStyles.labelM.copyWith(
+                                color: AppComponentColors.sectionTitle,
+                              ),
+                            ),
+                            Text(
+                              entry.$2,
+                              style: AppTextStyles.bodyXs.copyWith(
+                                color: AppColors.gray500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+            ],
           ),
-          const SizedBox(height: AppSpacing.xl),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _phoneFrameLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.gray800,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+          child: Text(
+            label,
+            style: AppTextStyles.labelS.copyWith(color: AppColors.gray0),
+          ),
+        ),
       ),
     );
   }

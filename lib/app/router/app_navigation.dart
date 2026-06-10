@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
+import '../../features/refresh/data/model/refresh_mode.dart';
 
 /// 화면에서 route path 문자열을 직접 쓰지 않고 이동할 때 사용합니다.
 ///
@@ -19,13 +20,20 @@ extension AppNavigation on BuildContext {
 
   void pushRefresh() => push(AppRoutePaths.refresh);
 
-  void pushRefreshProgress() => push(AppRoutePaths.refreshProgress);
+  void pushRefreshProgress({RefreshMode? mode, String? modeName}) {
+    assert(mode == null || modeName == null, 'mode 또는 modeName 중 하나만 전달하세요.');
+    push(AppRoutePaths.refreshProgress, extra: mode ?? modeName);
+  }
 
   void pushRefreshResult() => push(AppRoutePaths.refreshResult);
 
   /// 커스텀 모드 생성 화면으로 이동하고, 저장 성공 여부를 반환합니다.
   Future<bool?> pushRefreshCustomCreate() =>
       push<bool>(AppRoutePaths.refreshCustomCreate);
+
+  /// 홈 즐겨찾기(리프레시 바로가기) 추가 화면으로 이동하고, 선택한 모드를 반환합니다.
+  Future<RefreshMode?> pushRefreshShortcutAdd() =>
+      push<RefreshMode>(AppRoutePaths.refreshShortcutAdd);
 
   void pushHistory() => push(AppRoutePaths.history);
 

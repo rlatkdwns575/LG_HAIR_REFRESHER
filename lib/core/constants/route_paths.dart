@@ -16,6 +16,7 @@ class AppRoutePaths {
   static const refreshProgress = '/refresh/progress';
   static const refreshResult = '/refresh/result';
   static const refreshCustomCreate = '/refresh/custom/new';
+  static const refreshShortcutAdd = '/refresh/shortcut/add';
   static const history = '/history';
   static const settings = '/settings';
 
@@ -35,6 +36,7 @@ class AppRouteNames {
   static const refreshProgress = 'refreshProgress';
   static const refreshResult = 'refreshResult';
   static const refreshCustomCreate = 'refreshCustomCreate';
+  static const refreshShortcutAdd = 'refreshShortcutAdd';
   static const history = 'history';
   static const settings = 'settings';
   static const widgetGallery = 'widgetGallery';

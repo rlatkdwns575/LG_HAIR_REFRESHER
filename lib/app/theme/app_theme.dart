@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'app_colors.dart';
 import 'app_radius.dart';
@@ -43,8 +42,8 @@ class AppTheme {
         builders: {
           TargetPlatform.android: ZoomPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-  },
-),
+        },
+      ),
       visualDensity: VisualDensity.standard,
       extensions: const [AppSpacingExtension.regular],
     );

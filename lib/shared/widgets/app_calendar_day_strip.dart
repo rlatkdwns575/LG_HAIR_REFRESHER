@@ -30,16 +30,18 @@ class AppCalendarDayStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 46,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (var i = 0; i < days.length; i++)
-            GestureDetector(
-              onTap: onDaySelected == null ? null : () => onDaySelected!(i),
-              behavior: HitTestBehavior.opaque,
-              child: SizedBox(
-                width: 24,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        child: Row(
+          children: [
+            for (var i = 0; i < days.length; i++) ...[
+              if (i > 0) const SizedBox(width: 12),
+              GestureDetector(
+                onTap: onDaySelected == null ? null : () => onDaySelected!(i),
+                behavior: HitTestBehavior.opaque,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       days[i].weekdayLabel,
@@ -62,8 +64,9 @@ class AppCalendarDayStrip extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-        ],
+            ],
+          ],
+        ),
       ),
     );
   }
