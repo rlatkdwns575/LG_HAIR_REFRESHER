@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../data/api/auth_api.dart';
+import '../../data/model/auth_failure.dart';
 import '../../data/model/sign_up_draft.dart';
 import '../widgets/auth_screen_styles.dart';
 import '../widgets/auth_screen_widgets.dart';
@@ -23,10 +25,12 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
   static const _maxAge = 80;
   static const _defaultAge = 24;
 
+  final AuthApi _authApi = const AuthApi();
   final TextEditingController _nameController = TextEditingController();
 
   int? _selectedAge;
   String? _selectedGender;
+  bool _isSubmitting = false;
 
   bool get _isFormValid =>
       _nameController.text.trim().isNotEmpty &&
@@ -129,8 +133,8 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
     );
   }
 
-  void _handleSignUpComplete() {
-    if (!_isFormValid) {
+  Future<void> _handleSignUpComplete() async {
+    if (!_isFormValid || _isSubmitting) {
       return;
     }
 
@@ -146,16 +150,64 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
       debugPrint(signUpData.toString());
     }
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('회원가입이 완료되었습니다.'),
-          behavior: SnackBarBehavior.floating,
-        ),
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _authApi.signUpWithProfile(
+        email: widget.draft.email,
+        password: widget.draft.password,
+        name: _nameController.text.trim(),
+        age: _selectedAge!,
+        gender: _selectedGender!,
       );
 
-    context.go(AppRoutePaths.login);
+      if (_authApi.hasSession) {
+        await _authApi.signOut();
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('회원가입이 완료되었습니다.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+      context.go(AppRoutePaths.login);
+    } on AuthFailure catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('회원가입에 실패했습니다.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   Widget _buildAgePickerField() {
@@ -271,8 +323,8 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
               ),
               const Spacer(),
               AuthPrimaryButton(
-                label: '확인',
-                enabled: _isFormValid,
+                label: _isSubmitting ? '처리 중...' : '확인',
+                enabled: _isFormValid && !_isSubmitting,
                 onPressed: _handleSignUpComplete,
               ),
               const SizedBox(height: 24),

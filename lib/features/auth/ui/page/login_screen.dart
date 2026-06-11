@@ -2,27 +2,67 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../data/api/auth_api.dart';
 import '../../data/auth_assets.dart';
+import '../../data/model/auth_failure.dart';
 import '../widgets/auth_screen_styles.dart';
 
 /// 로그인 방법 선택 화면 (Google / 이메일 / 회원가입).
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   static const _emailButtonTextColor = Color(0xFF6B7280);
   static const _signupTextColor = Color(0xFF9CA3AF);
   static const _buttonHeight = 58.0;
   static const _buttonRadius = 16.0;
   static const _bottomInset = 110.0;
 
-  void _onGoogleLogin(BuildContext context) {
+  final AuthApi _authApi = const AuthApi();
+
+  bool _isGoogleLoading = false;
+
+  Future<void> _onGoogleLogin() async {
+    if (_isGoogleLoading) {
+      return;
+    }
+
+    setState(() => _isGoogleLoading = true);
+
+    try {
+      await _authApi.signInWithGoogle();
+      if (!mounted) {
+        return;
+      }
+      if (_authApi.hasSession) {
+        context.go(AppRoutePaths.home);
+      }
+    } on AuthFailure catch (error) {
+      if (!mounted || error.isCancelled) {
+        return;
+      }
+      _showMessage(error.message);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      _showMessage('Google 로그인에 실패했습니다.');
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleLoading = false);
+      }
+    }
+  }
+
+  void _showMessage(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(
-          content: Text('Google 로그인은 준비 중입니다.'),
-          behavior: SnackBarBehavior.floating,
-        ),
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }
 
@@ -44,22 +84,32 @@ class LoginScreen extends StatelessWidget {
                 height: _buttonHeight,
                 radius: _buttonRadius,
                 backgroundColor: Colors.white,
-                onPressed: () => _onGoogleLogin(context),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(AuthAssets.googleIcon, width: 24, height: 24),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Google로 로그인하기',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AuthScreenStyles.textDark,
+                onPressed: _isGoogleLoading ? null : _onGoogleLogin,
+                child: _isGoogleLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            AuthAssets.googleIcon,
+                            width: 24,
+                            height: 24,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Google로 로그인하기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AuthScreenStyles.textDark,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: 12),
               _LoginMethodButton(
@@ -67,7 +117,9 @@ class LoginScreen extends StatelessWidget {
                 radius: _buttonRadius,
                 backgroundColor: Colors.transparent,
                 borderColor: AuthScreenStyles.border,
-                onPressed: () => context.push(AppRoutePaths.emailLogin),
+                onPressed: _isGoogleLoading
+                    ? null
+                    : () => context.push(AppRoutePaths.emailLogin),
                 child: const Text(
                   '이메일로 로그인',
                   style: TextStyle(
@@ -79,7 +131,9 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 34),
               TextButton(
-                onPressed: () => context.push(AppRoutePaths.signUp),
+                onPressed: _isGoogleLoading
+                    ? null
+                    : () => context.push(AppRoutePaths.signUp),
                 style: TextButton.styleFrom(
                   foregroundColor: _signupTextColor,
                   padding: EdgeInsets.zero,
@@ -154,7 +208,7 @@ class _LoginMethodButton extends StatelessWidget {
   final double radius;
   final Color backgroundColor;
   final Color? borderColor;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Widget child;
 
   @override

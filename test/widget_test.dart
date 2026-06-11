@@ -13,33 +13,16 @@ void main() {
     expect(find.text('이메일로 로그인'), findsOneWidget);
   });
 
-  testWidgets('shows home dashboard after email login', (tester) async {
+  testWidgets('opens email login screen from login', (tester) async {
     await tester.pumpWidget(const LgHairRefresherApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('이메일로 로그인'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).at(0), 'user@example.com');
-    await tester.enterText(find.byType(TextField).at(1), 'password123');
-    await tester.tap(find.widgetWithText(FilledButton, '로그인'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('우리 기기 이름'), findsOneWidget);
-    expect(find.text('배터리'), findsOneWidget);
-    expect(find.text('60%'), findsOneWidget);
-    expect(find.text('필터 상태'), findsOneWidget);
-    expect(find.text('양호'), findsOneWidget);
-    expect(find.text('디바이스 관리'), findsOneWidget);
-    expect(find.textContaining('대기 중 미세먼지량이 많은 하루였어요'), findsOneWidget);
-    expect(find.text('퀵 리프레시'), findsNothing);
-    expect(find.text('즐겨찾기 추천 추가하기'), findsNothing);
-    expect(find.text('자주 사용한 모드'), findsNothing);
-    expect(find.text('헤어 리프레시'), findsOneWidget);
-    expect(find.text('헤어 상태 진단'), findsOneWidget);
-    expect(find.text('진단하기'), findsOneWidget);
-    expect(find.text('리프레시 내역'), findsOneWidget);
-    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.widgets_outlined), findsOneWidget);
+    expect(find.text('로그인'), findsWidgets);
+    expect(find.text('아이디(이메일)'), findsOneWidget);
+    expect(find.text('비밀번호'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '로그인'), findsOneWidget);
   });
 }

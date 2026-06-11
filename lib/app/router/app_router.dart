@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
+import '../../core/services/auth_session_notifier.dart';
+import 'auth_redirect.dart';
 import '../../features/auth/data/model/sign_up_draft.dart';
 import '../../features/auth/ui/page/email_login_screen.dart';
 import '../../features/auth/ui/page/login_screen.dart';
@@ -27,6 +29,8 @@ import '../../shared/widgets/shared_widget_gallery_page.dart';
 final appRouter = GoRouter(
   initialLocation: AppRoutePaths.login,
   debugLogDiagnostics: false,
+  refreshListenable: AuthSessionNotifier.instance,
+  redirect: authRedirect,
   errorBuilder: (context, state) => _RouteErrorPage(error: state.error),
   routes: [
     GoRoute(
