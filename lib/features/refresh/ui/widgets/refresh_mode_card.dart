@@ -6,6 +6,7 @@ import '../../../../app/theme/app_shadows.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/refresh_mode.dart';
+import '../../data/refresh_assets.dart';
 import 'duration_badge.dart';
 
 enum RefreshModeCardVariant { featured, compact, list }
@@ -17,6 +18,7 @@ class RefreshModeCard extends StatelessWidget {
     this.badgeLabel,
     this.onTap,
     this.onAction,
+    this.onDelete,
     super.key,
   });
 
@@ -25,6 +27,7 @@ class RefreshModeCard extends StatelessWidget {
   final String? badgeLabel;
   final VoidCallback? onTap;
   final VoidCallback? onAction;
+  final VoidCallback? onDelete;
 
   String get _badge => badgeLabel ?? mode.category.label;
 
@@ -108,15 +111,13 @@ class RefreshModeCard extends StatelessWidget {
   }
 
   Widget _buildList() {
-    return _CardShell(
+    return _ListCardShell(
       onTap: onTap,
+      onDelete: onDelete,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: DurationBadge(minutes: mode.durationMinutes),
-          ),
+          DurationBadge(minutes: mode.durationMinutes),
           const SizedBox(height: AppSpacing.sm),
           Text(
             mode.name,
@@ -132,6 +133,55 @@ class RefreshModeCard extends StatelessWidget {
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 목록 카드 — 본문 탭(상세 이동)과 삭제 버튼 탭 영역을 분리합니다.
+class _ListCardShell extends StatelessWidget {
+  const _ListCardShell({required this.child, this.onTap, this.onDelete});
+
+  final Widget child;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Material(
+        color: AppColors.gray0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          side: const BorderSide(color: AppColors.gray100),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(onTap: onTap, child: const SizedBox.expand()),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: child),
+                  if (onDelete != null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    _DeleteButton(onPressed: onDelete!),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -256,6 +306,32 @@ class _MetaRow extends StatelessWidget {
   }
 }
 
+class _DeleteButton extends StatelessWidget {
+  const _DeleteButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Image.asset(
+            RefreshAssets.trashIcon,
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ArrowButton extends StatelessWidget {
   const _ArrowButton({this.onPressed});
 
@@ -269,10 +345,19 @@ class _ArrowButton extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onPressed,
-        child: const SizedBox(
+        child: SizedBox(
           width: 36,
           height: 36,
-          child: Icon(Icons.arrow_forward, size: 20, color: AppColors.gray0),
+          child: Center(
+            child: Image.asset(
+              RefreshAssets.actionArrowIcon,
+              width: 20,
+              height: 20,
+              fit: BoxFit.contain,
+              color: AppColors.gray0,
+              colorBlendMode: BlendMode.srcIn,
+            ),
+          ),
         ),
       ),
     );

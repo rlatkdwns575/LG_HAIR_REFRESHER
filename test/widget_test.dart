@@ -15,10 +15,7 @@ void main() {
       expect(find.text('필터 상태'), findsOneWidget);
       expect(find.text('양호'), findsOneWidget);
       expect(find.text('디바이스 관리'), findsOneWidget);
-      expect(
-        find.textContaining('대기 중 미세먼지량이 많은 하루였어요'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('대기 중 미세먼지량이 많은 하루였어요'), findsOneWidget);
       expect(find.text('퀵 리프레시'), findsNothing);
       expect(find.text('즐겨찾기 추천 추가하기'), findsNothing);
       expect(find.text('자주 사용한 모드'), findsNothing);

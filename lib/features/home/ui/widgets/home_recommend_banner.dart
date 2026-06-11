@@ -42,35 +42,13 @@ class HomeRecommendBanner extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: 10,
+          vertical: 12,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppComponentColors.badgeSmallPrimaryLightBackground,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.nights_stay_outlined,
-                size: 18,
-                color: AppComponentColors.badgeSmallPrimaryText,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                message,
-                style: AppTextStyles.bodyXs.copyWith(
-                  color: AppComponentColors.recommendCardText,
-                ),
-              ),
-            ),
-          ],
+        child: Text(
+          message,
+          style: AppTextStyles.bodyXs.copyWith(
+            color: AppComponentColors.recommendCardText,
+          ),
         ),
       ),
     );

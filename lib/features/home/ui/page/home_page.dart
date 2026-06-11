@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
@@ -105,9 +106,20 @@ class _HomePageState extends State<HomePage> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
         children: [
-          HomeDeviceStatusSection(
-            data: _dashboardData,
-            onDeviceManagePressed: () {},
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              _contentHorizontalPadding,
+              AppSpacing.xs,
+              _contentHorizontalPadding,
+              0,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              child: HomeDeviceStatusSection(
+                data: _dashboardData,
+                onDeviceManagePressed: () {},
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -115,11 +127,11 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Column(
               children: [
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xl),
                 HomeRecommendBanner(message: _dashboardData.recommendMessage),
                 if (_dashboardData.hasUsageHistory &&
                     _quickSlots.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   HomeQuickRefreshRow(
                     slots: _quickSlots,
                     onFavoriteAddPressed: _handleFavoriteAdd,
@@ -127,20 +139,20 @@ class _HomePageState extends State<HomePage> {
                         context.pushRefreshProgress(modeName: mode.title),
                   ),
                 ],
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.sm),
                 HomeActionCard(
                   child: HomeTappableNavigationRow(
                     title: '헤어 리프레시',
                     onTap: context.pushRefresh,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.sm),
                 HomeActionCard(
                   child: HomeDiagnosisRow(
                     onDiagnosisPressed: _handleDiagnosisTap,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.sm),
                 HomeActionCard(
                   child: HomeTappableNavigationRow(
                     title: '리프레시 내역',

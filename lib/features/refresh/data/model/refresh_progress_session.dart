@@ -1,3 +1,4 @@
+import '../care_duration_split.dart';
 import 'refresh_mode.dart';
 
 /// 리프레시 진행 화면의 단계 정보.
@@ -16,9 +17,13 @@ class RefreshProgressStep {
   final String intensityLabel;
   final String? pausedHint;
 
-  String get durationLabel {
-    final minutes = durationSeconds ~/ 60;
-    return '$minutes분';
+  String get durationLabel =>
+      CareDurationSplit.formatKoreanDuration(durationSeconds);
+
+  /// Figma 단계명 (예: `먼지 집중관리`).
+  String get stepTitle {
+    final careName = label.replaceAll(' 케어', '');
+    return '$careName $intensityLabel';
   }
 }
 

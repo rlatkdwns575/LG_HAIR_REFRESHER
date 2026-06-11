@@ -28,6 +28,7 @@ class RefreshMode {
     required this.icon,
     this.tags = const [],
     this.isCustom = false,
+    this.createdByUser = false,
   });
 
   /// 사용자가 직접 만든 커스텀 모드를 생성합니다.
@@ -49,6 +50,7 @@ class RefreshMode {
       icon: Icons.tune_outlined,
       tags: tags,
       isCustom: true,
+      createdByUser: true,
     );
   }
 
@@ -60,6 +62,10 @@ class RefreshMode {
   final IconData icon;
   final List<String> tags;
   final bool isCustom;
+  final bool createdByUser;
+
+  /// 사용자가 직접 만든 모드만 삭제 가능.
+  bool get isDeletable => isCustom || createdByUser;
 
   String get durationLabel => '$durationMinutes분';
 
@@ -72,6 +78,7 @@ class RefreshMode {
     IconData? icon,
     List<String>? tags,
     bool? isCustom,
+    bool? createdByUser,
   }) {
     return RefreshMode(
       id: id ?? this.id,
@@ -82,6 +89,7 @@ class RefreshMode {
       icon: icon ?? this.icon,
       tags: tags ?? this.tags,
       isCustom: isCustom ?? this.isCustom,
+      createdByUser: createdByUser ?? this.createdByUser,
     );
   }
 

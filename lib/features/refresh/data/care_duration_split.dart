@@ -56,4 +56,16 @@ class CareDurationSplit {
     final remainSeconds = totalSeconds % 60;
     return '$minutes분 $remainSeconds초';
   }
+
+  /// 진행 화면 단계 시간 표시용. 1분 미만은 `30초`, 이상은 `4분 30초` 형식.
+  static String formatKoreanDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainSeconds = seconds % 60;
+
+    if (minutes == 0) {
+      return '${remainSeconds}초';
+    }
+
+    return '$minutes분 $remainSeconds초';
+  }
 }
