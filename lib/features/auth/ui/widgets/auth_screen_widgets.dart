@@ -43,29 +43,26 @@ class AuthCloseHeader extends StatelessWidget {
 class AuthSignupProgressLine extends StatelessWidget {
   const AuthSignupProgressLine({required this.step, super.key});
 
-  /// 1 또는 2
+  /// 1, 2, 3
   final int step;
+
+  static const _totalSteps = 3;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 2,
-            color: step == 1
-                ? AuthScreenStyles.progressActive
-                : AuthScreenStyles.progressInactive,
+        for (var i = 0; i < _totalSteps; i++) ...[
+          if (i > 0) const SizedBox(width: 4),
+          Expanded(
+            child: Container(
+              height: 2,
+              color: step >= i + 1
+                  ? AuthScreenStyles.progressActive
+                  : AuthScreenStyles.progressInactive,
+            ),
           ),
-        ),
-        Expanded(
-          child: Container(
-            height: 2,
-            color: step == 2
-                ? AuthScreenStyles.progressActive
-                : AuthScreenStyles.progressInactive,
-          ),
-        ),
+        ],
       ],
     );
   }

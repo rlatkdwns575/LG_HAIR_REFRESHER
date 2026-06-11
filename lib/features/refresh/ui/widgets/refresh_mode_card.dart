@@ -29,7 +29,7 @@ class RefreshModeCard extends StatelessWidget {
   final VoidCallback? onAction;
   final VoidCallback? onDelete;
 
-  String get _badge => badgeLabel ?? mode.category.label;
+  String get _badge => badgeLabel ?? mode.category;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class RefreshModeCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              DurationBadge(minutes: mode.durationMinutes),
+              DurationBadge(totalSeconds: mode.durationSeconds),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -117,7 +117,7 @@ class RefreshModeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DurationBadge(minutes: mode.durationMinutes),
+          DurationBadge(totalSeconds: mode.durationSeconds),
           const SizedBox(height: AppSpacing.sm),
           Text(
             mode.name,

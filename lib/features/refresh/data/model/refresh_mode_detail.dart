@@ -1,3 +1,4 @@
+import '../api/refresh_mode_mapper.dart';
 import '../care_duration_split.dart';
 import 'refresh_mode.dart';
 
@@ -73,11 +74,11 @@ class RefreshModeDetail {
     final weights = parsedTags
         .map((tag) => CareDurationSplit.getCareRatio(tag.intensity))
         .toList();
+    final totalSeconds = mode.durationSeconds;
     final durations = CareDurationSplit.splitSeconds(
-      totalMinutes: mode.durationMinutes,
+      totalSeconds: totalSeconds,
       weights: weights,
     );
-    final totalSeconds = mode.durationMinutes * 60;
 
     final steps = <RefreshModeDetailStep>[];
     for (var i = 0; i < parsedTags.length; i++) {
@@ -107,128 +108,122 @@ class RefreshModeDetail {
   }
 
   static RefreshModeDetail _fromDefaultMode(RefreshMode mode) {
-    final preset = _defaultPresets[mode.id] ?? _fallbackPreset(mode);
-    final totalSeconds = mode.durationMinutes * 60;
+    final parsedTags = _parsedTagsFromFlags(mode);
+    if (parsedTags.isEmpty) {
+      return _fromCategoryFallback(mode);
+    }
+
+    final weights = parsedTags
+        .map((tag) => CareDurationSplit.getCareRatio(tag.intensity))
+        .toList();
+    final totalSeconds = mode.durationSeconds;
+    final durations = CareDurationSplit.splitSeconds(
+      totalSeconds: totalSeconds,
+      weights: weights,
+    );
+
+    final steps = <RefreshModeDetailStep>[];
+    for (var i = 0; i < parsedTags.length; i++) {
+      final tag = parsedTags[i];
+      final stepCare = _stepCareName(tag.careLabel);
+      steps.add(
+        RefreshModeDetailStep(
+          durationLabel: _formatStepDurationLabel(durations[i]),
+          title: '$stepCare ${tag.intensityLabel}',
+          description: _stepDescriptions[stepCare] ?? mode.description,
+        ),
+      );
+    }
 
     return RefreshModeDetail(
       mode: mode,
-      careTags: preset.careTags,
+      careTags: [
+        for (final tag in parsedTags)
+          RefreshModeDetailCareTag(
+            careLabel: tag.careLabel,
+            intensityLabel: tag.intensityLabel,
+          ),
+      ],
       totalDurationLabel: _formatTotalDurationLabel(totalSeconds),
-      steps: preset.steps
-          .map(
-            (step) => RefreshModeDetailStep(
-              durationLabel: _formatStepDurationLabel(totalSeconds),
-              title: '${step.stepCare} ${step.intensityLabel}',
-              description: step.description,
-            ),
-          )
-          .toList(),
+      steps: steps,
     );
   }
 
-  static _DefaultPreset _fallbackPreset(RefreshMode mode) {
-    final care = switch (mode.category) {
-      RefreshModeCategory.dust => _PresetCare(
-        careLabel: '먼지제거',
-        stepCare: '먼지',
-        intensityLabel: '집중관리',
-        intensity: CareIntensity.intensive,
-      ),
-      RefreshModeCategory.care => _PresetCare(
-        careLabel: '두피관리',
-        stepCare: '두피',
-        intensityLabel: '일반관리',
-        intensity: CareIntensity.normal,
-      ),
-      _ => _PresetCare(
-        careLabel: '먼지제거',
-        stepCare: '먼지',
-        intensityLabel: '집중관리',
-        intensity: CareIntensity.intensive,
-      ),
-    };
+  static RefreshModeDetail _fromCategoryFallback(RefreshMode mode) {
+    final totalSeconds = mode.durationSeconds;
+    const careLabel = '먼지제거';
+    const intensityLabel = '일반관리';
 
-    return _DefaultPreset(
-      careTags: [
+    return RefreshModeDetail(
+      mode: mode,
+      careTags: const [
         RefreshModeDetailCareTag(
-          careLabel: care.careLabel,
-          intensityLabel: care.intensityLabel,
+          careLabel: careLabel,
+          intensityLabel: intensityLabel,
         ),
       ],
+      totalDurationLabel: _formatTotalDurationLabel(totalSeconds),
       steps: [
-        _PresetStep(
-          stepCare: care.stepCare,
-          intensityLabel: care.intensityLabel,
-          description:
-              _stepDescriptions[care.stepCare] ??
-              mode.description.replaceAll('\n', ' '),
+        RefreshModeDetailStep(
+          durationLabel: _formatStepDurationLabel(totalSeconds),
+          title: '먼지 $intensityLabel',
+          description: mode.description.replaceAll('\n', ' '),
         ),
       ],
     );
   }
 
-  static const _defaultPresets = <String, _DefaultPreset>{
-    'quick-refresh': _DefaultPreset(
-      careTags: [
-        RefreshModeDetailCareTag(careLabel: '먼지제거', intensityLabel: '집중관리'),
-      ],
-      steps: [
-        _PresetStep(
-          stepCare: '먼지',
-          intensityLabel: '집중관리',
-          description: '모발 표면에 묻은 먼지를 빠르게 제거해요.',
+  static List<_ParsedCareTag> _parsedTagsFromFlags(RefreshMode mode) {
+    final tags = <_ParsedCareTag>[];
+
+    if (mode.dustYn) {
+      tags.add(
+        _ParsedCareTag(
+          careLabel: RefreshModeMapper.careLabelForFlag(
+            type: 'dust',
+            enabled: true,
+          ),
+          intensityLabel: RefreshModeMapper.strengthLabel(mode.dustStrength),
+          intensity: _intensityFromLabel(
+            RefreshModeMapper.strengthLabel(mode.dustStrength),
+          ),
         ),
-      ],
-    ),
-    'scalp-deep-care': _DefaultPreset(
-      careTags: [
-        RefreshModeDetailCareTag(careLabel: '두피관리', intensityLabel: '집중관리'),
-      ],
-      steps: [
-        _PresetStep(
-          stepCare: '두피',
-          intensityLabel: '집중관리',
-          description: '두피를 시원하게 케어해요.',
+      );
+    }
+    if (mode.odorYn) {
+      tags.add(
+        _ParsedCareTag(
+          careLabel: RefreshModeMapper.careLabelForFlag(
+            type: 'odor',
+            enabled: true,
+          ),
+          intensityLabel: RefreshModeMapper.strengthLabel(mode.odorStrength),
+          intensity: _intensityFromLabel(
+            RefreshModeMapper.strengthLabel(mode.odorStrength),
+          ),
         ),
-      ],
-    ),
-    'fine-dust': _DefaultPreset(
-      careTags: [
-        RefreshModeDetailCareTag(careLabel: '먼지제거', intensityLabel: '집중관리'),
-      ],
-      steps: [
-        _PresetStep(
-          stepCare: '먼지',
-          intensityLabel: '집중관리',
-          description: '모발 표면에 묻은 먼지를 빠르게 제거해요.',
+      );
+    }
+    if (mode.scentYn) {
+      tags.add(
+        _ParsedCareTag(
+          careLabel: RefreshModeMapper.careLabelForFlag(
+            type: 'scent',
+            enabled: true,
+          ),
+          intensityLabel: RefreshModeMapper.strengthLabel(mode.scentStrength),
+          intensity: _intensityFromLabel(
+            RefreshModeMapper.strengthLabel(mode.scentStrength),
+          ),
         ),
-      ],
-    ),
-    'odor-care': _DefaultPreset(
-      careTags: [
-        RefreshModeDetailCareTag(careLabel: '냄새제거', intensityLabel: '집중관리'),
-      ],
-      steps: [
-        _PresetStep(
-          stepCare: '냄새',
-          intensityLabel: '집중관리',
-          description: '모발에 남은 냄새를 부드럽게 정리해요.',
-        ),
-      ],
-    ),
-    'night-care': _DefaultPreset(
-      careTags: [
-        RefreshModeDetailCareTag(careLabel: '두피관리', intensityLabel: '간편관리'),
-      ],
-      steps: [
-        _PresetStep(
-          stepCare: '두피',
-          intensityLabel: '간편관리',
-          description: '두피를 시원하게 케어해요.',
-        ),
-      ],
-    ),
-  };
+      );
+    }
+
+    tags.sort(
+      (a, b) => _careSortKey(a.careLabel).compareTo(_careSortKey(b.careLabel)),
+    );
+    return tags;
+  }
 
   static _ParsedCareTag _parseCareTag(String tag) {
     for (final intensity in _intensityLabels) {
@@ -259,8 +254,8 @@ class RefreshModeDetail {
 
   static String _careTagLabel(String careFull) {
     return switch (careFull) {
-      '먼지 케어' => '먼지제거',
-      '냄새 케어' => '냄새제거',
+      '먼지 케어' || '먼지 제거' => '먼지제거',
+      '냄새 케어' || '냄새 제거' => '냄새제거',
       '향기 케어' => '향기케어',
       _ => careFull,
     };
@@ -312,39 +307,6 @@ class _ParsedCareTag {
   });
 
   final String careLabel;
-  final String intensityLabel;
-  final CareIntensity intensity;
-}
-
-class _PresetStep {
-  const _PresetStep({
-    required this.stepCare,
-    required this.intensityLabel,
-    required this.description,
-  });
-
-  final String stepCare;
-  final String intensityLabel;
-  final String description;
-}
-
-class _DefaultPreset {
-  const _DefaultPreset({required this.careTags, required this.steps});
-
-  final List<RefreshModeDetailCareTag> careTags;
-  final List<_PresetStep> steps;
-}
-
-class _PresetCare {
-  const _PresetCare({
-    required this.careLabel,
-    required this.stepCare,
-    required this.intensityLabel,
-    required this.intensity,
-  });
-
-  final String careLabel;
-  final String stepCare;
   final String intensityLabel;
   final CareIntensity intensity;
 }

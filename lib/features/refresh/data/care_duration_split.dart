@@ -13,19 +13,17 @@ class CareDurationSplit {
     };
   }
 
-  /// 선택된 총 분을 초 단위로 환산한 뒤 [weights] 비율로 분배합니다.
+  /// [totalSeconds]를 [weights] 비율로 분배합니다.
   ///
   /// [weights] 의 합이 0이면 모든 항목에 0초를 반환합니다.
-  /// 마지막 항목은 나머지 초를 받아 합계가 [totalMinutes] × 60과 정확히 같습니다.
+  /// 마지막 항목은 나머지 초를 받아 합계가 [totalSeconds]와 정확히 같습니다.
   static List<int> splitSeconds({
-    required int totalMinutes,
+    required int totalSeconds,
     required List<int> weights,
   }) {
     if (weights.isEmpty) {
       return [];
     }
-
-    final totalSeconds = totalMinutes * 60;
     final weightSum = weights.fold<int>(0, (sum, weight) => sum + weight);
     if (weightSum == 0) {
       return List.filled(weights.length, 0);
@@ -50,22 +48,23 @@ class CareDurationSplit {
     return results;
   }
 
-  /// 초를 `N분 N초` 형식으로 포맷합니다. (예: 90 → `1분 30초`)
+  /// 초를 한국어 시간 문자열로 포맷합니다.
+  ///
+  /// 초가 0이면 `3분`, 분이 0이면 `30초`, 둘 다 있으면 `2분 30초`.
   static String formatKoreanTime(int totalSeconds) {
     final minutes = totalSeconds ~/ 60;
     final remainSeconds = totalSeconds % 60;
-    return '$minutes분 $remainSeconds초';
-  }
-
-  /// 진행 화면 단계 시간 표시용. 1분 미만은 `30초`, 이상은 `4분 30초` 형식.
-  static String formatKoreanDuration(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainSeconds = seconds % 60;
 
     if (minutes == 0) {
       return '${remainSeconds}초';
     }
-
+    if (remainSeconds == 0) {
+      return '$minutes분';
+    }
     return '$minutes분 $remainSeconds초';
   }
+
+  /// 진행 화면 단계 시간 표시용. [formatKoreanTime]과 동일 규칙.
+  static String formatKoreanDuration(int seconds) =>
+      formatKoreanTime(seconds);
 }

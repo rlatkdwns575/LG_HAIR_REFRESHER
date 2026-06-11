@@ -5,6 +5,7 @@ import '../../core/constants/route_paths.dart';
 import '../../features/auth/data/model/sign_up_draft.dart';
 import '../../features/auth/ui/page/email_login_screen.dart';
 import '../../features/auth/ui/page/login_screen.dart';
+import '../../features/auth/ui/page/signup_step_three_screen.dart';
 import '../../features/auth/ui/page/signup_step_one_screen.dart';
 import '../../features/auth/ui/page/signup_step_two_screen.dart';
 import '../../features/history/ui/page/history_page.dart';
@@ -53,6 +54,17 @@ final appRouter = GoRouter(
                   return const SignUpStepOneScreen();
                 }
                 return SignUpStepTwoScreen(draft: draft);
+              },
+            ),
+            GoRoute(
+              name: AppRouteNames.signUpStepThree,
+              path: 'step-three',
+              builder: (context, state) {
+                final draft = state.extra;
+                if (draft is! SignUpDraft || !draft.isProfileComplete) {
+                  return const SignUpStepOneScreen();
+                }
+                return SignUpStepThreeScreen(draft: draft);
               },
             ),
           ],
