@@ -61,6 +61,11 @@ flutter:
   assets:
     - .env
     - lib/features/measure/data/image.png
+    - lib/features/refresh/data/trash.png
+    - lib/features/refresh/data/refrash.png
+    - lib/features/home/energe.png
+    - lib/features/home/filter.png
+    - lib/features/home/check.png
 
   fonts:
     - family: Pretendard

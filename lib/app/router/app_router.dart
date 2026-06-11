@@ -9,9 +9,12 @@ import '../../features/measure/ui/page/measure_page.dart';
 import '../../features/measure/ui/page/measure_analyzing_page.dart';
 import '../../features/measure/ui/page/measure_result_page.dart';
 import '../../features/measure/ui/page/measure_run_page.dart';
+import '../../features/refresh/data/refresh_route_extra.dart';
 import '../../features/refresh/ui/page/refresh_custom_create_page.dart';
+import '../../features/refresh/ui/page/refresh_detail_page.dart';
 import '../../features/refresh/ui/page/refresh_page.dart';
 import '../../features/refresh/ui/page/refresh_progress_page.dart';
+import '../../features/refresh/ui/page/refresh_result_collecting_page.dart';
 import '../../features/refresh/ui/page/refresh_result_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
 import '../../shared/widgets/shared_widget_gallery_page.dart';
@@ -54,11 +57,26 @@ final appRouter = GoRouter(
       builder: (context, state) => const RefreshPage(),
       routes: [
         GoRoute(
+          name: AppRouteNames.refreshDetail,
+          path: 'detail',
+          builder: (context, state) {
+            final mode = resolveRefreshMode(state.extra);
+            if (mode == null) {
+              return const RefreshDetailPageFallback();
+            }
+            return RefreshDetailPage(mode: mode);
+          },
+        ),
+        GoRoute(
           name: AppRouteNames.refreshProgress,
           path: 'progress',
-          builder: (context, state) => RefreshProgressPage(
-            mode: resolveRefreshProgressMode(state.extra),
-          ),
+          builder: (context, state) =>
+              RefreshProgressPage(mode: resolveRefreshMode(state.extra)),
+        ),
+        GoRoute(
+          name: AppRouteNames.refreshResultCollecting,
+          path: 'result/collecting',
+          builder: (context, state) => const RefreshResultCollectingPage(),
         ),
         GoRoute(
           name: AppRouteNames.refreshResult,

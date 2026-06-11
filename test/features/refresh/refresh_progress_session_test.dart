@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lg_hair_refresher/features/refresh/data/care_duration_split.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_progress_session.dart';
 
@@ -49,11 +50,29 @@ void main() {
       );
 
       expect(session.steps[0].label, '먼지 케어');
-      expect(session.steps[1].label, '냄새 케어');
-      expect(session.steps[2].label, '향기 케어');
-      expect(session.steps[0].intensityLabel, '집중관리');
-      expect(session.steps[1].intensityLabel, '일반관리');
+      expect(session.steps[0].stepTitle, '먼지 집중관리');
+      expect(session.steps[1].stepTitle, '냄새 일반관리');
+      expect(session.steps[2].stepTitle, '향기 간편관리');
       expect(session.steps[0].durationLabel, isNotEmpty);
+    });
+
+    test('formats step duration as minutes and seconds', () {
+      final steps = RefreshProgressSession.buildStepsForDuration(10);
+
+      expect(steps[0].durationLabel, '2분 51초');
+      expect(steps[1].durationLabel, '4분 17초');
+      expect(steps[2].durationLabel, '2분 52초');
+    });
+  });
+
+  group('CareDurationSplit.formatKoreanDuration', () {
+    test('shows seconds only under one minute', () {
+      expect(CareDurationSplit.formatKoreanDuration(30), '30초');
+    });
+
+    test('shows minutes and seconds at or above one minute', () {
+      expect(CareDurationSplit.formatKoreanDuration(60), '1분 0초');
+      expect(CareDurationSplit.formatKoreanDuration(270), '4분 30초');
     });
   });
 }

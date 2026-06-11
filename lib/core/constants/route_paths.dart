@@ -13,7 +13,9 @@ class AppRoutePaths {
   static const measureResult = '/measure/result';
 
   static const refresh = '/refresh';
+  static const refreshDetail = '/refresh/detail';
   static const refreshProgress = '/refresh/progress';
+  static const refreshResultCollecting = '/refresh/result/collecting';
   static const refreshResult = '/refresh/result';
   static const refreshCustomCreate = '/refresh/custom/new';
   static const refreshShortcutAdd = '/refresh/shortcut/add';
@@ -33,7 +35,9 @@ class AppRouteNames {
   static const measureResult = 'measureResult';
 
   static const refresh = 'refresh';
+  static const refreshDetail = 'refreshDetail';
   static const refreshProgress = 'refreshProgress';
+  static const refreshResultCollecting = 'refreshResultCollecting';
   static const refreshResult = 'refreshResult';
   static const refreshCustomCreate = 'refreshCustomCreate';
   static const refreshShortcutAdd = 'refreshShortcutAdd';

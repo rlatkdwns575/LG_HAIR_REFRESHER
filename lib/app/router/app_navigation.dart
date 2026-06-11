@@ -20,10 +20,17 @@ extension AppNavigation on BuildContext {
 
   void pushRefresh() => push(AppRoutePaths.refresh);
 
+  void pushRefreshDetail({required RefreshMode mode}) {
+    push(AppRoutePaths.refreshDetail, extra: mode);
+  }
+
   void pushRefreshProgress({RefreshMode? mode, String? modeName}) {
     assert(mode == null || modeName == null, 'mode 또는 modeName 중 하나만 전달하세요.');
     push(AppRoutePaths.refreshProgress, extra: mode ?? modeName);
   }
+
+  void pushRefreshResultCollecting() =>
+      push(AppRoutePaths.refreshResultCollecting);
 
   void pushRefreshResult() => push(AppRoutePaths.refreshResult);
 
@@ -54,6 +61,9 @@ extension AppNavigation on BuildContext {
   void pushRefreshNamed() => pushNamed(AppRouteNames.refresh);
 
   void pushRefreshProgressNamed() => pushNamed(AppRouteNames.refreshProgress);
+
+  void pushRefreshResultCollectingNamed() =>
+      pushNamed(AppRouteNames.refreshResultCollecting);
 
   void pushRefreshResultNamed() => pushNamed(AppRouteNames.refreshResult);
 

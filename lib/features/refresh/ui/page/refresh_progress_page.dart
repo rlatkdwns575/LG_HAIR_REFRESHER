@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_component_colors.dart';
+import '../../../../core/constants/route_paths.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
@@ -12,7 +12,8 @@ import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
-import '../../data/refresh_mode_catalog.dart';
+import '../../data/model/refresh_result.dart';
+import '../../data/refresh_result_store.dart';
 import '../widgets/refresh_progress_ring.dart';
 import '../widgets/refresh_progress_step_strip.dart';
 
@@ -34,6 +35,14 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
 
   Timer? _timer;
   bool _isPaused = false;
+  bool _navigated = false;
+
+  static const Duration _completionHold = Duration(milliseconds: 500);
+  static const double _spacingBelowModeName = 40;
+  static const double _spacingBelowRing = 36;
+  static const double _spacingBelowStepStrip = 36;
+  static const double _contentOffsetY = -84;
+  static const double _pauseButtonBottom = 168;
 
   @override
   void initState() {
@@ -74,6 +83,29 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
             _session.steps[_activeStepIndex].durationSeconds;
       }
     });
+
+    if (_totalRemainingSeconds <= 0) {
+      _onComplete();
+    }
+  }
+
+  void _onComplete() {
+    if (_navigated) {
+      return;
+    }
+    _navigated = true;
+    _timer?.cancel();
+
+    RefreshResultStore.instance.setPending(
+      RefreshResult.fromProgressSession(session: _session, mode: widget.mode),
+    );
+
+    Future<void>.delayed(_completionHold, () {
+      if (!mounted) {
+        return;
+      }
+      context.pushReplacementNamed(AppRouteNames.refreshResultCollecting);
+    });
   }
 
   RefreshProgressStep get _currentStep => _session.steps[_activeStepIndex];
@@ -85,8 +117,6 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     }
     return 1 - (_totalRemainingSeconds / total);
   }
-
-  String get _percentLabel => '${(_progress * 100).round()}%';
 
   String _formatClock(int seconds) {
     final minutes = seconds ~/ 60;
@@ -137,83 +167,92 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
           title: '리프레시하기',
           onBack: _confirmStop,
         ),
-        body: Column(
+        body: Stack(
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 0),
-                child: Column(
-                  children: [
-                    Text(
-                      _session.modeName,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.headlineL.copyWith(
-                        color: AppColors.primary700,
-                        fontSize: 24,
-                        height: 30 / 24,
+            Align(
+              alignment: const Alignment(0, -0.2),
+              child: Transform.translate(
+                offset: const Offset(0, _contentOffsetY),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _session.modeName,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.headlineL.copyWith(
+                          color: AppColors.primary700,
+                          fontSize: 26,
+                          height: 32 / 26,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    RefreshProgressRing(
-                      progress: _progress,
-                      percentLabel: _percentLabel,
-                      remainingLabel: _formatClock(_totalRemainingSeconds),
-                      dimmed: _isPaused,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    RefreshProgressStepStrip(
-                      steps: _session.steps,
-                      activeIndex: _activeStepIndex,
-                      dimmed: _isPaused,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    SizedBox(
-                      width: 330,
-                      child: _isPaused
-                          ? Column(
-                              children: [
-                                Text(
-                                  '리프레시가 잠시 멈췄어요.',
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.titleS.copyWith(
-                                    color: AppColors.gray900,
+                      const SizedBox(height: _spacingBelowModeName),
+                      RefreshProgressRing(
+                        progress: _progress,
+                        remainingLabel: _formatClock(_totalRemainingSeconds),
+                        dimmed: _isPaused,
+                      ),
+                      const SizedBox(height: _spacingBelowRing),
+                      RefreshProgressStepStrip(
+                        steps: _session.steps,
+                        activeIndex: _activeStepIndex,
+                        dimmed: _isPaused,
+                      ),
+                      const SizedBox(height: _spacingBelowStepStrip),
+                      SizedBox(
+                        width: 330,
+                        child: _isPaused
+                            ? Column(
+                                children: [
+                                  Text(
+                                    '리프레시가 잠시 멈췄어요.',
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.titleM.copyWith(
+                                      color: AppColors.gray900,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  _pausedHint,
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.bodyXs.copyWith(
-                                    color: AppColors.gray700,
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    _pausedHint,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.bodyM1.copyWith(
+                                      color: AppColors.gray700,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                Text(
-                                  step.statusMessage,
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.titleS.copyWith(
-                                    color: AppColors.gray900,
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Text(
+                                    step.statusMessage,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.titleM.copyWith(
+                                      color: AppColors.gray900,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  _session.deviceGuide,
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.bodyXs.copyWith(
-                                    color: AppColors.gray700,
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    _session.deviceGuide,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.bodyM1.copyWith(
+                                      color: AppColors.gray700,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                    ),
-                  ],
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            _buildBottomAction(),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: _pauseButtonBottom,
+              child: _buildBottomAction(),
+            ),
           ],
         ),
       ),
@@ -221,37 +260,13 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   }
 
   Widget _buildBottomAction() {
-    return ColoredBox(
-      color: AppComponentColors.bottomBarBackground,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          child: Center(
-            child: AppBoxButton(
-              label: _isPaused ? '진행하기' : '일시 정지',
-              onPressed: _togglePause,
-              size: AppBoxButtonSize.small,
-              variant: AppBoxButtonVariant.line,
-            ),
-          ),
-        ),
+    return Center(
+      child: AppBoxButton(
+        label: _isPaused ? '진행하기' : '일시 정지',
+        onPressed: _togglePause,
+        size: AppBoxButtonSize.small,
+        variant: AppBoxButtonVariant.line,
       ),
     );
   }
-}
-
-/// [GoRouter] extra 로 전달된 모드를 [RefreshProgressPage]에 맞게 해석합니다.
-RefreshMode? resolveRefreshProgressMode(Object? extra) {
-  if (extra is RefreshMode) {
-    return extra;
-  }
-  if (extra is String) {
-    for (final mode in getAllRefreshModes()) {
-      if (mode.name == extra) {
-        return mode;
-      }
-    }
-  }
-  return null;
 }

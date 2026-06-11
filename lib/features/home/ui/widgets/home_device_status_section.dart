@@ -5,6 +5,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
+import '../../data/home_assets.dart';
 import '../../data/model/home_dashboard_data.dart';
 
 /// Figma `홈_첫진입 시` (710:17738) — img area 360×356 · 배터리/필터 · 디바이스 관리.
@@ -20,62 +21,62 @@ class HomeDeviceStatusSection extends StatelessWidget {
 
   static const _heroHeight = 356.0;
   static const _statusLabelColor = AppColors.gray700;
+  static const _statusIconSize = 24.0;
+  static const _statusAreaBottomPadding = 16.0;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: _heroHeight,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          DecoratedBox(
-            decoration: const BoxDecoration(color: AppColors.gray100),
-            child: Align(
-              alignment: const Alignment(0, -0.15),
-              child: Icon(
-                Icons.dry_cleaning_outlined,
-                size: 120,
-                color: AppColors.gray300,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: AppColors.gray100),
+        child: Column(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: const Alignment(0, -0.1),
+                child: Icon(
+                  Icons.dry_cleaning_outlined,
+                  size: 120,
+                  color: AppColors.gray300,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 240,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        child: Center(
-                          child: _BatteryStatus(percent: data.batteryPercent),
+            Padding(
+              padding: const EdgeInsets.only(bottom: _statusAreaBottomPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 240,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          child: Center(
+                            child: _BatteryStatus(percent: data.batteryPercent),
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 120,
-                        child: Center(
-                          child: _FilterStatus(label: data.filterStatusLabel),
+                        SizedBox(
+                          width: 120,
+                          child: Center(
+                            child: _FilterStatus(label: data.filterStatusLabel),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                AppTextLinkButton(
-                  label: '디바이스 관리',
-                  onPressed: onDeviceManagePressed,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-              ],
+                  const SizedBox(height: AppSpacing.sm),
+                  AppTextLinkButton(
+                    label: '디바이스 관리',
+                    onPressed: onDeviceManagePressed,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -95,10 +96,10 @@ class _BatteryStatus extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.battery_5_bar,
-              size: 20,
-              color: HomeDeviceStatusSection._statusLabelColor,
+            Image.asset(
+              HomeAssets.batteryIcon,
+              width: HomeDeviceStatusSection._statusIconSize,
+              height: HomeDeviceStatusSection._statusIconSize,
             ),
             const SizedBox(width: AppSpacing.xs),
             Text(
@@ -135,10 +136,10 @@ class _FilterStatus extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.air_outlined,
-              size: 20,
-              color: HomeDeviceStatusSection._statusLabelColor,
+            Image.asset(
+              HomeAssets.filterIcon,
+              width: HomeDeviceStatusSection._statusIconSize,
+              height: HomeDeviceStatusSection._statusIconSize,
             ),
             const SizedBox(width: AppSpacing.xs),
             Text(
