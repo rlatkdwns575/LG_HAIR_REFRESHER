@@ -8,6 +8,10 @@ import '../../features/refresh/data/model/refresh_mode.dart';
 ///
 /// 홈 허브에서 하위 화면으로 갈 때는 [push] 계열을 사용해 뒤로가기가 동작하게 합니다.
 extension AppNavigation on BuildContext {
+  void goLogin() => go(AppRoutePaths.login);
+
+  void pushEmailLogin() => push(AppRoutePaths.emailLogin);
+
   void goHome() => go(AppRoutePaths.home);
 
   void pushMeasure() => push(AppRoutePaths.measure);

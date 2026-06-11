@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
+import '../../features/auth/data/model/sign_up_draft.dart';
+import '../../features/auth/ui/page/email_login_screen.dart';
+import '../../features/auth/ui/page/login_screen.dart';
+import '../../features/auth/ui/page/signup_step_one_screen.dart';
+import '../../features/auth/ui/page/signup_step_two_screen.dart';
 import '../../features/history/ui/page/history_page.dart';
 import '../../features/home/ui/page/home_page.dart';
 import '../../features/home/ui/page/home_refresh_shortcut_add_page.dart';
@@ -20,10 +25,40 @@ import '../../features/settings/ui/page/settings_page.dart';
 import '../../shared/widgets/shared_widget_gallery_page.dart';
 
 final appRouter = GoRouter(
-  initialLocation: AppRoutePaths.home,
+  initialLocation: AppRoutePaths.login,
   debugLogDiagnostics: false,
   errorBuilder: (context, state) => _RouteErrorPage(error: state.error),
   routes: [
+    GoRoute(
+      name: AppRouteNames.login,
+      path: AppRoutePaths.login,
+      builder: (context, state) => const LoginScreen(),
+      routes: [
+        GoRoute(
+          name: AppRouteNames.emailLogin,
+          path: 'email',
+          builder: (context, state) => const EmailLoginScreen(),
+        ),
+        GoRoute(
+          name: AppRouteNames.signUp,
+          path: 'signup',
+          builder: (context, state) => const SignUpStepOneScreen(),
+          routes: [
+            GoRoute(
+              name: AppRouteNames.signUpStepTwo,
+              path: 'step-two',
+              builder: (context, state) {
+                final draft = state.extra;
+                if (draft is! SignUpDraft) {
+                  return const SignUpStepOneScreen();
+                }
+                return SignUpStepTwoScreen(draft: draft);
+              },
+            ),
+          ],
+        ),
+      ],
+    ),
     GoRoute(
       name: AppRouteNames.home,
       path: AppRoutePaths.home,
