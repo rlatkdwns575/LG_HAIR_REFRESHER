@@ -13,6 +13,7 @@ import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
 import '../../data/model/refresh_result.dart';
+import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_result_store.dart';
 import '../widgets/refresh_progress_ring.dart';
 import '../widgets/refresh_progress_step_strip.dart';
@@ -47,13 +48,29 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   @override
   void initState() {
     super.initState();
-    _session = RefreshProgressSession.fromMode(
-      widget.mode ?? RefreshMode.samples.last,
-    );
+    final mode = widget.mode ?? _resolveFallbackMode();
+    _session = RefreshProgressSession.fromMode(mode);
     _totalRemainingSeconds = _session.totalDurationSeconds;
     _activeStepIndex = 0;
     _stepRemainingSeconds = _session.steps.first.durationSeconds;
     _startTimer();
+  }
+
+  RefreshMode _resolveFallbackMode() {
+    final modes = getAllRefreshModes();
+    if (modes.isNotEmpty) {
+      return modes.first;
+    }
+
+    return const RefreshMode(
+      id: 'fallback-refresh',
+      name: '리프레시',
+      description: '모드를 불러오지 못했습니다.',
+      category: RefreshModeTabs.beforeOuting,
+      durationSeconds: 180,
+      icon: Icons.bolt_outlined,
+      dustYn: true,
+    );
   }
 
   @override

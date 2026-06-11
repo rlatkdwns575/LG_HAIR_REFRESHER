@@ -8,9 +8,14 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../home/data/api/weather_api.dart';
+import '../../data/api/refresh_api.dart';
+import '../../data/api/refresh_recommend_api.dart';
+import '../../data/api/refresh_recommend_fallback.dart';
 import '../../data/custom_mode_store.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_mode_catalog.dart';
+import '../../data/refresh_mode_filter.dart';
 import '../widgets/refresh_mode_card.dart';
 import '../widgets/refresh_section_header.dart';
 
@@ -22,30 +27,69 @@ class RefreshPage extends StatefulWidget {
 }
 
 class _RefreshPageState extends State<RefreshPage> {
-  static const List<RefreshMode> _modes = RefreshMode.samples;
+  final _refreshApi = const RefreshApi();
+  final _weatherApi = const WeatherApi();
+  final _refreshRecommendApi = const RefreshRecommendApi();
 
-  late final List<String> _chipTabs = [
-    '전체',
-    for (final category in RefreshModeCategory.values) category.label,
-  ];
-
+  List<RefreshMode> _presetModes = const [];
+  RefreshMode? _recommendedMode;
+  bool _isLoading = true;
   int _selectedChipIndex = 0;
 
-  RefreshMode get _recommended => _modes.first;
-
-  /// 기본 샘플 모드 + [CustomModeStore] 커스텀 모드.
-  List<RefreshMode> get _allModes => getAllRefreshModes();
-
-  RefreshModeCategory? get _selectedCategory => _selectedChipIndex == 0
-      ? null
-      : RefreshModeCategory.values[_selectedChipIndex - 1];
+  List<RefreshMode> get _allModes => [
+    ..._presetModes,
+    ...CustomModeStore.instance.modes,
+  ];
 
   List<RefreshMode> get _filteredModes {
-    final category = _selectedCategory;
-    if (category == null) {
-      return _allModes;
+    final selectedTab = RefreshModeTabs.all[_selectedChipIndex];
+    return filterRefreshModes(allModes: _allModes, selectedTab: selectedTab);
+  }
+
+  RefreshMode? get _featuredMode {
+    if (_recommendedMode != null) {
+      return _recommendedMode;
     }
-    return _allModes.where((mode) => mode.category == category).toList();
+    if (_presetModes.isNotEmpty) {
+      return _presetModes.first;
+    }
+    return _allModes.isNotEmpty ? _allModes.first : null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModes();
+  }
+
+  Future<void> _loadModes() async {
+    final presets = await _refreshApi.fetchPresetModes();
+    RefreshPresetModeStore.instance.setPresets(presets);
+
+    RefreshMode? recommended;
+    try {
+      final environment = await _weatherApi.fetchSnapshot();
+      recommended = await _refreshRecommendApi.recommendMode(
+        candidates: presets,
+        environment: environment,
+      );
+      recommended ??= RefreshRecommendFallback.pickMode(
+        candidates: presets,
+        environment: environment,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('RefreshPage recommend failed: $error\n$stackTrace');
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _presetModes = presets;
+      _recommendedMode = recommended;
+      _isLoading = false;
+    });
   }
 
   Future<void> _openCustomCreate() async {
@@ -91,18 +135,22 @@ class _RefreshPageState extends State<RefreshPage> {
         title: '리프레시',
         onBack: () => context.pop(),
       ),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-        children: [
-          _buildRecommendedSection(),
-          const SizedBox(height: AppSpacing.lg),
-          _buildModeListSection(),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+              children: [
+                if (_featuredMode != null) ...[
+                  _buildRecommendedSection(_featuredMode!),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+                _buildModeListSection(),
+              ],
+            ),
     );
   }
 
-  Widget _buildRecommendedSection() {
+  Widget _buildRecommendedSection(RefreshMode mode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -114,10 +162,10 @@ class _RefreshPageState extends State<RefreshPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: RefreshModeCard(
-            mode: _recommended,
+            mode: mode,
             variant: RefreshModeCardVariant.featured,
             badgeLabel: 'AI 추천',
-            onTap: () => _onModeTap(_recommended),
+            onTap: () => _onModeTap(mode),
           ),
         ),
       ],
@@ -160,7 +208,8 @@ class _RefreshPageState extends State<RefreshPage> {
   }
 
   Widget _buildEmptyState() {
-    final isCustom = _selectedCategory == RefreshModeCategory.customMode;
+    final selectedTab = RefreshModeTabs.all[_selectedChipIndex];
+    final isCustom = selectedTab == RefreshModeTabs.customMode;
     final message = isCustom ? '아직 제작된 커스텀 모드가 없어요' : '해당 분류의 모드가 아직 없어요';
 
     return Padding(
@@ -183,7 +232,7 @@ class _RefreshPageState extends State<RefreshPage> {
           Padding(
             padding: const EdgeInsets.only(top: 18, left: 15, right: 15),
             child: AppChipTabBar(
-              tabs: _chipTabs,
+              tabs: RefreshModeTabs.all,
               selectedIndex: _selectedChipIndex,
               onChanged: (index) => setState(() => _selectedChipIndex = index),
             ),

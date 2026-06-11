@@ -14,40 +14,45 @@ class HomeRecommendBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppComponentColors.recommendCardGradientStart.withValues(
-              alpha: 0.6,
-            ),
-            AppComponentColors.recommendCardGradientEnd.withValues(alpha: 0.6),
-          ],
-        ),
-        border: GradientBoxBorder(
+    return SizedBox(
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           gradient: LinearGradient(
-            begin: const Alignment(-0.2, 0.9),
-            end: const Alignment(0.8, 0.1),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              AppComponentColors.recommendCardBorderStart,
-              AppComponentColors.recommendCardBorderEnd,
+              AppComponentColors.recommendCardGradientStart.withValues(
+                alpha: 0.6,
+              ),
+              AppComponentColors.recommendCardGradientEnd.withValues(
+                alpha: 0.6,
+              ),
             ],
           ),
-          width: 1,
+          border: GradientBoxBorder(
+            gradient: LinearGradient(
+              begin: const Alignment(-0.2, 0.9),
+              end: const Alignment(0.8, 0.1),
+              colors: [
+                AppComponentColors.recommendCardBorderStart,
+                AppComponentColors.recommendCardBorderEnd,
+              ],
+            ),
+            width: 1,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: 12,
-        ),
-        child: Text(
-          message,
-          style: AppTextStyles.bodyXs.copyWith(
-            color: AppComponentColors.recommendCardText,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 12,
+          ),
+          child: Text(
+            message,
+            style: AppTextStyles.bodyXs.copyWith(
+              color: AppComponentColors.recommendCardText,
+            ),
           ),
         ),
       ),

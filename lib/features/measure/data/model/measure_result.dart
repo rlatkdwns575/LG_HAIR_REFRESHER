@@ -40,20 +40,23 @@ class MeasureResult {
     id: 'outdoor-safe-refresh',
     name: '외출 후 안심 리프레시',
     description: '외출 후 머리카락에 남은 냄새와 먼지를 집중적으로 관리해요.',
-    category: RefreshModeCategory.dust,
-    durationMinutes: 10,
+    category: RefreshModeTabs.afterOuting,
+    durationSeconds: 600,
     icon: Icons.air_outlined,
     tags: ['집중 냄새 케어', '집중 먼지 케어'],
+    odorYn: true,
+    dustYn: true,
   );
 
   static const RefreshMode _dailyRefresh = RefreshMode(
     id: 'daily-light-refresh',
     name: '데일리 라이트 리프레시',
     description: '현재 상태를 유지하기 위한 가벼운 리프레시예요.',
-    category: RefreshModeCategory.normal,
-    durationMinutes: 5,
+    category: RefreshModeTabs.beforeOuting,
+    durationSeconds: 300,
     icon: Icons.bolt_outlined,
     tags: ['데일리', '가벼운 케어'],
+    dustYn: true,
   );
 
   /// 경고형 mock — Figma 621-12885 (냄새 집중 권장 + 먼지 집중 필요).

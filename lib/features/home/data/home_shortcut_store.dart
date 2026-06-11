@@ -28,7 +28,7 @@ extension RefreshModeHomeShortcut on RefreshMode {
     return HomeQuickRefreshMode(
       title: name,
       durationLabel: durationLabel,
-      captionItems: tags.isNotEmpty ? tags : [category.label],
+      captionItems: tags.isNotEmpty ? tags : [category],
     );
   }
 }

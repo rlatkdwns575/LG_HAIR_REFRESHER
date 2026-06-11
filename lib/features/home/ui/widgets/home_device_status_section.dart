@@ -36,10 +36,24 @@ class HomeDeviceStatusSection extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: const Alignment(0, -0.1),
-                child: Icon(
-                  Icons.dry_cleaning_outlined,
-                  size: 120,
-                  color: AppColors.gray300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.dry_cleaning_outlined,
+                      size: 120,
+                      color: AppColors.gray300,
+                    ),
+                    if (data.modelName != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        data.modelName!,
+                        style: AppTextStyles.bodyS.copyWith(
+                          color: AppColors.gray500,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),

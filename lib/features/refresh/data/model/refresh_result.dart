@@ -46,10 +46,11 @@ class RefreshResult {
     id: 'scent-care',
     name: '향기 케어 모드',
     description: '리프레시 후 은은한 향으로 마무리할 수 있어요',
-    category: RefreshModeCategory.care,
-    durationMinutes: 2,
+    category: RefreshModeTabs.afterOuting,
+    durationSeconds: 120,
     icon: Icons.local_florist_outlined,
     tags: ['냄새 흔적 완화', '산뜻한 잔향', '외출 전 추천'],
+    scentYn: true,
   );
 
   /// 진행 세션 기반 mock 결과. 실제 API 연동 시 이 factory를 교체합니다.

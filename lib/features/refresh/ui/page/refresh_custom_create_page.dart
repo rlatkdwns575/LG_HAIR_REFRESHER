@@ -14,15 +14,17 @@ import '../../data/care_duration_split.dart';
 import '../../data/custom_mode_store.dart';
 import '../../data/model/refresh_mode.dart';
 
-/// 케어 종류 (냄새 / 먼지 / 향기).
+/// 케어 종류 (먼지 / 냄새 / 향기).
 enum _CareType {
-  odor('냄새 케어'),
-  dust('먼지 케어'),
+  dust('먼지 제거'),
+  odor('냄새 제거'),
   scent('향기 케어');
 
   const _CareType(this.label);
 
   final String label;
+
+  static const displayOrder = [dust, odor, scent];
 }
 
 /// 케어 강도 (집중관리 / 일반관리 / 간편관리).
@@ -72,7 +74,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   }
 
   List<_CareType> get _selectedCares =>
-      _CareType.values.where((type) => _enabled[type] == true).toList();
+      _CareType.displayOrder.where((type) => _enabled[type] == true).toList();
 
   bool get _canSave {
     if (_nameController.text.trim().isEmpty) {
@@ -192,11 +194,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   }
 
   /// 복합 케어 권장 순서: 먼지 제거 → 냄새 제거 → 향기 케어.
-  static const List<_CareType> _previewOrder = [
-    _CareType.dust,
-    _CareType.odor,
-    _CareType.scent,
-  ];
+  static const List<_CareType> _previewOrder = _CareType.displayOrder;
 
   List<int> _previewDurationsSeconds(List<_CareType> selected) {
     final weights = selected
@@ -216,7 +214,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     }
 
     final split = CareDurationSplit.splitSeconds(
-      totalMinutes: _durationMinutes,
+      totalSeconds: _durationMinutes * 60,
       weights: [for (final i in positiveIndices) weights[i]],
     );
 
@@ -271,9 +269,9 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
       children: [
         const _SectionTitle('무엇을 케어할까요?'),
         const SizedBox(height: AppSpacing.md),
-        for (var i = 0; i < _CareType.values.length; i++) ...[
+        for (var i = 0; i < _CareType.displayOrder.length; i++) ...[
           if (i > 0) const SizedBox(height: AppSpacing.lg),
-          _buildCareRow(_CareType.values[i]),
+          _buildCareRow(_CareType.displayOrder[i]),
         ],
       ],
     );

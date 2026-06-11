@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../data/model/hair_profile_options.dart';
 import '../../data/model/sign_up_draft.dart';
 import '../widgets/auth_screen_styles.dart';
 import '../widgets/auth_screen_widgets.dart';
@@ -129,33 +129,19 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
     );
   }
 
-  void _handleSignUpComplete() {
+  void _handleNext() {
     if (!_isFormValid) {
       return;
     }
 
-    final signUpData = {
-      'email': widget.draft.email,
-      'password': widget.draft.password,
-      'name': _nameController.text.trim(),
-      'age': _selectedAge,
-      'gender': _selectedGender,
-    };
-
-    if (kDebugMode) {
-      debugPrint(signUpData.toString());
-    }
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('회원가입이 완료되었습니다.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-
-    context.go(AppRoutePaths.login);
+    context.push(
+      AppRoutePaths.signUpStepThree,
+      extra: widget.draft.copyWith(
+        nickname: _nameController.text.trim(),
+        age: _selectedAge,
+        gender: _selectedGender,
+      ),
+    );
   }
 
   Widget _buildAgePickerField() {
@@ -264,16 +250,21 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _buildGenderButton('남성'),
-                  const SizedBox(width: 12),
-                  _buildGenderButton('여성'),
+                  for (
+                    var i = 0;
+                    i < HairProfileOptions.genders.length;
+                    i++
+                  ) ...[
+                    if (i > 0) const SizedBox(width: 12),
+                    _buildGenderButton(HairProfileOptions.genders[i]),
+                  ],
                 ],
               ),
               const Spacer(),
               AuthPrimaryButton(
-                label: '확인',
+                label: '다음',
                 enabled: _isFormValid,
-                onPressed: _handleSignUpComplete,
+                onPressed: _handleNext,
               ),
               const SizedBox(height: 24),
             ],

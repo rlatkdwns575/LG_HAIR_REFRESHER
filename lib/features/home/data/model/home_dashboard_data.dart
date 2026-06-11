@@ -16,6 +16,7 @@ class HomeQuickRefreshMode {
 class HomeDashboardData {
   const HomeDashboardData({
     this.deviceName = '우리 기기 이름',
+    this.modelName,
     this.batteryPercent = 60,
     this.filterStatusLabel = '양호',
     this.recommendMessage = '대기 중 미세먼지량이 많은 하루였어요.\n잠들기 전 리프레시를 통해 안심하고 숙면하세요.',
@@ -29,6 +30,7 @@ class HomeDashboardData {
   });
 
   final String deviceName;
+  final String? modelName;
   final int batteryPercent;
   final String filterStatusLabel;
 
@@ -41,6 +43,29 @@ class HomeDashboardData {
   /// 자주 사용한 모드 (사용 이력이 있을 때 노출).
   final HomeQuickRefreshMode? frequentMode;
   final bool hasRecentDiagnosisResult;
+
+  HomeDashboardData copyWith({
+    String? deviceName,
+    String? modelName,
+    int? batteryPercent,
+    String? filterStatusLabel,
+    String? recommendMessage,
+    bool? hasUsageHistory,
+    HomeQuickRefreshMode? frequentMode,
+    bool? hasRecentDiagnosisResult,
+  }) {
+    return HomeDashboardData(
+      deviceName: deviceName ?? this.deviceName,
+      modelName: modelName ?? this.modelName,
+      batteryPercent: batteryPercent ?? this.batteryPercent,
+      filterStatusLabel: filterStatusLabel ?? this.filterStatusLabel,
+      recommendMessage: recommendMessage ?? this.recommendMessage,
+      hasUsageHistory: hasUsageHistory ?? this.hasUsageHistory,
+      frequentMode: frequentMode ?? this.frequentMode,
+      hasRecentDiagnosisResult:
+          hasRecentDiagnosisResult ?? this.hasRecentDiagnosisResult,
+    );
+  }
 }
 
 /// 간편 리프레시 행 슬롯 종류.

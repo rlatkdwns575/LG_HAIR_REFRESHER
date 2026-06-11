@@ -1,10 +1,25 @@
 import 'custom_mode_store.dart';
 import 'model/refresh_mode.dart';
 
+/// Supabase에서 불러온 프리셋 모드 캐시.
+class RefreshPresetModeStore {
+  RefreshPresetModeStore._();
+
+  static final RefreshPresetModeStore instance = RefreshPresetModeStore._();
+
+  List<RefreshMode> _presets = const [];
+
+  List<RefreshMode> get presets => List.unmodifiable(_presets);
+
+  void setPresets(List<RefreshMode> presets) {
+    _presets = List.unmodifiable(presets);
+  }
+}
+
 /// 앱 내에서 사용 가능한 전체 리프레시 모드 목록.
-///
-/// 정해진 모드는 [RefreshMode.samples], 커스텀 모드는 [CustomModeStore]에서 합칩니다.
-/// 커스텀 모드는 추후 Supabase `data/api` 연동으로 대체됩니다.
 List<RefreshMode> getAllRefreshModes() {
-  return [...RefreshMode.samples, ...CustomModeStore.instance.modes];
+  return [
+    ...RefreshPresetModeStore.instance.presets,
+    ...CustomModeStore.instance.modes,
+  ];
 }

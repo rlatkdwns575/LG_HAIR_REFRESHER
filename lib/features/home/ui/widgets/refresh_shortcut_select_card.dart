@@ -66,7 +66,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       child: Text(
-                        mode.category.label,
+                        mode.category,
                         style: AppTextStyles.labelXs.copyWith(
                           color: badgeTextColor,
                         ),
@@ -87,7 +87,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    DurationBadge(minutes: mode.durationMinutes),
+                    DurationBadge(totalSeconds: mode.durationSeconds),
                   ],
                 ),
                 const SizedBox(height: 6),
