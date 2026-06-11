@@ -7,8 +7,8 @@ import '../../../../app/theme/app_text_styles.dart';
 
 /// Figma `graph` + `Frame 4956` — 160px 링 · 진행률 · 잔여 시간.
 ///
-/// [MeasureProgressRing]과 동일하게 CustomPaint 기반이며,
-/// SweepGradient와 1초 선형 보간으로 부드럽게 채워집니다.
+/// [MeasureProgressRing]과 동일하게 호 시작은 연한 파스텔,
+/// 진행 끝으로 갈수록 진한 파란색으로 채워집니다.
 class RefreshProgressRing extends StatelessWidget {
   const RefreshProgressRing({
     required this.progress,
@@ -90,11 +90,13 @@ class _RefreshRingPainter extends CustomPainter {
   final double strokeWidth;
   final Color trackColor;
 
-  static const _gradientColors = [
-    AppColors.primary300,
-    AppColors.primary400,
-    AppColors.primary500,
-  ];
+  /// 호 시작(12시) — 연한 파스텔. [MeasureProgressRing._startColor] 과 동일.
+  static const Color _arcStartColor = AppColors.primary300;
+
+  /// 호 끝 — 진한 포인트. [MeasureProgressRing] 의 progressColor 와 동일.
+  static const Color _arcEndColor = AppColors.primary500;
+
+  static const _segmentCount = 48;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -114,21 +116,36 @@ class _RefreshRingPainter extends CustomPainter {
 
     const startAngle = -math.pi / 2;
     final sweep = progress * 2 * math.pi;
+    final segmentSweep = sweep / _segmentCount;
 
-    final gradient = SweepGradient(
-      startAngle: startAngle,
-      endAngle: startAngle + 2 * math.pi,
-      colors: _gradientColors,
-      stops: const [0.0, 0.55, 1.0],
+    for (var i = 0; i < _segmentCount; i++) {
+      final t = _segmentCount <= 1 ? 1.0 : i / (_segmentCount - 1);
+      final color = Color.lerp(_arcStartColor, _arcEndColor, t) ?? _arcEndColor;
+      final isFirst = i == 0;
+      final isLast = i == _segmentCount - 1;
+
+      final segmentPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = isFirst || isLast ? StrokeCap.round : StrokeCap.butt;
+
+      canvas.drawArc(
+        rect,
+        startAngle + segmentSweep * i,
+        segmentSweep * 1.05,
+        false,
+        segmentPaint,
+      );
+    }
+
+    final tipAngle = startAngle + sweep;
+    final tip = Offset(
+      center.dx + radius * math.cos(tipAngle),
+      center.dy + radius * math.sin(tipAngle),
     );
-
-    final progressPaint = Paint()
-      ..shader = gradient.createShader(rect)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawArc(rect, startAngle, sweep, false, progressPaint);
+    canvas.drawCircle(tip, strokeWidth * 0.7, Paint()..color = AppColors.gray0);
+    canvas.drawCircle(tip, strokeWidth * 0.42, Paint()..color = _arcEndColor);
   }
 
   @override

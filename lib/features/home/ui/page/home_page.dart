@@ -25,6 +25,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static const _contentHorizontalPadding = 15.0;
 
+  /// 추천 배너(대기중) 아래 메뉴 카드(헤어 리프레시~) 시작 여백.
+  static const _recommendToMenuGap = 40.0;
+
   /// 기본값: 기록 없는 첫 진입.
   final _dashboardData = const HomeDashboardData();
 
@@ -127,7 +130,7 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Column(
               children: [
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.lg),
                 HomeRecommendBanner(message: _dashboardData.recommendMessage),
                 if (_dashboardData.hasUsageHistory &&
                     _quickSlots.isNotEmpty) ...[
@@ -139,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                         context.pushRefreshProgress(modeName: mode.title),
                   ),
                 ],
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: _recommendToMenuGap),
                 HomeActionCard(
                   child: HomeTappableNavigationRow(
                     title: '헤어 리프레시',
