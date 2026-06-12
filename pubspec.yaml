@@ -65,6 +65,8 @@ flutter:
     - lib/features/measure/data/image.png
     - lib/features/refresh/data/trash.png
     - lib/features/refresh/data/refrash.png
+    - lib/features/refresh/data/calendar.png
+    - lib/features/home/energe.png
     - lib/features/home/assets/battery/icon_battery_24_state_0.png
     - lib/features/home/assets/battery/icon_battery_24_state_10.png
     - lib/features/home/assets/battery/icon_battery_24_state_30.png
