@@ -68,7 +68,7 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(
             15,
-            AppSpacing.sm,
+            AppSpacing.xl,
             15,
             AppSpacing.xl,
           ),

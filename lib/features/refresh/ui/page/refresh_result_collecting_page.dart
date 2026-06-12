@@ -63,7 +63,7 @@ class _RefreshResultCollectingPageState
           children: [
             const SizedBox(height: 160),
             const RefreshResultCollectingIllustration(),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: 40),
             Text(
               '리프레시 결과를 수집중이에요',
               textAlign: TextAlign.center,
