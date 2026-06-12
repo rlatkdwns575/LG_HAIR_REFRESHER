@@ -8,6 +8,21 @@ import '../model/sign_up_draft.dart';
 class AuthApi {
   const AuthApi();
 
+  Future<void> signIn({required String email, required String password}) async {
+    try {
+      final response = await SupabaseService.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.user == null) {
+        throw const AuthApiException('로그인에 실패했습니다.');
+      }
+    } on AuthException catch (error) {
+      throw AuthApiException(error.message);
+    }
+  }
+
   Future<void> signUp(SignUpDraft draft) async {
     if (!draft.isReadyToSubmit) {
       throw const AuthApiException('회원가입 정보가 충분하지 않습니다.');

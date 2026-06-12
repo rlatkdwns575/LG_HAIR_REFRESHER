@@ -10,9 +10,10 @@ import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_toggle.dart';
+import '../../../../core/services/auth_session_service.dart';
+import '../../data/api/custom_mode_api.dart';
 import '../../data/care_duration_split.dart';
-import '../../data/custom_mode_store.dart';
-import '../../data/model/refresh_mode.dart';
+import '../../data/custom_mode_cache.dart';
 
 /// 케어 종류 (먼지 / 냄새 / 향기).
 enum _CareType {
@@ -56,7 +57,9 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   static const int _minDuration = 1;
   static const int _maxDuration = 30;
 
+  final _customModeApi = const CustomModeApi();
   final _nameController = TextEditingController();
+  bool _isSaving = false;
 
   final Map<_CareType, bool> _enabled = {
     for (final type in _CareType.values) type: false,
@@ -112,27 +115,63 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     }
   }
 
-  void _onSave() {
-    if (!_canSave) {
+  int _strengthForLevel(_CareLevel level) {
+    return switch (level.intensity) {
+      CareIntensity.intensive => 3,
+      CareIntensity.normal => 2,
+      CareIntensity.simple => 1,
+    };
+  }
+
+  Future<void> _onSave() async {
+    if (!_canSave || _isSaving) {
       return;
     }
 
-    final selected = _selectedCares;
-    final tags = selected
-        .map((type) => '${type.label} ${_levels[type]!.label}')
-        .toList();
-    final detail = '${tags.join(' · ')} · $_durationMinutes분 케어해요.';
+    setState(() => _isSaving = true);
 
-    final mode = RefreshMode.custom(
-      id: 'custom-${DateTime.now().microsecondsSinceEpoch}',
-      name: _nameController.text.trim(),
-      description: detail,
-      durationMinutes: _durationMinutes,
-      tags: tags,
-    );
+    try {
+      final userId = AuthSessionService.resolveUserId();
+      final mode = await _customModeApi.create(
+        userId: userId,
+        displayName: _nameController.text.trim(),
+        durationMinutes: _durationMinutes,
+        dustYn: _enabled[_CareType.dust] == true,
+        odorYn: _enabled[_CareType.odor] == true,
+        scentYn: _enabled[_CareType.scent] == true,
+        dustStrength: _enabled[_CareType.dust] == true
+            ? _strengthForLevel(_levels[_CareType.dust]!)
+            : null,
+        odorStrength: _enabled[_CareType.odor] == true
+            ? _strengthForLevel(_levels[_CareType.odor]!)
+            : null,
+        scentStrength: _enabled[_CareType.scent] == true
+            ? _strengthForLevel(_levels[_CareType.scent]!)
+            : null,
+      );
 
-    CustomModeStore.instance.add(mode);
-    context.pop(true);
+      CustomModeCache.instance.add(mode);
+      if (!mounted) {
+        return;
+      }
+      context.pop(true);
+    } on CustomModeApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
@@ -335,9 +374,9 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
           AppSpacing.md,
         ),
         child: AppBoxButton(
-          label: '이 설정으로 시작하기',
-          onPressed: _canSave ? _onSave : null,
-          variant: _canSave
+          label: _isSaving ? '저장 중...' : '이 설정으로 시작하기',
+          onPressed: _canSave && !_isSaving ? _onSave : null,
+          variant: _canSave && !_isSaving
               ? AppBoxButtonVariant.active
               : AppBoxButtonVariant.disabled,
         ),

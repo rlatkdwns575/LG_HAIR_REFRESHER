@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../data/api/auth_api.dart';
 import '../widgets/auth_screen_styles.dart';
 import '../widgets/auth_screen_widgets.dart';
 
@@ -14,10 +15,12 @@ class EmailLoginScreen extends StatefulWidget {
 }
 
 class _EmailLoginScreenState extends State<EmailLoginScreen> {
+  final _authApi = const AuthApi();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -26,7 +29,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -42,7 +45,31 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       return;
     }
 
-    context.go(AppRoutePaths.home);
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _authApi.signIn(email: email, password: password);
+      if (!mounted) {
+        return;
+      }
+      context.go(AppRoutePaths.home);
+    } on AuthApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -82,8 +109,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
               ),
               const Spacer(),
               AuthPrimaryButton(
-                label: '로그인',
-                enabled: true,
+                label: _isSubmitting ? '로그인 중...' : '로그인',
+                enabled: !_isSubmitting,
                 onPressed: _handleLogin,
               ),
               const SizedBox(height: 24),
