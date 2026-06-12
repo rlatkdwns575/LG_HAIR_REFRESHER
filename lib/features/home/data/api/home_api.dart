@@ -74,8 +74,11 @@ class HomeApi {
         .eq('user_device_id', userDeviceId);
 
     final hasUsageHistory = sessionCount > 0;
-    final frequentMode = hasUsageHistory
+    final resolvedFrequentMode = hasUsageHistory
         ? await _fetchFrequentMode(userDeviceId)
+        : null;
+    final frequentMode = hasUsageHistory
+        ? (resolvedFrequentMode ?? homeFrequentModeFallback)
         : null;
 
     return HomeDashboardData(

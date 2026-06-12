@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_component_colors.dart';
 import '../../../../app/theme/app_radius.dart';
-import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_recommend_card.dart';
-import 'home_navigation_card.dart';
 
-/// Figma `card_recommend` (710:17764) — 날씨·환경 안내 배너.
+/// Figma `card_recommend` (631:18545) — 330×52, 문구만 (chevron/아이콘 없음).
 class HomeRecommendBanner extends StatelessWidget {
   const HomeRecommendBanner({required this.message, super.key});
+
+  static const bannerHeight = 52.0;
 
   final String message;
 
@@ -17,7 +17,7 @@ class HomeRecommendBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: HomeActionCard.rowHeight,
+      height: bannerHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -46,7 +46,7 @@ class HomeRecommendBanner extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -55,6 +55,7 @@ class HomeRecommendBanner extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodyXs.copyWith(
                 color: AppComponentColors.recommendCardText,
+                height: 16 / 12,
               ),
             ),
           ),

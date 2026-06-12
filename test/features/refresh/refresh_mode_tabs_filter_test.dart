@@ -70,14 +70,32 @@ void main() {
       expect(result.first.id, 'weather-1');
     });
 
-    test('카테고리 탭은 커스텀 모드를 제외한다', () {
+    test('카테고리 탭은 해당 카테고리 모드만 반환한다', () {
       final result = filterRefreshModes(
         allModes: allModes,
         selectedTab: RefreshModeTabs.beforeOuting,
       );
 
-      expect(result.every((mode) => !mode.isCustom), isTrue);
       expect(result.map((mode) => mode.id), ['before-1']);
+    });
+
+    test('카테고리가 일치하는 커스텀 모드도 카테고리 탭에 포함된다', () {
+      final customBefore = RefreshMode.custom(
+        id: 'custom-before',
+        name: '커스텀 외출 전',
+        description: '커스텀',
+        durationMinutes: 5,
+      ).copyWith(category: RefreshModeTabs.beforeOuting);
+
+      final result = filterRefreshModes(
+        allModes: [...allModes, customBefore],
+        selectedTab: RefreshModeTabs.beforeOuting,
+      );
+
+      expect(
+        result.map((mode) => mode.id),
+        containsAll(['before-1', 'custom-before']),
+      );
     });
   });
 }

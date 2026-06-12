@@ -14,6 +14,15 @@ class RefreshModeTabs {
   static const beforeOuting = '외출 전';
   static const afterOuting = '외출 후';
   static const weather = '날씨';
+  static const etc = '기타';
+
+  /// 커스텀 모드 생성 시 선택 가능한 카테고리.
+  static const customSelectableCategories = [
+    beforeOuting,
+    afterOuting,
+    weather,
+    etc,
+  ];
 }
 
 /// 리프레시 모드 화면 데이터 모델.

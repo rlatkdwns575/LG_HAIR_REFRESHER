@@ -15,12 +15,5 @@ List<RefreshMode> filterRefreshModes({
         .toList();
   }
 
-  return allModes
-      .where(
-        (mode) =>
-            !mode.isCustom &&
-            !mode.createdByUser &&
-            mode.category == selectedTab,
-      )
-      .toList();
+  return allModes.where((mode) => mode.category == selectedTab).toList();
 }

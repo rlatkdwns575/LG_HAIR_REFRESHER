@@ -24,11 +24,7 @@ class RefreshModeMapper {
     final rawCategory = (row['category'] as String? ?? '').trim();
     final customYn = row['custom_yn'] == true;
     final descriptionText = (row['description'] as String?)?.trim() ?? '';
-    final category = customYn
-        ? RefreshModeTabs.customMode
-        : rawCategory.isEmpty
-        ? '기타'
-        : rawCategory;
+    final category = rawCategory.isEmpty ? RefreshModeTabs.etc : rawCategory;
 
     return RefreshMode(
       id: row['mode_id'] as String,
@@ -43,7 +39,7 @@ class RefreshModeMapper {
             ),
       category: category,
       durationSeconds: _readInt(row['duration_time']) ?? 0,
-      icon: customYn ? Icons.tune_outlined : _iconForCategory(rawCategory),
+      icon: _iconForCategory(category),
       tags: _buildTags(
         odorYn: odorYn,
         dustYn: dustYn,
@@ -113,6 +109,7 @@ class RefreshModeMapper {
       RefreshModeTabs.afterOuting => Icons.home_outlined,
       RefreshModeTabs.weather => Icons.wb_sunny_outlined,
       RefreshModeTabs.customMode => Icons.tune_outlined,
+      RefreshModeTabs.etc => Icons.auto_awesome_outlined,
       _ => Icons.auto_awesome_outlined,
     };
   }

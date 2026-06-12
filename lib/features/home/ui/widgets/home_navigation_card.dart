@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
 import '../../../../app/theme/app_radius.dart';
-import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
-/// Figma 홈 액션 카드 — 개별 흰색 카드 (710:17738 Frame 4941/4940/4944).
+/// Figma 홈 액션 카드 — 헤어 리프레시/진단/내역 동일 높이 62px.
 class HomeActionCard extends StatelessWidget {
   const HomeActionCard({required this.child, super.key});
 
-  /// `헤어 상태 진단` 행 높이와 동일 (Figma Frame 4940 · 62).
+  /// `헤어 상태 진단` 행 높이 기준 — 리프레시·내역도 동일 (62).
   static const rowHeight = 62.0;
 
   final Widget child;
@@ -24,7 +23,7 @@ class HomeActionCard extends StatelessWidget {
         border: Border.all(color: AppColors.gray100),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: SizedBox(height: rowHeight, child: child),
       ),
     );

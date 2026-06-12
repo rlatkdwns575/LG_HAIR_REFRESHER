@@ -36,6 +36,7 @@ class CustomModeApi {
   Future<RefreshMode> create({
     required String userId,
     required String displayName,
+    required String category,
     required int durationMinutes,
     required bool dustYn,
     required bool odorYn,
@@ -50,7 +51,7 @@ class CustomModeApi {
       'mode_id': modeId,
       'user_id': userId,
       'display_name': displayName,
-      'category': RefreshModeTabs.customMode,
+      'category': category,
       'duration_time': durationMinutes * 60,
       'custom_yn': true,
       'odor_yn': odorYn,

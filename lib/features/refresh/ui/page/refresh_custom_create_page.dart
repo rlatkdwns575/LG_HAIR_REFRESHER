@@ -14,6 +14,7 @@ import '../../../../core/services/auth_session_service.dart';
 import '../../data/api/custom_mode_api.dart';
 import '../../data/care_duration_split.dart';
 import '../../data/custom_mode_cache.dart';
+import '../../data/model/refresh_mode.dart';
 
 /// 케어 종류 (먼지 / 냄새 / 향기).
 enum _CareType {
@@ -69,6 +70,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   };
 
   int _durationMinutes = _minDuration;
+  String _selectedCategory = RefreshModeTabs.beforeOuting;
 
   @override
   void dispose() {
@@ -135,6 +137,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
       final mode = await _customModeApi.create(
         userId: userId,
         displayName: _nameController.text.trim(),
+        category: _selectedCategory,
         durationMinutes: _durationMinutes,
         dustYn: _enabled[_CareType.dust] == true,
         odorYn: _enabled[_CareType.odor] == true,
@@ -201,6 +204,8 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
                 _buildCareSection(),
                 const SizedBox(height: AppSpacing.xl),
                 _buildDurationSection(),
+                const SizedBox(height: AppSpacing.xl),
+                _buildCategorySection(),
               ],
             ),
           ),
@@ -363,6 +368,21 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     );
   }
 
+  Widget _buildCategorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionTitle('카테고리 선택'),
+        const SizedBox(height: AppSpacing.md),
+        _CategoryChips(
+          selected: _selectedCategory,
+          onSelected: (category) =>
+              setState(() => _selectedCategory = category),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSubmitBar() {
     return SafeArea(
       top: false,
@@ -447,6 +467,42 @@ class _PreviewItem extends StatelessWidget {
             ],
           ],
         ),
+      ],
+    );
+  }
+}
+
+class _CategoryChips extends StatelessWidget {
+  const _CategoryChips({required this.selected, required this.onSelected});
+
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = RefreshModeTabs.customSelectableCategories;
+
+    return Column(
+      children: [
+        for (var row = 0; row < categories.length; row += 2) ...[
+          if (row > 0) const SizedBox(height: 6),
+          Row(
+            children: [
+              for (var col = 0; col < 2; col++) ...[
+                if (col > 0) const SizedBox(width: 6),
+                Expanded(
+                  child: row + col < categories.length
+                      ? _LevelChip(
+                          label: categories[row + col],
+                          selected: selected == categories[row + col],
+                          onTap: () => onSelected(categories[row + col]),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ],
+          ),
+        ],
       ],
     );
   }
