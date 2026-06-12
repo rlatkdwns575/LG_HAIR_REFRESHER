@@ -18,7 +18,7 @@ class CustomModeApi {
           .select(RefreshModeMapper.selectColumns)
           .eq('custom_yn', true)
           .eq('user_id', userId)
-          .order('display_name');
+          .order('created_at', ascending: false); // 최신 등록순(내림차순)으로 변경 완료
 
       return rows
           .map(

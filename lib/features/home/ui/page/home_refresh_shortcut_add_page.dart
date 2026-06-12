@@ -14,9 +14,9 @@ import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/custom_mode_cache.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
-import '../../../refresh/data/refresh_mode_filter.dart';
 import '../../../refresh/ui/widgets/refresh_section_header.dart';
 import '../widgets/refresh_shortcut_select_card.dart';
+import '../../../refresh/data/model/refresh_mode_filter.dart';
 
 /// Figma `리프레시 바로가기 추가` — 홈 즐겨찾기 모드 선택 화면.
 class HomeRefreshShortcutAddPage extends StatefulWidget {

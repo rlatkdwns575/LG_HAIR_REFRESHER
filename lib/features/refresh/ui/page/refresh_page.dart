@@ -3,9 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_component_colors.dart';
+import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../core/services/auth_session_service.dart';
@@ -17,7 +18,7 @@ import '../../data/api/refresh_recommend_fallback.dart';
 import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_mode_catalog.dart';
-import '../../data/refresh_mode_filter.dart';
+import '../../data/model/refresh_mode_filter.dart';
 import '../widgets/refresh_mode_card.dart';
 import '../widgets/refresh_section_header.dart';
 
@@ -148,7 +149,7 @@ class _RefreshPageState extends State<RefreshPage> {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시',
+        title: '헤어 리프레시',
         onBack: () => context.pop(),
       ),
       body: _isLoading
@@ -246,11 +247,66 @@ class _RefreshPageState extends State<RefreshPage> {
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 18, left: 15, right: 15),
-            child: AppChipTabBar(
-              tabs: RefreshModeTabs.all,
-              selectedIndex: _selectedChipIndex,
-              onChanged: (index) => setState(() => _selectedChipIndex = index),
+            padding: const EdgeInsets.only(top: 18),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                children: List.generate(RefreshModeTabs.all.length, (index) {
+                  final tab = RefreshModeTabs.all[index];
+                  final selected = index == _selectedChipIndex;
+
+                  final chipWidget = GestureDetector(
+                    onTap: () => setState(() => _selectedChipIndex = index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppComponentColors.chipSelectedBackground
+                            : AppComponentColors.chipNormalBackground,
+                        borderRadius: BorderRadius.circular(AppRadius.chip),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        tab,
+                        style: AppTextStyles.labelM.copyWith(
+                          color: selected
+                              ? AppComponentColors.chipSelectedText
+                              : AppComponentColors.chipNormalText,
+                        ),
+                      ),
+                    ),
+                  );
+
+                  if (index == 1) {
+                    // '커스텀 모드'와 '외출 전' 사이
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        chipWidget,
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 28,
+                          color: const Color(0xFFEFF1F4),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      chipWidget,
+                      if (index < RefreshModeTabs.all.length - 1)
+                        const SizedBox(width: 8),
+                    ],
+                  );
+                }),
+              ),
             ),
           ),
           Positioned(
