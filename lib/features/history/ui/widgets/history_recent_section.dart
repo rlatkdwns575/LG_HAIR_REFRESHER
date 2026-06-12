@@ -5,13 +5,12 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_title.dart';
+import '../../data/history_assets.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
 import 'history_care_badge.dart';
 import 'history_common.dart';
 import 'history_month_calendar.dart';
-
-const _calendarIconAsset = 'lib/features/refresh/data/calendar.png';
 
 /// Section 2 — 최근 리프레시 기록 (월 이동 + 캘린더 + 선택 날짜 상세).
 class HistoryRecentSection extends StatelessWidget {
@@ -147,7 +146,7 @@ class _MonthNavRow extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(4),
             child: Image.asset(
-              _calendarIconAsset,
+              HistoryAssets.calendarIcon,
               width: 20,
               height: 20,
               fit: BoxFit.contain,

@@ -6,7 +6,7 @@ const outputDir = process.argv[3];
 
 if (!terminalLog || !outputDir) {
   console.error(
-    'Usage: node scripts/save_figma_battery_exports.mjs <terminal-log> [output-dir]',
+    'Usage: node scripts/save_figma_battery_exports.mjs <terminal-log> [output-dir=assets/images/home/battery]',
   );
   process.exit(1);
 }

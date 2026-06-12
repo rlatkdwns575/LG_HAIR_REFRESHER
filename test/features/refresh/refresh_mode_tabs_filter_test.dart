@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
-import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode_filter.dart';
+import 'package:lg_hair_refresher/features/refresh/data/refresh_mode_filter.dart';
 
 void main() {
   final presets = [
