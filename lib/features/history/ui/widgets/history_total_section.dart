@@ -72,6 +72,7 @@ class HistoryTotalSection extends StatelessWidget {
         _InsightCard(
           insight: summary.preStatePattern,
           titleColor: AppColors.primary500,
+          firstDescriptionBoldPhrase: '냄새 높음 상태',
           child: _StackedBar(
             bars: summary.preStatePattern.bars,
             barHeight: 14,
@@ -89,13 +90,18 @@ class HistoryTotalSection extends StatelessWidget {
         _InsightCard(
           insight: summary.careRatio,
           titleColor: AppColors.primary500,
+          firstDescriptionBoldPhrase: '냄새 중심의 케어',
           child: _GradientStackedBar(bars: summary.careRatio.bars),
         ),
         const SizedBox(height: AppSpacing.md),
         _InsightCard(
           title: '주요 리프레시 모드',
           titleColor: AppColors.primary500,
-          descriptions: [summary.modeUsageDescription],
+          firstDescriptionBoldPhrase: '00000모드',
+          descriptions: [
+            summary.modeUsageDescription,
+            '* 개선도가 가장 높았던 모드는 {모드}이에요',
+          ],
           child: Column(
             children: [
               for (var i = 0; i < summary.modeUsages.length; i++) ...[
@@ -149,7 +155,10 @@ class _StatCard extends StatelessWidget {
             Text(
               value,
               textAlign: TextAlign.center,
-              style: AppTextStyles.headlineM.copyWith(color: AppColors.gray900),
+              style: AppTextStyles.titleS.copyWith(
+                color: AppColors.gray900,
+                fontWeight: FontWeight.w700,
+              ),
             )
           else
             Row(
@@ -166,8 +175,9 @@ class _StatCard extends StatelessWidget {
                 ),
                 Text(
                   value,
-                  style: AppTextStyles.headlineM.copyWith(
+                  style: AppTextStyles.titleS.copyWith(
                     color: AppColors.gray900,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -186,12 +196,14 @@ class _InsightCard extends StatelessWidget {
     this.title,
     this.descriptions = const [],
     this.titleColor,
+    this.firstDescriptionBoldPhrase,
   }) : assert(insight != null || title != null);
 
   final HistoryInsight? insight;
   final String? title;
   final List<String> descriptions;
   final Color? titleColor;
+  final String? firstDescriptionBoldPhrase;
   final Widget child;
 
   String get _title => insight?.title ?? title!;
@@ -216,15 +228,43 @@ class _InsightCard extends StatelessWidget {
               padding: EdgeInsets.only(
                 bottom: i < _descriptions.length - 1 ? 4 : 0,
               ),
-              child: Text(
-                _descriptions[i],
-                style: i == 0
-                    ? AppTextStyles.bodyM2.copyWith(color: AppColors.gray900)
-                    : AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
-              ),
+              child: i == 0
+                  ? _buildFirstDescription(_descriptions[i])
+                  : Text(
+                      _descriptions[i],
+                      style: AppTextStyles.bodyS.copyWith(
+                        color: AppColors.gray600,
+                      ),
+                    ),
             ),
           const SizedBox(height: AppSpacing.md),
           child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFirstDescription(String text) {
+    final baseStyle = AppTextStyles.bodyM2.copyWith(color: AppColors.gray900);
+    final phrase = firstDescriptionBoldPhrase;
+
+    if (phrase == null || !text.contains(phrase)) {
+      return Text(text, style: baseStyle);
+    }
+
+    final index = text.indexOf(phrase);
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: text.substring(0, index), style: baseStyle),
+          TextSpan(
+            text: phrase,
+            style: baseStyle.copyWith(fontWeight: FontWeight.w700),
+          ),
+          TextSpan(
+            text: text.substring(index + phrase.length),
+            style: baseStyle,
+          ),
         ],
       ),
     );
@@ -468,59 +508,60 @@ class _TimeUsageChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: _chartSize,
-          height: _chartSize,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              CustomPaint(
-                size: const Size(_chartSize, _chartSize),
-                painter: _ClockDonutPainter(usages: usages),
-              ),
-              const Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Text(
-                  '24',
-                  textAlign: TextAlign.center,
-                  style: _hourLabelStyle,
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: _chartSize,
+            height: _chartSize,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(_chartSize, _chartSize),
+                  painter: _ClockDonutPainter(usages: usages),
                 ),
-              ),
-              const Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(child: Text('6', style: _hourLabelStyle)),
-              ),
-              const Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Text(
-                  '12',
-                  textAlign: TextAlign.center,
-                  style: _hourLabelStyle,
+                const Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Text(
+                    '24',
+                    textAlign: TextAlign.center,
+                    style: _hourLabelStyle,
+                  ),
                 ),
-              ),
-              const Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(child: Text('18', style: _hourLabelStyle)),
-              ),
-            ],
+                const Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(child: Text('6', style: _hourLabelStyle)),
+                ),
+                const Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Text(
+                    '12',
+                    textAlign: TextAlign.center,
+                    style: _hourLabelStyle,
+                  ),
+                ),
+                const Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(child: Text('18', style: _hourLabelStyle)),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          const SizedBox(width: AppSpacing.md),
+          Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (var i = 0; i < usages.length; i++) ...[
@@ -529,8 +570,8 @@ class _TimeUsageChart extends StatelessWidget {
               ],
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -546,6 +587,7 @@ class _LegendRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
@@ -555,14 +597,12 @@ class _LegendRow extends StatelessWidget {
             child: _CountChip(count: usage.count),
           ),
         ),
-        Expanded(
-          child: Text(
-            usage.label,
-            style: AppTextStyles.bodyS.copyWith(
-              color: highlight ? AppColors.primary500 : AppColors.gray900,
-              fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
-              height: 1.3,
-            ),
+        Text(
+          usage.label,
+          style: AppTextStyles.bodyS.copyWith(
+            color: highlight ? AppColors.primary500 : AppColors.gray900,
+            fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
+            height: 1.3,
           ),
         ),
       ],

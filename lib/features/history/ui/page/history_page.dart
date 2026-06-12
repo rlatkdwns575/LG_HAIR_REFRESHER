@@ -10,6 +10,7 @@ import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
 import '../../data/refresh_history_store.dart';
 import '../widgets/history_common.dart';
+import '../widgets/history_month_picker.dart';
 import '../widgets/history_recent_section.dart';
 import '../widgets/history_today_section.dart';
 import '../widgets/history_total_section.dart';
@@ -26,8 +27,10 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   static const _horizontalPadding = 15.0;
+  static final _minMonth = DateTime(1970, 1);
 
   late final RefreshHistoryReport _report;
+  late DateTime _visibleMonth;
   DateTime? _selectedDate;
   bool _calendarExpanded = false;
 
@@ -35,7 +38,24 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     _report = RefreshHistoryStore.instance.loadReport();
-    _selectedDate = _report.latestRecordedDate;
+    _visibleMonth = _report.defaultMonth;
+    _selectedDate = _report.monthDataFor(_visibleMonth).latestRecordedDate;
+  }
+
+  RefreshHistoryMonthData get _visibleMonthData =>
+      _report.monthDataFor(_visibleMonth);
+
+  bool get _canGoPreviousMonth {
+    return _visibleMonth.year > _minMonth.year ||
+        (_visibleMonth.year == _minMonth.year &&
+            _visibleMonth.month > _minMonth.month);
+  }
+
+  bool get _canGoNextMonth {
+    final latest = _report.defaultMonth;
+    return _visibleMonth.year < latest.year ||
+        (_visibleMonth.year == latest.year &&
+            _visibleMonth.month < latest.month);
   }
 
   void _onBack() {
@@ -52,6 +72,42 @@ class _HistoryPageState extends State<HistoryPage> {
 
   void _onToggleExpanded() {
     setState(() => _calendarExpanded = !_calendarExpanded);
+  }
+
+  void _onPreviousMonth() {
+    if (!_canGoPreviousMonth) {
+      return;
+    }
+    setState(() {
+      _visibleMonth = RefreshHistoryReport.monthBefore(_visibleMonth);
+      _selectedDate = _visibleMonthData.latestRecordedDate;
+    });
+  }
+
+  void _onNextMonth() {
+    if (!_canGoNextMonth) {
+      return;
+    }
+    setState(() {
+      _visibleMonth = RefreshHistoryReport.monthAfter(_visibleMonth);
+      _selectedDate = _visibleMonthData.latestRecordedDate;
+    });
+  }
+
+  Future<void> _onCalendarIconTap() async {
+    final picked = await showHistoryMonthPicker(
+      context: context,
+      initialMonth: _visibleMonth,
+      maxMonth: _report.defaultMonth,
+      minMonth: _minMonth,
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    setState(() {
+      _visibleMonth = DateTime(picked.year, picked.month);
+      _selectedDate = _visibleMonthData.latestRecordedDate;
+    });
   }
 
   void _showComingSoon(String message) {
@@ -91,9 +147,16 @@ class _HistoryPageState extends State<HistoryPage> {
           const SizedBox(height: AppSpacing.lg),
           _padded(
             HistoryRecentSection(
-              report: _report,
+              asOfDate: _report.asOfDate,
+              visibleMonth: _visibleMonth,
+              monthData: _visibleMonthData,
               selectedDate: _selectedDate,
               calendarExpanded: _calendarExpanded,
+              canGoPreviousMonth: _canGoPreviousMonth,
+              canGoNextMonth: _canGoNextMonth,
+              onPreviousMonth: _onPreviousMonth,
+              onNextMonth: _onNextMonth,
+              onCalendarIconTap: _onCalendarIconTap,
               onDateSelected: _onDateSelected,
               onToggleExpanded: _onToggleExpanded,
               onDayResultDetailTap: () =>

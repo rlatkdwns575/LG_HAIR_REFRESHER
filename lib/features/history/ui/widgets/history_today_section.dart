@@ -175,22 +175,23 @@ class _TodayRecordTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (record.odorBeforeStatus != null)
-                      HistoryCareStatusRow(
-                        label: '냄새 관리',
-                        before: record.odorBeforeStatus!,
-                        after: record.odorAfterStatus,
-                        labelWidth: 58,
-                      ),
-                    if (record.dustBeforeStatus != null) ...[
-                      const SizedBox(height: 8),
-                      HistoryCareStatusRow(
-                        label: '먼지 관리',
-                        before: record.dustBeforeStatus!,
-                        after: record.dustAfterStatus,
-                        labelWidth: 58,
-                      ),
-                    ],
+                    HistoryCareStatusGroup(
+                      labelWidth: 58,
+                      items: [
+                        if (record.odorBeforeStatus != null)
+                          HistoryCareStatusItem(
+                            label: '냄새 관리',
+                            before: record.odorBeforeStatus!,
+                            after: record.odorAfterStatus,
+                          ),
+                        if (record.dustBeforeStatus != null)
+                          HistoryCareStatusItem(
+                            label: '먼지 관리',
+                            before: record.dustBeforeStatus!,
+                            after: record.dustAfterStatus,
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ],

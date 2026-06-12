@@ -111,6 +111,63 @@ class RefreshMonthlySummary {
   final double improvementDeltaPercent;
   final String mostUsedMode;
   final String mostUsedTimeRange;
+
+  factory RefreshMonthlySummary.empty(DateTime month) {
+    return RefreshMonthlySummary(
+      month: DateTime(month.year, month.month),
+      totalCount: 0,
+      vsLastMonthDelta: 0,
+      improvementPercent: 0,
+      improvementDeltaPercent: 0,
+      mostUsedMode: '-',
+      mostUsedTimeRange: '-',
+    );
+  }
+}
+
+/// 특정 연·월의 캘린더·요약 데이터.
+class RefreshHistoryMonthData {
+  const RefreshHistoryMonthData({
+    required this.month,
+    required this.dayGroups,
+    required this.monthlySummary,
+  });
+
+  final DateTime month;
+  final List<RefreshDayGroup> dayGroups;
+  final RefreshMonthlySummary monthlySummary;
+
+  factory RefreshHistoryMonthData.empty(DateTime month) {
+    final normalized = DateTime(month.year, month.month);
+    return RefreshHistoryMonthData(
+      month: normalized,
+      dayGroups: const [],
+      monthlySummary: RefreshMonthlySummary.empty(normalized),
+    );
+  }
+
+  Map<DateTime, int> get countByDate {
+    return {for (final group in dayGroups) group.date: group.count};
+  }
+
+  RefreshDayGroup? groupForDate(DateTime date) {
+    final key = DateTime(date.year, date.month, date.day);
+    for (final group in dayGroups) {
+      if (group.date == key) {
+        return group;
+      }
+    }
+    return null;
+  }
+
+  DateTime? get latestRecordedDate {
+    if (dayGroups.isEmpty) {
+      return null;
+    }
+    return dayGroups
+        .map((group) => group.date)
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+  }
 }
 
 /// 전체 누적 인사이트.
@@ -157,9 +214,7 @@ class RefreshHistoryReport {
     required this.todaySummaryTitle,
     required this.todaySummarySubtitle,
     required this.routineSuggestion,
-    required this.month,
-    required this.dayGroups,
-    required this.monthlySummary,
+    required this.monthHistory,
     required this.totalSummary,
   });
 
@@ -171,40 +226,47 @@ class RefreshHistoryReport {
   final String todaySummarySubtitle;
   final RoutineSuggestion? routineSuggestion;
 
-  final DateTime month;
-  final List<RefreshDayGroup> dayGroups;
-  final RefreshMonthlySummary monthlySummary;
+  final List<RefreshHistoryMonthData> monthHistory;
   final RefreshTotalSummary totalSummary;
 
   bool get hasTodayRecords => todayRecords.isNotEmpty;
 
-  /// 날짜별 기록 수 (캘린더 도트 표시용).
-  Map<DateTime, int> get countByDate {
-    return {for (final group in dayGroups) group.date: group.count};
+  DateTime get defaultMonth => DateTime(asOfDate.year, asOfDate.month);
+
+  DateTime get earliestMonth {
+    if (monthHistory.isEmpty) {
+      return defaultMonth;
+    }
+    return monthHistory
+        .map((data) => data.month)
+        .reduce((a, b) => a.isBefore(b) ? a : b);
   }
 
-  RefreshDayGroup? groupForDate(DateTime date) {
-    final key = DateTime(date.year, date.month, date.day);
-    for (final group in dayGroups) {
-      if (group.date == key) {
-        return group;
+  RefreshHistoryMonthData monthDataFor(DateTime month) {
+    final normalized = DateTime(month.year, month.month);
+    for (final data in monthHistory) {
+      if (data.month.year == normalized.year &&
+          data.month.month == normalized.month) {
+        return data;
       }
     }
-    return null;
+    return RefreshHistoryMonthData.empty(normalized);
   }
 
-  /// 가장 최근 기록이 있는 날짜 (기본 선택용).
-  DateTime? get latestRecordedDate {
-    if (dayGroups.isEmpty) {
-      return null;
-    }
-    return dayGroups
-        .map((group) => group.date)
-        .reduce((a, b) => a.isAfter(b) ? a : b);
-  }
+  static bool isSameMonth(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month;
+
+  static DateTime monthBefore(DateTime month) =>
+      DateTime(month.year, month.month - 1);
+
+  static DateTime monthAfter(DateTime month) =>
+      DateTime(month.year, month.month + 1);
 
   static DateTime _at(int day, int hour, int minute) =>
       DateTime(2026, 6, day, hour, minute);
+
+  static DateTime _atMay(int day, int hour, int minute) =>
+      DateTime(2026, 5, day, hour, minute);
 
   /// Figma 리프레시 기록 리포트 기준 mock. API 연동 시 교체합니다.
   static final RefreshHistoryReport sample = RefreshHistoryReport(
@@ -241,172 +303,248 @@ class RefreshHistoryReport {
       subtitle: '새로운 루틴으로 등록할까요?',
       tags: ['퇴근 후 리프레시 케어', '수요일·금요일', '오후 7시', '5분 소요'],
     ),
-    month: DateTime(2026, 6),
-    dayGroups: [
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 3),
-        summaryMessage: '외부 냄새와 먼지가 함께 많이 감지된 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(3, 22, 42),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.both,
-            necessityReductionPercent: 72,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
+    monthHistory: [
+      RefreshHistoryMonthData(
+        month: DateTime(2026, 5),
+        dayGroups: [
+          RefreshDayGroup(
+            date: DateTime(2026, 5, 5),
+            summaryMessage: '가벼운 케어 위주로 사용했어요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _atMay(5, 19, 30),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.odor,
+                necessityReductionPercent: 58,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 5, 12),
+            summaryMessage: '저녁 시간대에 자주 사용했어요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _atMay(12, 20, 15),
+                modeName: '외부 냄새 리프레시',
+                careType: CareType.both,
+                necessityReductionPercent: 65,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _atMay(12, 21, 40),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.both,
+                necessityReductionPercent: 62,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 5, 21),
+            summaryMessage: '먼지관리에 집중했던 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _atMay(21, 8, 10),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.dust,
+                necessityReductionPercent: 54,
+                odorBeforeStatus: CareStatus.normal,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
           ),
         ],
+        monthlySummary: RefreshMonthlySummary(
+          month: DateTime(2026, 5),
+          totalCount: 8,
+          vsLastMonthDelta: 2,
+          improvementPercent: 61,
+          improvementDeltaPercent: 3,
+          mostUsedMode: '리프레시 모드 이름',
+          mostUsedTimeRange: '오후 7시~10시',
+        ),
       ),
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 6),
-        summaryMessage: '냄새관리에 집중했던 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(6, 9, 12),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.odor,
-            necessityReductionPercent: 64,
-            odorBeforeStatus: CareStatus.recommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.normal,
-            dustAfterStatus: CareStatus.good,
+      RefreshHistoryMonthData(
+        month: DateTime(2026, 6),
+        dayGroups: [
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 3),
+            summaryMessage: '외부 냄새와 먼지가 함께 많이 감지된 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(3, 22, 42),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.both,
+                necessityReductionPercent: 72,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
           ),
-          RefreshHistoryRecord(
-            dateTime: _at(6, 20, 5),
-            modeName: '외부 냄새 리프레시',
-            careType: CareType.odor,
-            necessityReductionPercent: 70,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.normal,
-            dustAfterStatus: CareStatus.good,
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 6),
+            summaryMessage: '냄새관리에 집중했던 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(6, 9, 12),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.odor,
+                necessityReductionPercent: 64,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(6, 20, 5),
+                modeName: '외부 냄새 리프레시',
+                careType: CareType.odor,
+                necessityReductionPercent: 70,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 7),
+            summaryMessage: '먼지관리에 집중했던 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(7, 8, 30),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.dust,
+                necessityReductionPercent: 58,
+                odorBeforeStatus: CareStatus.normal,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(7, 19, 40),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.dust,
+                necessityReductionPercent: 61,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 8),
+            summaryMessage: '냄새와 먼지를 함께 케어한 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(8, 21, 15),
+                modeName: '외부 냄새 리프레시',
+                careType: CareType.both,
+                necessityReductionPercent: 73,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 9),
+            summaryMessage: '냄새관리에 집중했던 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(9, 7, 20),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.odor,
+                necessityReductionPercent: 55,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(9, 12, 0),
+                modeName: '외부 냄새 리프레시',
+                careType: CareType.odor,
+                necessityReductionPercent: 67,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(9, 20, 30),
+                modeName: '외부 냄새 리프레시',
+                careType: CareType.odor,
+                necessityReductionPercent: 71,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.normal,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
+          ),
+          RefreshDayGroup(
+            date: DateTime(2026, 6, 10),
+            summaryMessage: '먼지관리에 집중했던 날이에요.',
+            records: [
+              RefreshHistoryRecord(
+                dateTime: _at(10, 23, 12),
+                modeName: '헤어 상태 진단',
+                careType: CareType.diagnosis,
+                isDiagnosis: true,
+                odorBeforeStatus: CareStatus.notNeeded,
+                dustBeforeStatus: CareStatus.notNeeded,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(10, 19, 38),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.both,
+                necessityReductionPercent: 74,
+                odorBeforeStatus: CareStatus.focusedRecommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+              RefreshHistoryRecord(
+                dateTime: _at(10, 11, 42),
+                modeName: '리프레시 모드 이름',
+                careType: CareType.both,
+                necessityReductionPercent: 69,
+                odorBeforeStatus: CareStatus.recommend,
+                odorAfterStatus: CareStatus.good,
+                dustBeforeStatus: CareStatus.focusedRequired,
+                dustAfterStatus: CareStatus.good,
+              ),
+            ],
           ),
         ],
-      ),
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 7),
-        summaryMessage: '먼지관리에 집중했던 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(7, 8, 30),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.dust,
-            necessityReductionPercent: 58,
-            odorBeforeStatus: CareStatus.normal,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
-          ),
-          RefreshHistoryRecord(
-            dateTime: _at(7, 19, 40),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.dust,
-            necessityReductionPercent: 61,
-            odorBeforeStatus: CareStatus.recommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
-          ),
-        ],
-      ),
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 8),
-        summaryMessage: '냄새와 먼지를 함께 케어한 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(8, 21, 15),
-            modeName: '외부 냄새 리프레시',
-            careType: CareType.both,
-            necessityReductionPercent: 73,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
-          ),
-        ],
-      ),
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 9),
-        summaryMessage: '냄새관리에 집중했던 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(9, 7, 20),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.odor,
-            necessityReductionPercent: 55,
-            odorBeforeStatus: CareStatus.recommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.normal,
-            dustAfterStatus: CareStatus.good,
-          ),
-          RefreshHistoryRecord(
-            dateTime: _at(9, 12, 0),
-            modeName: '외부 냄새 리프레시',
-            careType: CareType.odor,
-            necessityReductionPercent: 67,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.normal,
-            dustAfterStatus: CareStatus.good,
-          ),
-          RefreshHistoryRecord(
-            dateTime: _at(9, 20, 30),
-            modeName: '외부 냄새 리프레시',
-            careType: CareType.odor,
-            necessityReductionPercent: 71,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.normal,
-            dustAfterStatus: CareStatus.good,
-          ),
-        ],
-      ),
-      RefreshDayGroup(
-        date: DateTime(2026, 6, 10),
-        summaryMessage: '먼지관리에 집중했던 날이에요.',
-        records: [
-          RefreshHistoryRecord(
-            dateTime: _at(10, 23, 12),
-            modeName: '헤어 상태 진단',
-            careType: CareType.diagnosis,
-            isDiagnosis: true,
-            odorBeforeStatus: CareStatus.notNeeded,
-            dustBeforeStatus: CareStatus.notNeeded,
-          ),
-          RefreshHistoryRecord(
-            dateTime: _at(10, 19, 38),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.both,
-            necessityReductionPercent: 74,
-            odorBeforeStatus: CareStatus.focusedRecommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
-          ),
-          RefreshHistoryRecord(
-            dateTime: _at(10, 11, 42),
-            modeName: '리프레시 모드 이름',
-            careType: CareType.both,
-            necessityReductionPercent: 69,
-            odorBeforeStatus: CareStatus.recommend,
-            odorAfterStatus: CareStatus.good,
-            dustBeforeStatus: CareStatus.focusedRequired,
-            dustAfterStatus: CareStatus.good,
-          ),
-        ],
+        monthlySummary: RefreshMonthlySummary(
+          month: DateTime(2026, 6),
+          totalCount: 12,
+          vsLastMonthDelta: 3,
+          improvementPercent: 67,
+          improvementDeltaPercent: 4,
+          mostUsedMode: '외부 냄새 리프레시',
+          mostUsedTimeRange: '오후 7시~10시',
+        ),
       ),
     ],
-    monthlySummary: RefreshMonthlySummary(
-      month: DateTime(2026, 6),
-      totalCount: 12,
-      vsLastMonthDelta: 3,
-      improvementPercent: 67,
-      improvementDeltaPercent: 4,
-      mostUsedMode: '외부 냄새 리프레시',
-      mostUsedTimeRange: '오후 7시~10시',
-    ),
     totalSummary: RefreshTotalSummary(
       introMessage: '리프레시가 점점 {이름}님의\n외출 후 루틴으로 자리 잡고 있어요.',
       totalCount: 100,
@@ -472,11 +610,11 @@ class RefreshHistoryReport {
           HistoryBarStat(label: '먼지 케어', percent: 10, color: AppColors.blue700),
         ],
       ),
-      modeUsageDescription: '000000모드를 가장 많이 사용했어요',
+      modeUsageDescription: '00000모드를 가장 많이 사용했어요',
       modeUsages: [
-        ModeUsage(count: 56, modeName: '000000모드', improvementPercent: 70),
-        ModeUsage(count: 12, modeName: '000000모드', improvementPercent: 86),
-        ModeUsage(count: 3, modeName: '000000모드', improvementPercent: 50),
+        ModeUsage(count: 56, modeName: '00000모드', improvementPercent: 70),
+        ModeUsage(count: 12, modeName: '00000모드', improvementPercent: 86),
+        ModeUsage(count: 3, modeName: '00000모드', improvementPercent: 50),
       ],
     ),
   );
@@ -489,9 +627,7 @@ class RefreshHistoryReport {
     todaySummarySubtitle: sample.todaySummarySubtitle,
     todayRecords: const [],
     routineSuggestion: sample.routineSuggestion,
-    month: sample.month,
-    dayGroups: sample.dayGroups,
-    monthlySummary: sample.monthlySummary,
+    monthHistory: sample.monthHistory,
     totalSummary: sample.totalSummary,
   );
 }

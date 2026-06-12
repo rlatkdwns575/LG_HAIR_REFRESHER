@@ -55,6 +55,7 @@ class HistoryStatusArrow extends StatelessWidget {
 /// `라벨 + (이전 배지 → 이후 배지)` 한 줄.
 ///
 /// [after] 가 없으면 단일 배지만 표시합니다(진단 기록 등).
+/// [showArrow] 가 false 이면 화살표 없이 이전 배지만 표시합니다.
 class HistoryCareStatusRow extends StatelessWidget {
   const HistoryCareStatusRow({
     required this.label,
@@ -63,6 +64,7 @@ class HistoryCareStatusRow extends StatelessWidget {
     this.labelWidth = 64,
     this.beforeBadgeWidth,
     this.compact = false,
+    this.showArrow = true,
     super.key,
   });
 
@@ -78,6 +80,9 @@ class HistoryCareStatusRow extends StatelessWidget {
 
   /// 좁은 2열 카드용 — 라벨·배지·간격을 줄입니다.
   final bool compact;
+
+  /// false 이면 [HistoryCareStatusGroup] 등에서 공용 화살표를 쓸 때 사용합니다.
+  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +112,129 @@ class HistoryCareStatusRow extends StatelessWidget {
             width: beforeBadgeWidth,
             child: Align(alignment: Alignment.centerLeft, child: beforeBadge),
           ),
-        if (after != null) ...[
+        if (after != null && showArrow) ...[
           SizedBox(width: gap),
           HistoryStatusArrow(size: compact ? 10 : 12),
           SizedBox(width: gap),
           HistoryCareBadge(status: after!, compact: compact),
         ],
       ],
+    );
+  }
+}
+
+/// 냄새·먼지 등 여러 케어 상태를 **화살표 1개**로 연결해 표시합니다.
+class HistoryCareStatusGroup extends StatelessWidget {
+  const HistoryCareStatusGroup({
+    required this.items,
+    this.labelWidth = 58,
+    this.compact = false,
+    super.key,
+  });
+
+  final List<HistoryCareStatusItem> items;
+  final double labelWidth;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final gap = compact ? 2.0 : 4.0;
+    final rowSpacing = compact ? 6.0 : 8.0;
+    final rowHeight = compact ? 20.0 : 22.0;
+    final arrowSize = compact ? 10.0 : 12.0;
+    final showArrow = items.any((item) => item.after != null);
+
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                if (i > 0) SizedBox(height: rowSpacing),
+                SizedBox(
+                  height: rowHeight,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: HistoryCareStatusRow(
+                      label: items[i].label,
+                      before: items[i].before,
+                      after: items[i].after,
+                      labelWidth: labelWidth,
+                      compact: compact,
+                      showArrow: false,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          if (showArrow) ...[
+            SizedBox(width: gap),
+            Center(child: HistoryStatusArrow(size: arrowSize)),
+            SizedBox(width: gap),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < items.length; i++) ...[
+                  if (i > 0) SizedBox(height: rowSpacing),
+                  _AfterBadgeSlot(
+                    after: items[i].after,
+                    compact: compact,
+                    rowHeight: rowHeight,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class HistoryCareStatusItem {
+  const HistoryCareStatusItem({
+    required this.label,
+    required this.before,
+    this.after,
+  });
+
+  final String label;
+  final CareStatus before;
+  final CareStatus? after;
+}
+
+class _AfterBadgeSlot extends StatelessWidget {
+  const _AfterBadgeSlot({
+    required this.after,
+    required this.compact,
+    required this.rowHeight,
+  });
+
+  final CareStatus? after;
+  final bool compact;
+  final double rowHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: rowHeight,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: after == null
+            ? const SizedBox.shrink()
+            : HistoryCareBadge(status: after!, compact: compact),
+      ),
     );
   }
 }

@@ -11,31 +11,47 @@ import 'history_care_badge.dart';
 import 'history_common.dart';
 import 'history_month_calendar.dart';
 
+const _calendarIconAsset = 'lib/features/refresh/data/calendar.png';
+
 /// Section 2 — 최근 리프레시 기록 (월 이동 + 캘린더 + 선택 날짜 상세).
 class HistoryRecentSection extends StatelessWidget {
   const HistoryRecentSection({
-    required this.report,
+    required this.asOfDate,
+    required this.visibleMonth,
+    required this.monthData,
     required this.selectedDate,
     required this.calendarExpanded,
+    required this.canGoPreviousMonth,
+    required this.canGoNextMonth,
+    required this.onPreviousMonth,
+    required this.onNextMonth,
+    required this.onCalendarIconTap,
     required this.onDateSelected,
     required this.onToggleExpanded,
     this.onDayResultDetailTap,
     super.key,
   });
 
-  final RefreshHistoryReport report;
+  final DateTime asOfDate;
+  final DateTime visibleMonth;
+  final RefreshHistoryMonthData monthData;
   final DateTime? selectedDate;
   final bool calendarExpanded;
+  final bool canGoPreviousMonth;
+  final bool canGoNextMonth;
+  final VoidCallback onPreviousMonth;
+  final VoidCallback onNextMonth;
+  final VoidCallback onCalendarIconTap;
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback onToggleExpanded;
   final VoidCallback? onDayResultDetailTap;
 
   @override
   Widget build(BuildContext context) {
-    final summary = report.monthlySummary;
+    final summary = monthData.monthlySummary;
     final selectedGroup = selectedDate == null
         ? null
-        : report.groupForDate(selectedDate!);
+        : monthData.groupForDate(selectedDate!);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,7 +61,14 @@ class HistoryRecentSection extends StatelessWidget {
           subtitle: '파란 점이 있는 날짜를 선택해 기록을 확인해보세요.',
         ),
         const SizedBox(height: AppSpacing.md),
-        _MonthNavRow(month: report.month),
+        _MonthNavRow(
+          month: visibleMonth,
+          canGoPrevious: canGoPreviousMonth,
+          canGoNext: canGoNextMonth,
+          onPrevious: onPreviousMonth,
+          onNext: onNextMonth,
+          onCalendarIconTap: onCalendarIconTap,
+        ),
         const SizedBox(height: AppSpacing.md),
         _MonthlySummaryCard(summary: summary),
         const SizedBox(height: AppSpacing.md),
@@ -54,10 +77,10 @@ class HistoryRecentSection extends StatelessWidget {
           backgroundColor: AppColors.gray0,
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: HistoryMonthCalendar(
-            month: report.month,
-            countByDate: report.countByDate,
+            month: visibleMonth,
+            countByDate: monthData.countByDate,
             selectedDate: selectedDate,
-            asOfDate: report.asOfDate,
+            asOfDate: asOfDate,
             expanded: calendarExpanded,
             onDateSelected: onDateSelected,
             onToggleExpanded: onToggleExpanded,
@@ -76,9 +99,21 @@ class HistoryRecentSection extends StatelessWidget {
 }
 
 class _MonthNavRow extends StatelessWidget {
-  const _MonthNavRow({required this.month});
+  const _MonthNavRow({
+    required this.month,
+    required this.canGoPrevious,
+    required this.canGoNext,
+    required this.onPrevious,
+    required this.onNext,
+    required this.onCalendarIconTap,
+  });
 
   final DateTime month;
+  final bool canGoPrevious;
+  final bool canGoNext;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+  final VoidCallback onCalendarIconTap;
 
   String get _label {
     final monthStr = month.month.toString().padLeft(2, '0');
@@ -89,21 +124,62 @@ class _MonthNavRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.chevron_left, size: 22, color: AppColors.gray700),
+        _NavIconButton(
+          icon: Icons.chevron_left,
+          enabled: canGoPrevious,
+          onTap: onPrevious,
+        ),
         const SizedBox(width: 4),
         Text(
           _label,
           style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
         ),
         const SizedBox(width: 4),
-        const Icon(Icons.chevron_right, size: 22, color: AppColors.gray700),
+        _NavIconButton(
+          icon: Icons.chevron_right,
+          enabled: canGoNext,
+          onTap: onNext,
+        ),
         const Spacer(),
-        const Icon(
-          Icons.calendar_today_outlined,
-          size: 20,
-          color: AppColors.gray700,
+        GestureDetector(
+          onTap: onCalendarIconTap,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Image.asset(
+              _calendarIconAsset,
+              width: 20,
+              height: 20,
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _NavIconButton extends StatelessWidget {
+  const _NavIconButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: Icon(
+        icon,
+        size: 22,
+        color: enabled ? AppColors.gray700 : AppColors.gray300,
+      ),
     );
   }
 }
