@@ -14,18 +14,15 @@ class CustomModeApi {
   Future<List<RefreshMode>> fetchForUser(String userId) async {
     try {
       final rows = await SupabaseService.client
-          .from(SupabaseTables.customModes)
-          .select(
-            'mode_id, display_name, category, duration_time, '
-            'odor_yn, dust_yn, scent_yn, '
-            'odor_strength, dust_strength, scent_strength',
-          )
+          .from(SupabaseTables.refreshMode)
+          .select(RefreshModeMapper.selectColumns)
+          .eq('custom_yn', true)
           .eq('user_id', userId)
           .order('display_name');
 
       return rows
           .map(
-            (row) => RefreshModeMapper.fromCustomModeRow(
+            (row) => RefreshModeMapper.fromRefreshModeRow(
               Map<String, dynamic>.from(row),
             ),
           )
@@ -46,6 +43,7 @@ class CustomModeApi {
     int? dustStrength,
     int? odorStrength,
     int? scentStrength,
+    String? description,
   }) async {
     final modeId = _generateUuidV4();
     final payload = <String, dynamic>{
@@ -54,11 +52,15 @@ class CustomModeApi {
       'display_name': displayName,
       'category': RefreshModeTabs.customMode,
       'duration_time': durationMinutes * 60,
+      'custom_yn': true,
       'odor_yn': odorYn,
       'dust_yn': dustYn,
       'scent_yn': scentYn,
     };
 
+    if (description != null && description.trim().isNotEmpty) {
+      payload['description'] = description.trim();
+    }
     if (odorYn && odorStrength != null) {
       payload['odor_strength'] = odorStrength;
     }
@@ -71,16 +73,12 @@ class CustomModeApi {
 
     try {
       final row = await SupabaseService.client
-          .from(SupabaseTables.customModes)
+          .from(SupabaseTables.refreshMode)
           .insert(payload)
-          .select(
-            'mode_id, display_name, category, duration_time, '
-            'odor_yn, dust_yn, scent_yn, '
-            'odor_strength, dust_strength, scent_strength',
-          )
+          .select(RefreshModeMapper.selectColumns)
           .single();
 
-      return RefreshModeMapper.fromCustomModeRow(
+      return RefreshModeMapper.fromRefreshModeRow(
         Map<String, dynamic>.from(row),
       );
     } on PostgrestException catch (error) {
@@ -91,10 +89,11 @@ class CustomModeApi {
   Future<bool> delete({required String userId, required String modeId}) async {
     try {
       await SupabaseService.client
-          .from(SupabaseTables.customModes)
+          .from(SupabaseTables.refreshMode)
           .delete()
           .eq('user_id', userId)
-          .eq('mode_id', modeId);
+          .eq('mode_id', modeId)
+          .eq('custom_yn', true);
       return true;
     } catch (error, stackTrace) {
       debugPrint('CustomModeApi.delete failed: $error\n$stackTrace');

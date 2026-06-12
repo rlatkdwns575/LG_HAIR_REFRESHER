@@ -4,9 +4,11 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
+import '../../../../shared/widgets/app_battery_status.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
 import '../../data/home_assets.dart';
 import '../../data/model/home_dashboard_data.dart';
+import '../../data/model/home_filter_status.dart';
 
 /// Figma `홈_첫진입 시` (710:17738) — img area 360×356 · 배터리/필터 · 디바이스 관리.
 class HomeDeviceStatusSection extends StatelessWidget {
@@ -23,6 +25,12 @@ class HomeDeviceStatusSection extends StatelessWidget {
   static const _statusLabelColor = AppColors.gray700;
   static const _statusIconSize = 24.0;
   static const _statusAreaBottomPadding = 16.0;
+  static const _deviceManageButtonPadding = EdgeInsets.fromLTRB(
+    16,
+    AppSpacing.xs,
+    9,
+    AppSpacing.xs,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -69,22 +77,30 @@ class HomeDeviceStatusSection extends StatelessWidget {
                         SizedBox(
                           width: 120,
                           child: Center(
-                            child: _BatteryStatus(percent: data.batteryPercent),
+                            child: AppBatteryStatus(
+                              percent: data.batteryPercent,
+                              iconAsset: HomeAssets.batteryIconFor(
+                                data.batteryPercent,
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
                           width: 120,
                           child: Center(
-                            child: _FilterStatus(label: data.filterStatusLabel),
+                            child: _FilterStatus(status: data.filterStatus),
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  AppTextLinkButton(
-                    label: '디바이스 관리',
-                    onPressed: onDeviceManagePressed,
+                  Center(
+                    child: AppTextLinkButton(
+                      label: '디바이스 관리',
+                      onPressed: onDeviceManagePressed,
+                      contentPadding: _deviceManageButtonPadding,
+                    ),
                   ),
                 ],
               ),
@@ -96,50 +112,19 @@ class HomeDeviceStatusSection extends StatelessWidget {
   }
 }
 
-class _BatteryStatus extends StatelessWidget {
-  const _BatteryStatus({required this.percent});
-
-  final int percent;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 32,
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              HomeAssets.batteryIcon,
-              width: HomeDeviceStatusSection._statusIconSize,
-              height: HomeDeviceStatusSection._statusIconSize,
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              '배터리',
-              style: AppTextStyles.bodyS.copyWith(
-                color: HomeDeviceStatusSection._statusLabelColor,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              '$percent%',
-              style: AppTextStyles.bodyS.copyWith(
-                color: HomeDeviceStatusSection._statusLabelColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _FilterStatus extends StatelessWidget {
-  const _FilterStatus({required this.label});
+  const _FilterStatus({required this.status});
 
-  final String label;
+  final HomeFilterStatus status;
+
+  static AppBadgeSmallVariant _badgeVariant(HomeFilterStatusTier tier) {
+    return switch (tier) {
+      HomeFilterStatusTier.replaceSoon => AppBadgeSmallVariant.veryHigh,
+      HomeFilterStatusTier.replaceRecommended => AppBadgeSmallVariant.high,
+      HomeFilterStatusTier.normal => AppBadgeSmallVariant.gray,
+      HomeFilterStatusTier.fresh => AppBadgeSmallVariant.medium,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +149,8 @@ class _FilterStatus extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.xs),
             AppBadge(
-              label: label,
-              smallVariant: AppBadgeSmallVariant.medium,
+              label: status.label,
+              smallVariant: _badgeVariant(status.tier),
               style: AppBadgeStyle.text,
             ),
           ],

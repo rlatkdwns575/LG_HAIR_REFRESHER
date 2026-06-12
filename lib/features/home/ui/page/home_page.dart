@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,10 +18,12 @@ import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
 import '../../data/api/weather_api.dart';
 import '../../data/api/weather_recommend_fallback.dart';
+import '../../data/home_device_status_watcher.dart';
 import '../../data/home_recommend_cache.dart';
 import '../../data/home_shortcut_store.dart';
 import '../../data/model/environment_snapshot.dart';
 import '../../data/model/home_dashboard_data.dart';
+import '../../data/model/home_device_status_snapshot.dart';
 import '../widgets/home_device_status_section.dart';
 import '../widgets/home_navigation_card.dart';
 import '../widgets/home_quick_refresh_row.dart';
@@ -33,13 +37,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const _contentHorizontalPadding = 15.0;
 
-  /// 추천 배너(대기중) 아래 메뉴 카드(헤어 리프레시~) 시작 여백.
-  static const _recommendToMenuGap = 40.0;
-
+  static const _sectionGap = AppSpacing.sm;
   final _homeApi = const HomeApi();
+  final _deviceStatusWatcher = HomeDeviceStatusWatcher();
   final _weatherApi = const WeatherApi();
   final _refreshApi = const RefreshApi();
   final _geminiRecommendApi = const GeminiRecommendApi();
@@ -48,7 +51,6 @@ class _HomePageState extends State<HomePage> {
   HomeDashboardData _dashboardData = const HomeDashboardData();
   bool _isLoading = true;
   String? _recommendMessage;
-
   HomeQuickRefreshMode? get _favoriteMode =>
       HomeShortcutStore.instance.favoriteQuickMode;
 
@@ -83,7 +85,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadDashboard();
+  }
+
+  @override
+  void dispose() {
+    unawaited(_deviceStatusWatcher.stop());
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_deviceStatusWatcher.refresh());
+    }
   }
 
   Future<void> _loadDashboard() async {
@@ -154,7 +171,40 @@ class _HomePageState extends State<HomePage> {
       _recommendMessage = recommendMessage;
       _isLoading = false;
     });
+
+    final deviceId = dashboard.linkedDeviceId;
+    if (deviceId != null) {
+      _deviceStatusWatcher.start(
+        deviceId: deviceId,
+        onChanged: _applyDeviceStatusSnapshot,
+      );
+    }
   }
+
+  void _applyDeviceStatusSnapshot(HomeDeviceStatusSnapshot snapshot) {
+    if (!mounted) {
+      return;
+    }
+
+    final currentFilter = _dashboardData.filterStatus;
+    final hasChanges =
+        _dashboardData.batteryPercent != snapshot.batteryPercent ||
+        currentFilter.tier != snapshot.filterStatus.tier ||
+        currentFilter.label != snapshot.filterStatus.label;
+
+    if (!hasChanges) {
+      return;
+    }
+
+    setState(() {
+      _dashboardData = _dashboardData.copyWith(
+        batteryPercent: snapshot.batteryPercent,
+        filterStatus: snapshot.filterStatus,
+      );
+    });
+  }
+
+  Future<void> _refreshDeviceStatus() => _deviceStatusWatcher.refresh();
 
   Future<RefreshMode?> _resolveRecommendedMode(
     EnvironmentSnapshot environment,
@@ -228,71 +278,74 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    _contentHorizontalPadding,
-                    AppSpacing.xs,
-                    _contentHorizontalPadding,
-                    0,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    child: HomeDeviceStatusSection(
-                      data: _dashboardData,
-                      onDeviceManagePressed: () {},
+          : RefreshIndicator(
+              onRefresh: _refreshDeviceStatus,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      _contentHorizontalPadding,
+                      AppSpacing.xs,
+                      _contentHorizontalPadding,
+                      0,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      child: HomeDeviceStatusSection(
+                        data: _dashboardData,
+                        onDeviceManagePressed: () {},
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: _contentHorizontalPadding,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: AppSpacing.xl),
-                      if (_recommendMessage != null)
-                        HomeRecommendBanner(message: _recommendMessage!),
-                      if (_recommendMessage != null &&
-                          _dashboardData.hasUsageHistory &&
-                          _quickSlots.isNotEmpty)
-                        const SizedBox(height: AppSpacing.lg),
-                      if (_dashboardData.hasUsageHistory &&
-                          _quickSlots.isNotEmpty) ...[
-                        HomeQuickRefreshRow(
-                          slots: _quickSlots,
-                          onFavoriteAddPressed: _handleFavoriteAdd,
-                          onModePressed: (mode) =>
-                              context.pushRefreshProgress(modeName: mode.title),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: _contentHorizontalPadding,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: _sectionGap),
+                        if (_recommendMessage != null) ...[
+                          HomeRecommendBanner(message: _recommendMessage!),
+                          const SizedBox(height: _sectionGap),
+                        ],
+                        if (_dashboardData.hasUsageHistory &&
+                            _quickSlots.isNotEmpty) ...[
+                          HomeQuickRefreshRow(
+                            slots: _quickSlots,
+                            onFavoriteAddPressed: _handleFavoriteAdd,
+                            onModePressed: (mode) => context
+                                .pushRefreshProgress(modeName: mode.title),
+                          ),
+                          const SizedBox(height: _sectionGap),
+                        ],
+                        HomeActionCard(
+                          child: HomeTappableNavigationRow(
+                            title: '헤어 리프레시',
+                            onTap: context.pushRefresh,
+                          ),
+                        ),
+                        const SizedBox(height: _sectionGap),
+                        HomeActionCard(
+                          child: HomeTappableNavigationRow(
+                            title: '헤어 상태 진단',
+                            onTap: _handleDiagnosisTap,
+                          ),
+                        ),
+                        const SizedBox(height: _sectionGap),
+                        HomeActionCard(
+                          child: HomeTappableNavigationRow(
+                            title: '리프레시 내역',
+                            onTap: context.pushHistory,
+                          ),
                         ),
                       ],
-                      const SizedBox(height: _recommendToMenuGap),
-                      HomeActionCard(
-                        child: HomeTappableNavigationRow(
-                          title: '헤어 리프레시',
-                          onTap: context.pushRefresh,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      HomeActionCard(
-                        child: HomeDiagnosisRow(
-                          onDiagnosisPressed: _handleDiagnosisTap,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      HomeActionCard(
-                        child: HomeTappableNavigationRow(
-                          title: '리프레시 내역',
-                          onTap: context.pushHistory,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
       floatingActionButton: kDebugMode
           ? FloatingActionButton.small(

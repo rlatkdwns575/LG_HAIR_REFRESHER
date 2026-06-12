@@ -6,6 +6,7 @@ import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_badge.dart';
+import 'app_battery_status.dart';
 import 'app_bottom_button_bar.dart';
 import 'app_box_button.dart';
 import 'app_box_mini_button.dart';
@@ -32,6 +33,8 @@ import 'app_text_field.dart';
 import 'app_text_link_button.dart';
 import 'app_toggle.dart';
 import 'app_top_header.dart';
+import 'feature_placeholder_page.dart';
+import 'feature_sub_page_scaffold.dart';
 
 /// Medium Phone (360×800) 기준 위젯 미리보기 폭.
 const double _phonePreviewWidth = 360;
@@ -64,6 +67,7 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
 
   static const _widgetFiles = <(String, String)>[
     ('AppBadge', 'app_badge.dart'),
+    ('AppBatteryStatus', 'app_battery_status.dart'),
     ('AppBoxButton', 'app_box_button.dart'),
     ('AppBoxMiniButton', 'app_box_mini_button.dart'),
     ('AppBottomButtonBar', 'app_bottom_button_bar.dart'),
@@ -90,6 +94,8 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
     ('AppRefreshCard', 'app_refresh_card.dart'),
     ('AppResultCard', 'app_result_card.dart'),
     ('AppTextLinkButton', 'app_text_link_button.dart'),
+    ('FeaturePlaceholderPage', 'feature_placeholder_page.dart'),
+    ('FeatureSubPageScaffold', 'feature_sub_page_scaffold.dart'),
   ];
 
   @override
@@ -232,6 +238,20 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
               onActionPressed: () {},
               tags: const [AppResultCardTag(label: '모이스처 리프레시')],
             ),
+          ],
+        ),
+      ),
+      _groupTitle('Device Status'),
+      _section(
+        'AppBatteryStatus',
+        'icon_battery_24 · state 0/10/30/40/50/60/80/100 + %',
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final sample in const [5, 20, 50, 85]) ...[
+              AppBatteryStatus(percent: sample),
+              if (sample != 85) const SizedBox(height: AppSpacing.sm),
+            ],
           ],
         ),
       ),
@@ -705,6 +725,44 @@ class _SharedWidgetGalleryPageState extends State<SharedWidgetGalleryPage> {
             title: '타이틀을 입력해주세요.',
             message: '텍스트가 한 줄일 경우 높이\n값은 두 줄로 유지합니다.',
           ),
+          size: AppBoxButtonSize.medium,
+        ),
+      ),
+      _groupTitle('Layout'),
+      _section(
+        'FeaturePlaceholderPage',
+        'MVP feature placeholder body · title + description + checklist',
+        SizedBox(
+          height: 300,
+          child: FeaturePlaceholderPage(
+            title: '디바이스 관리',
+            description: '기기 연결, 필터 교체, 배터리 상태를 확인합니다.',
+            items: const ['기기 연결 상태', '필터 잔량 확인', '배터리 잔량 확인'],
+            footer: AppBoxButton(
+              label: '설정 열기',
+              onPressed: () {},
+              size: AppBoxButtonSize.medium,
+            ),
+          ),
+        ),
+      ),
+      _section(
+        'FeatureSubPageScaffold',
+        'AppTopHeader + FeaturePlaceholderPage · push sub-page shell',
+        AppBoxButton(
+          label: '전체 화면 미리보기',
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (previewContext) => FeatureSubPageScaffold(
+                  title: '디바이스 관리',
+                  description: '홈 허브에서 진입하는 feature 서브 페이지 레이아웃입니다.',
+                  items: const ['기기 연결 상태', '필터 잔량 확인', '배터리 잔량 확인'],
+                  onBack: () => Navigator.of(previewContext).pop(),
+                ),
+              ),
+            );
+          },
           size: AppBoxButtonSize.medium,
         ),
       ),

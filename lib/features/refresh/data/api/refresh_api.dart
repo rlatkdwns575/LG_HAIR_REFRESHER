@@ -12,11 +12,8 @@ class RefreshApi {
     try {
       final rows = await SupabaseService.client
           .from(SupabaseTables.refreshMode)
-          .select(
-            'mode_id, display_name, category, duration_time, '
-            'odor_yn, dust_yn, scent_yn, '
-            'odor_strength, dust_strength, scent_strength',
-          )
+          .select(RefreshModeMapper.selectColumns)
+          .eq('custom_yn', false)
           .order('display_name');
 
       return rows

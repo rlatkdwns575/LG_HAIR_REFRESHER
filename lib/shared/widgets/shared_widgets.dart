@@ -1,4 +1,5 @@
 export 'app_badge.dart';
+export 'app_battery_status.dart';
 export 'app_bottom_button_bar.dart';
 export 'app_box_button.dart';
 export 'app_box_mini_button.dart';
