@@ -65,6 +65,5 @@ class CareDurationSplit {
   }
 
   /// 진행 화면 단계 시간 표시용. [formatKoreanTime]과 동일 규칙.
-  static String formatKoreanDuration(int seconds) =>
-      formatKoreanTime(seconds);
+  static String formatKoreanDuration(int seconds) => formatKoreanTime(seconds);
 }

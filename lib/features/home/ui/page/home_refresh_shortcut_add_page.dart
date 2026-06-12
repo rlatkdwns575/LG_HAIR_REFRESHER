@@ -8,7 +8,10 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_bottom_button_bar.dart';
 import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../core/services/auth_session_service.dart';
+import '../../../refresh/data/api/custom_mode_api.dart';
 import '../../../refresh/data/api/refresh_api.dart';
+import '../../../refresh/data/custom_mode_cache.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
 import '../../../refresh/data/refresh_mode_filter.dart';
@@ -27,6 +30,7 @@ class HomeRefreshShortcutAddPage extends StatefulWidget {
 class _HomeRefreshShortcutAddPageState
     extends State<HomeRefreshShortcutAddPage> {
   final _refreshApi = const RefreshApi();
+  final _customModeApi = const CustomModeApi();
 
   bool _isLoading = true;
   int _selectedChipIndex = 0;
@@ -46,8 +50,11 @@ class _HomeRefreshShortcutAddPageState
   }
 
   Future<void> _loadPresets() async {
+    final userId = AuthSessionService.resolveUserId();
     final presets = await _refreshApi.fetchPresetModes();
+    final customModes = await _customModeApi.fetchForUser(userId);
     RefreshPresetModeStore.instance.setPresets(presets);
+    CustomModeCache.instance.setModes(customModes);
 
     if (!mounted) {
       return;

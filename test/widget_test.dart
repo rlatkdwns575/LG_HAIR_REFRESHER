@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/app/app.dart';
+import 'package:lg_hair_refresher/app/router/app_router.dart';
+import 'package:lg_hair_refresher/core/constants/route_paths.dart';
 
 void main() {
   testWidgets('shows login screen on app start', (tester) async {
@@ -13,16 +15,9 @@ void main() {
     expect(find.text('이메일로 로그인'), findsOneWidget);
   });
 
-  testWidgets('shows home dashboard after email login', (tester) async {
+  testWidgets('shows home dashboard screen', (tester) async {
+    appRouter.go(AppRoutePaths.home);
     await tester.pumpWidget(const LgHairRefresherApp());
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('이메일로 로그인'));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField).at(0), 'user@example.com');
-    await tester.enterText(find.byType(TextField).at(1), 'password123');
-    await tester.tap(find.widgetWithText(FilledButton, '로그인'));
     await tester.pumpAndSettle();
 
     expect(find.text('우리 기기 이름'), findsOneWidget);

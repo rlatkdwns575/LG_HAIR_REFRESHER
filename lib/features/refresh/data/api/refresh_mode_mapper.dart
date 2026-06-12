@@ -5,6 +5,15 @@ import '../model/refresh_mode.dart';
 class RefreshModeMapper {
   const RefreshModeMapper._();
 
+  static RefreshMode fromCustomModeRow(Map<String, dynamic> row) {
+    return fromRefreshModeRow(row).copyWith(
+      isCustom: true,
+      createdByUser: true,
+      category: RefreshModeTabs.customMode,
+      icon: Icons.tune_outlined,
+    );
+  }
+
   static RefreshMode fromRefreshModeRow(Map<String, dynamic> row) {
     final odorYn = row['odor_yn'] == true;
     final dustYn = row['dust_yn'] == true;

@@ -1,4 +1,4 @@
-import 'custom_mode_store.dart';
+import 'custom_mode_cache.dart';
 import 'model/refresh_mode.dart';
 
 /// Supabase에서 불러온 프리셋 모드 캐시.
@@ -20,6 +20,6 @@ class RefreshPresetModeStore {
 List<RefreshMode> getAllRefreshModes() {
   return [
     ...RefreshPresetModeStore.instance.presets,
-    ...CustomModeStore.instance.modes,
+    ...CustomModeCache.instance.modes,
   ];
 }

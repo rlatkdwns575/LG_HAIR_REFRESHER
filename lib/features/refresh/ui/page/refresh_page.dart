@@ -8,11 +8,13 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../core/services/auth_session_service.dart';
 import '../../../home/data/api/weather_api.dart';
+import '../../data/api/custom_mode_api.dart';
 import '../../data/api/refresh_api.dart';
 import '../../data/api/refresh_recommend_api.dart';
 import '../../data/api/refresh_recommend_fallback.dart';
-import '../../data/custom_mode_store.dart';
+import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_mode_filter.dart';
@@ -28,6 +30,7 @@ class RefreshPage extends StatefulWidget {
 
 class _RefreshPageState extends State<RefreshPage> {
   final _refreshApi = const RefreshApi();
+  final _customModeApi = const CustomModeApi();
   final _weatherApi = const WeatherApi();
   final _refreshRecommendApi = const RefreshRecommendApi();
 
@@ -38,7 +41,7 @@ class _RefreshPageState extends State<RefreshPage> {
 
   List<RefreshMode> get _allModes => [
     ..._presetModes,
-    ...CustomModeStore.instance.modes,
+    ...CustomModeCache.instance.modes,
   ];
 
   List<RefreshMode> get _filteredModes {
@@ -63,8 +66,11 @@ class _RefreshPageState extends State<RefreshPage> {
   }
 
   Future<void> _loadModes() async {
+    final userId = AuthSessionService.resolveUserId();
     final presets = await _refreshApi.fetchPresetModes();
+    final customModes = await _customModeApi.fetchForUser(userId);
     RefreshPresetModeStore.instance.setPresets(presets);
+    CustomModeCache.instance.setModes(customModes);
 
     RefreshMode? recommended;
     try {
@@ -121,7 +127,17 @@ class _RefreshPageState extends State<RefreshPage> {
       return;
     }
 
-    if (CustomModeStore.instance.delete(mode)) {
+    final userId = AuthSessionService.resolveUserId();
+    final deleted = await _customModeApi.delete(
+      userId: userId,
+      modeId: mode.id,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (deleted && CustomModeCache.instance.removeById(mode.id)) {
       setState(() {});
     }
   }

@@ -52,6 +52,28 @@ void main() {
     });
   });
 
+  group('RefreshModeMapper.fromCustomModeRow', () {
+    test('marks row as user custom mode', () {
+      final mode = RefreshModeMapper.fromCustomModeRow({
+        'mode_id': 'custom-uuid',
+        'display_name': '나만의 모드',
+        'category': '커스텀 모드',
+        'duration_time': 420,
+        'odor_yn': true,
+        'dust_yn': false,
+        'scent_yn': true,
+        'odor_strength': 2,
+        'scent_strength': 1,
+      });
+
+      expect(mode.isCustom, isTrue);
+      expect(mode.createdByUser, isTrue);
+      expect(mode.id, 'custom-uuid');
+      expect(mode.name, '나만의 모드');
+      expect(mode.tags, ['냄새 제거 일반관리', '향 케어 간편관리']);
+    });
+  });
+
   group('RefreshModeMapper.strengthLabel', () {
     test('maps strength levels to Korean labels', () {
       expect(RefreshModeMapper.strengthLabel(null), '일반관리');

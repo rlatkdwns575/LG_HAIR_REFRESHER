@@ -16,6 +16,7 @@ import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
 import '../../data/api/weather_api.dart';
 import '../../data/api/weather_recommend_fallback.dart';
+import '../../data/home_recommend_cache.dart';
 import '../../data/home_shortcut_store.dart';
 import '../../data/model/environment_snapshot.dart';
 import '../../data/model/home_dashboard_data.dart';
@@ -104,37 +105,44 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    String? recommendMessage;
-    EnvironmentSnapshot? environment;
+    String? recommendMessage = HomeRecommendCache.instance.message;
 
-    try {
-      environment = await _weatherApi.fetchSnapshot();
-      debugPrint(
-        'Home weather loaded: '
-        '${environment.temperatureCelsius}°C, '
-        'humidity ${environment.humidityPercent}%, '
-        'rain=${environment.isRaining}, snow=${environment.isSnowing}',
-      );
-
-      final recommendedMode = await _resolveRecommendedMode(environment);
-      final recommendedModeName = recommendedMode?.name;
+    if (recommendMessage != null) {
+      debugPrint('Home banner using cached recommend message.');
+    } else {
+      EnvironmentSnapshot? environment;
 
       try {
-        recommendMessage = await _geminiRecommendApi.generateMessage(
-          environment,
-          recommendedModeName: recommendedModeName,
+        environment = await _weatherApi.fetchSnapshot();
+        debugPrint(
+          'Home weather loaded: '
+          '${environment.temperatureCelsius}°C, '
+          'humidity ${environment.humidityPercent}%, '
+          'rain=${environment.isRaining}, snow=${environment.isSnowing}',
         );
-        debugPrint('Home Gemini banner message generated.');
+
+        final recommendedMode = await _resolveRecommendedMode(environment);
+        final recommendedModeName = recommendedMode?.name;
+
+        try {
+          recommendMessage = await _geminiRecommendApi.generateMessage(
+            environment,
+            recommendedModeName: recommendedModeName,
+          );
+          debugPrint('Home Gemini banner message generated.');
+        } catch (error, stackTrace) {
+          debugPrint('Home Gemini failed: $error\n$stackTrace');
+          recommendMessage = WeatherRecommendFallback.message(
+            environment,
+            recommendedModeName: recommendedModeName,
+          );
+          debugPrint('Home banner using weather fallback message.');
+        }
+
+        HomeRecommendCache.instance.save(recommendMessage);
       } catch (error, stackTrace) {
-        debugPrint('Home Gemini failed: $error\n$stackTrace');
-        recommendMessage = WeatherRecommendFallback.message(
-          environment,
-          recommendedModeName: recommendedModeName,
-        );
-        debugPrint('Home banner using weather fallback message.');
+        debugPrint('Home weather failed: $error\n$stackTrace');
       }
-    } catch (error, stackTrace) {
-      debugPrint('Home weather failed: $error\n$stackTrace');
     }
 
     if (!mounted) {
