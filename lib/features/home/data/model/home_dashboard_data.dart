@@ -12,6 +12,12 @@ class HomeQuickRefreshMode {
   final List<String> captionItems;
 }
 
+/// API에서 자주 사용 모드를 못 가져올 때 우측 카드 기본값.
+const homeFrequentModeFallback = HomeQuickRefreshMode(
+  title: '자주 사용한 모드',
+  durationLabel: '2분',
+);
+
 /// 홈 대시보드 목 데이터.
 ///
 /// [hasUsageHistory]가 false이면 즐겨찾기·자주 사용한 모드 영역을 숨깁니다.

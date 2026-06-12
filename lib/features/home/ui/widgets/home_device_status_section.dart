@@ -10,7 +10,7 @@ import '../../data/home_assets.dart';
 import '../../data/model/home_dashboard_data.dart';
 import '../../data/model/home_filter_status.dart';
 
-/// Figma `홈_첫진입 시` (710:17738) — img area 360×356 · 배터리/필터 · 디바이스 관리.
+/// Figma `631:18545` img area 360×356 · 배터리/필터 · 디바이스 관리.
 class HomeDeviceStatusSection extends StatelessWidget {
   const HomeDeviceStatusSection({
     required this.data,
@@ -38,7 +38,7 @@ class HomeDeviceStatusSection extends StatelessWidget {
       width: double.infinity,
       height: _heroHeight,
       child: DecoratedBox(
-        decoration: const BoxDecoration(color: AppColors.gray100),
+        decoration: const BoxDecoration(color: AppColors.homeBackground),
         child: Column(
           children: [
             Expanded(

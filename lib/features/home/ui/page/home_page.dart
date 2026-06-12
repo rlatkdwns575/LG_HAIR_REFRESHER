@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
@@ -25,11 +24,11 @@ import '../../data/model/environment_snapshot.dart';
 import '../../data/model/home_dashboard_data.dart';
 import '../../data/model/home_device_status_snapshot.dart';
 import '../widgets/home_device_status_section.dart';
-import '../widgets/home_navigation_card.dart';
+import '../widgets/home_navigation_menu.dart';
 import '../widgets/home_quick_refresh_row.dart';
 import '../widgets/home_recommend_banner.dart';
 
-/// Figma `홈_첫진입 시` (710:17738) 및 사용 이력 이후 상태.
+/// Figma `631:18545` — 첫진입(710:17738) · 리프레시 1회+(801:23885/801:24040).
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -40,7 +39,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const _contentHorizontalPadding = 15.0;
 
-  static const _sectionGap = AppSpacing.sm;
+  /// Figma Frame 4947 내부 섹션 간격 6px.
+  static const _sectionGap = 6.0;
   final _homeApi = const HomeApi();
   final _deviceStatusWatcher = HomeDeviceStatusWatcher();
   final _weatherApi = const WeatherApi();
@@ -69,15 +69,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         const HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
     ];
 
-    final frequent = _dashboardData.frequentMode;
-    if (frequent != null) {
-      slots.add(
-        HomeQuickRefreshSlot(
-          type: HomeQuickSlotType.frequentMode,
-          mode: frequent,
-        ),
-      );
-    }
+    slots.add(
+      HomeQuickRefreshSlot(
+        type: HomeQuickSlotType.frequentMode,
+        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
+      ),
+    );
 
     return slots;
   }
@@ -284,20 +281,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      _contentHorizontalPadding,
-                      AppSpacing.xs,
-                      _contentHorizontalPadding,
-                      0,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      child: HomeDeviceStatusSection(
-                        data: _dashboardData,
-                        onDeviceManagePressed: () {},
-                      ),
-                    ),
+                  HomeDeviceStatusSection(
+                    data: _dashboardData,
+                    onDeviceManagePressed: () {},
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -311,8 +297,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           HomeRecommendBanner(message: _recommendMessage!),
                           const SizedBox(height: _sectionGap),
                         ],
-                        if (_dashboardData.hasUsageHistory &&
-                            _quickSlots.isNotEmpty) ...[
+                        if (_dashboardData.hasUsageHistory) ...[
                           HomeQuickRefreshRow(
                             slots: _quickSlots,
                             onFavoriteAddPressed: _handleFavoriteAdd,
@@ -321,25 +306,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           const SizedBox(height: _sectionGap),
                         ],
-                        HomeActionCard(
-                          child: HomeTappableNavigationRow(
-                            title: '헤어 리프레시',
-                            onTap: context.pushRefresh,
-                          ),
-                        ),
-                        const SizedBox(height: _sectionGap),
-                        HomeActionCard(
-                          child: HomeTappableNavigationRow(
-                            title: '헤어 상태 진단',
-                            onTap: _handleDiagnosisTap,
-                          ),
-                        ),
-                        const SizedBox(height: _sectionGap),
-                        HomeActionCard(
-                          child: HomeTappableNavigationRow(
-                            title: '리프레시 내역',
-                            onTap: context.pushHistory,
-                          ),
+                        HomeNavigationMenu(
+                          onRefreshPressed: context.pushRefresh,
+                          onDiagnosisPressed: _handleDiagnosisTap,
+                          onHistoryPressed: context.pushHistory,
                         ),
                       ],
                     ),

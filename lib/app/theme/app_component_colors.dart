@@ -147,11 +147,17 @@ class AppComponentColors {
   // card_refresh
   static const refreshCardDefaultBackground = Color(0xFFF5F6FF);
   static const refreshCardDefaultBorder = Color(0xFFEBEDFF);
+  static const refreshCardAddBackground = Color(0xFFF5F7FA);
+  static const refreshCardAddBorder = Color(0xFFDADEE3);
+  static const refreshCardAddTitle = Color(0xFF8B939E);
   static const refreshCardCompactBackground = Color(0xFFFFFFFF);
   static const refreshCardCompactBorder = Color(0xFFEFF1F4);
   static const refreshCardTitle = Color(0xFF052C66);
   static const refreshCardBody = Color(0xFF4E5561);
   static const refreshCardCaption = Color(0xFF8B939E);
+  static const refreshCardOutlineBadgeBorder = Color(0xFFDADEE3);
+  static const capsuleIconOnlyNeutral = Color(0xFFE6E9ED);
+  static const capsuleIconOnlyNeutralIcon = Color(0xFF8B939E);
 
   // card_recommend
   static const recommendCardGradientStart = Color(0xFFF5F6FF);

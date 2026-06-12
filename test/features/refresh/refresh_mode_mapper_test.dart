@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/refresh/data/api/refresh_mode_mapper.dart';
+import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
 
 void main() {
   group('RefreshModeMapper.fromRefreshModeRow', () {
@@ -92,6 +93,24 @@ void main() {
       expect(mode.id, 'custom-uuid');
       expect(mode.name, '나만의 모드');
       expect(mode.tags, ['냄새 제거 일반관리', '향 케어 간편관리']);
+    });
+
+    test('preserves selected category for custom mode', () {
+      final mode = RefreshModeMapper.fromCustomModeRow({
+        'mode_id': 'custom-uuid',
+        'user_id': 'user-uuid',
+        'display_name': '나만의 모드',
+        'category': RefreshModeTabs.beforeOuting,
+        'custom_yn': true,
+        'duration_time': 420,
+        'odor_yn': true,
+        'dust_yn': false,
+        'scent_yn': false,
+        'odor_strength': 2,
+      });
+
+      expect(mode.category, RefreshModeTabs.beforeOuting);
+      expect(mode.icon, Icons.directions_walk_outlined);
     });
   });
 
