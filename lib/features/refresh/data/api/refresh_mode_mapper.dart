@@ -5,13 +5,13 @@ import '../model/refresh_mode.dart';
 class RefreshModeMapper {
   const RefreshModeMapper._();
 
+  static const selectColumns =
+      'mode_id, user_id, display_name, category, description, duration_time, '
+      'custom_yn, odor_yn, dust_yn, scent_yn, '
+      'odor_strength, dust_strength, scent_strength';
+
   static RefreshMode fromCustomModeRow(Map<String, dynamic> row) {
-    return fromRefreshModeRow(row).copyWith(
-      isCustom: true,
-      createdByUser: true,
-      category: RefreshModeTabs.customMode,
-      icon: Icons.tune_outlined,
-    );
+    return fromRefreshModeRow({...row, 'custom_yn': true});
   }
 
   static RefreshMode fromRefreshModeRow(Map<String, dynamic> row) {
@@ -21,20 +21,29 @@ class RefreshModeMapper {
     final odorStrength = _readInt(row['odor_strength']);
     final dustStrength = _readInt(row['dust_strength']);
     final scentStrength = _readInt(row['scent_strength']);
-    final category = (row['category'] as String? ?? '').trim();
+    final rawCategory = (row['category'] as String? ?? '').trim();
+    final customYn = row['custom_yn'] == true;
+    final descriptionText = (row['description'] as String?)?.trim() ?? '';
+    final category = customYn
+        ? RefreshModeTabs.customMode
+        : rawCategory.isEmpty
+        ? '기타'
+        : rawCategory;
 
     return RefreshMode(
       id: row['mode_id'] as String,
       name: row['display_name'] as String? ?? '리프레시 모드',
-      description: _buildDescription(
-        odorYn: odorYn,
-        dustYn: dustYn,
-        scentYn: scentYn,
-        category: row['category'] as String? ?? '',
-      ),
-      category: category.isEmpty ? '기타' : category,
+      description: descriptionText.isNotEmpty
+          ? descriptionText
+          : _buildDescription(
+              odorYn: odorYn,
+              dustYn: dustYn,
+              scentYn: scentYn,
+              category: rawCategory,
+            ),
+      category: category,
       durationSeconds: _readInt(row['duration_time']) ?? 0,
-      icon: _iconForCategory(row['category'] as String? ?? ''),
+      icon: customYn ? Icons.tune_outlined : _iconForCategory(rawCategory),
       tags: _buildTags(
         odorYn: odorYn,
         dustYn: dustYn,
@@ -43,6 +52,8 @@ class RefreshModeMapper {
         dustStrength: dustStrength,
         scentStrength: scentStrength,
       ),
+      isCustom: customYn,
+      createdByUser: customYn,
       odorYn: odorYn,
       dustYn: dustYn,
       scentYn: scentYn,

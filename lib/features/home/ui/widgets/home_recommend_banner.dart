@@ -5,6 +5,7 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_recommend_card.dart';
+import 'home_navigation_card.dart';
 
 /// Figma `card_recommend` (710:17764) — 날씨·환경 안내 배너.
 class HomeRecommendBanner extends StatelessWidget {
@@ -16,6 +17,7 @@ class HomeRecommendBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: HomeActionCard.rowHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -44,14 +46,16 @@ class HomeRecommendBanner extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 12,
-          ),
-          child: Text(
-            message,
-            style: AppTextStyles.bodyXs.copyWith(
-              color: AppComponentColors.recommendCardText,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyXs.copyWith(
+                color: AppComponentColors.recommendCardText,
+              ),
             ),
           ),
         ),

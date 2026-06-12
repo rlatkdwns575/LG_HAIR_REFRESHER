@@ -9,6 +9,7 @@ void main() {
         'mode_id': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
         'display_name': '외출 전 케어',
         'category': '외출 전',
+        'custom_yn': false,
         'duration_time': 150,
         'odor_yn': true,
         'dust_yn': true,
@@ -32,6 +33,23 @@ void main() {
       expect(mode.description, contains('먼지'));
       expect(mode.description, contains('냄새'));
       expect(mode.tags, ['먼지 제거 일반관리', '냄새 제거 집중관리']);
+      expect(mode.isCustom, isFalse);
+    });
+
+    test('uses description column when provided', () {
+      final mode = RefreshModeMapper.fromRefreshModeRow({
+        'mode_id': 'mode-desc',
+        'display_name': '설명 모드',
+        'category': '외출 후',
+        'description': '저녁 귀가 후 머리를 정돈해요.',
+        'custom_yn': false,
+        'duration_time': 120,
+        'odor_yn': false,
+        'dust_yn': false,
+        'scent_yn': false,
+      });
+
+      expect(mode.description, '저녁 귀가 후 머리를 정돈해요.');
     });
 
     test('uses default category and icon when category is empty', () {
@@ -39,6 +57,7 @@ void main() {
         'mode_id': 'mode-1',
         'display_name': '기본 모드',
         'category': '',
+        'custom_yn': false,
         'duration_time': 90,
         'odor_yn': false,
         'dust_yn': false,
@@ -56,8 +75,10 @@ void main() {
     test('marks row as user custom mode', () {
       final mode = RefreshModeMapper.fromCustomModeRow({
         'mode_id': 'custom-uuid',
+        'user_id': 'user-uuid',
         'display_name': '나만의 모드',
         'category': '커스텀 모드',
+        'custom_yn': true,
         'duration_time': 420,
         'odor_yn': true,
         'dust_yn': false,

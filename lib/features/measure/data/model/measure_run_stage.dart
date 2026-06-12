@@ -2,14 +2,8 @@
 ///
 /// 진행률(0.0~1.0)에 따라 단계가 결정되며, 각 단계마다 안내 문구를 갖습니다.
 enum MeasureRunStage {
-  analyzing(
-    title: '현재 헤어 상태를 진단 중이에요',
-    subtitle: '디바이스를 움직이지 말고 잠시 유지해 주세요.',
-  ),
-  finishing(
-    title: '거의 다 됐어요',
-    subtitle: '디바이스를 움직이지 말고 잠시 유지해 주세요.',
-  ),
+  analyzing(title: '현재 헤어 상태를 진단 중이에요', subtitle: '디바이스를 움직이지 말고 잠시 유지해 주세요.'),
+  finishing(title: '거의 다 됐어요', subtitle: '디바이스를 움직이지 말고 잠시 유지해 주세요.'),
   completed(title: '진단이 완료되었어요.');
 
   const MeasureRunStage({required this.title, this.subtitle});

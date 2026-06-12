@@ -67,6 +67,14 @@ flutter:
     - lib/features/refresh/data/refrash.png
     - lib/features/refresh/data/calendar.png
     - lib/features/home/energe.png
+    - lib/features/home/assets/battery/icon_battery_24_state_0.png
+    - lib/features/home/assets/battery/icon_battery_24_state_10.png
+    - lib/features/home/assets/battery/icon_battery_24_state_30.png
+    - lib/features/home/assets/battery/icon_battery_24_state_40.png
+    - lib/features/home/assets/battery/icon_battery_24_state_50.png
+    - lib/features/home/assets/battery/icon_battery_24_state_60.png
+    - lib/features/home/assets/battery/icon_battery_24_state_80.png
+    - lib/features/home/assets/battery/icon_battery_24_state_100.png
     - lib/features/home/filter.png
     - lib/features/home/check.png
 
