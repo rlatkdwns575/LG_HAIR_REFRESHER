@@ -18,7 +18,7 @@ import '../../data/api/refresh_recommend_fallback.dart';
 import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_mode_catalog.dart';
-import '../../data/model/refresh_mode_filter.dart';
+import '../../data/refresh_mode_filter.dart';
 import '../widgets/refresh_mode_card.dart';
 import '../widgets/refresh_section_header.dart';
 
@@ -197,7 +197,7 @@ class _RefreshPageState extends State<RefreshPage> {
       children: [
         RefreshSectionHeader(
           title: '리프레시 모드',
-          trailingLabel: '커스텀하기',
+          trailingLabel: '커스텀 모드 생성',
           onTrailingTap: _openCustomCreate,
         ),
         _buildChipTabBar(),

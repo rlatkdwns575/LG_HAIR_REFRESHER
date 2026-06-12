@@ -5,7 +5,7 @@ void main() {
   test('batteryIconFor returns home asset path', () {
     expect(
       HomeAssets.batteryIconFor(60),
-      'lib/features/home/assets/battery/icon_battery_24_state_60.png',
+      'assets/images/home/battery/icon_battery_24_state_60.png',
     );
   });
 }

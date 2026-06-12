@@ -58,7 +58,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         backgroundColor: AppColors.surface,
         appBar: AppCommonTopHeader(
           variant: AppCommonTopHeaderVariant.gnb,
-          title: '현재 헤어 상태',
+          title: '헤어 상태 진단',
           onBack: _goHome,
         ),
         body: Column(

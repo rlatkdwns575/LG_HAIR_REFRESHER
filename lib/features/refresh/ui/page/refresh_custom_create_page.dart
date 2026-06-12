@@ -183,7 +183,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '커스텀 모드',
+        title: '커스텀 모드 생성',
         onBack: () => context.pop(),
       ),
       body: Column(
@@ -372,7 +372,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionTitle('카테고리 선택'),
+        const _SectionTitle('언제 사용하실건가요?'),
         const SizedBox(height: AppSpacing.md),
         _CategoryChips(
           selected: _selectedCategory,

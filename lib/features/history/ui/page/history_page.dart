@@ -128,7 +128,7 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '기록',
+        title: '리프레시 내역',
         onBack: _onBack,
       ),
       body: ListView(

@@ -89,7 +89,7 @@ class _MeasurePreparePageState extends State<MeasurePreparePage> {
       backgroundColor: AppColors.surface,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '현재 헤어 상태',
+        title: '헤어 상태 진단',
         onBack: () => context.pop(),
       ),
       body: isLoading
