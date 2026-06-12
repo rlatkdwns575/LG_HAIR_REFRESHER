@@ -53,8 +53,8 @@ class RefreshCustomCreatePage extends StatefulWidget {
 }
 
 class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
-  static const int _minDuration = 1;
-  static const int _maxDuration = 30;
+  static const int _minDuration = 2;
+  static const int _maxDuration = 15;
 
   final _nameController = TextEditingController();
 
