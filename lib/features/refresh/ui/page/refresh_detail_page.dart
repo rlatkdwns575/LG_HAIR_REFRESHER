@@ -40,7 +40,7 @@ class RefreshDetailPage extends StatelessWidget {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시 상세',
+        title: '헤어 리프레시 상세',
         onBack: () => context.pop(),
       ),
       body: Column(

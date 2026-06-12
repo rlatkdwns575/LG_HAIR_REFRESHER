@@ -8,7 +8,8 @@ class CustomModeCache {
 
   List<RefreshMode> _modes = const [];
 
-  List<RefreshMode> get modes => List.unmodifiable(_modes.reversed);
+  // API가 이미 최신순으로 정렬해서 주므로 .reversed를 제거함
+  List<RefreshMode> get modes => List.unmodifiable(_modes);
 
   bool get isEmpty => _modes.isEmpty;
 
@@ -16,8 +17,9 @@ class CustomModeCache {
     _modes = List.unmodifiable(modes);
   }
 
+  // 최신 등록한 모드가 리스트 맨 상단에 바로 뜨도록 앞쪽에 추가되게 수정
   void add(RefreshMode mode) {
-    _modes = [..._modes, mode];
+    _modes = [mode, ..._modes];
   }
 
   bool removeById(String modeId) {
