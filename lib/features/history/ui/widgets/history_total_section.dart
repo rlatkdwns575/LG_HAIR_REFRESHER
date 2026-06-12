@@ -35,19 +35,10 @@ class HistoryTotalSection extends StatelessWidget {
           subtitle: '지금까지의 리프레시 기록을 확인해보세요.',
         ),
         const SizedBox(height: AppSpacing.lg),
-        Column(
-          children: [
-            Text(
-              '리프레시가 점점 {이름}님의',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
-            ),
-            Text(
-              '외출 후 루틴으로 자리 잡고 있어요.',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
-            ),
-          ],
+        Text(
+          summary.introMessage,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
         ),
         const SizedBox(height: AppSpacing.lg),
         Row(
@@ -97,10 +88,12 @@ class HistoryTotalSection extends StatelessWidget {
         _InsightCard(
           title: '주요 리프레시 모드',
           titleColor: AppColors.primary500,
-          firstDescriptionBoldPhrase: '00000모드',
+          firstDescriptionBoldPhrase: summary.modeUsages.isEmpty
+              ? null
+              : summary.modeUsages.first.modeName,
           descriptions: [
             summary.modeUsageDescription,
-            '* 개선도가 가장 높았던 모드는 {모드}이에요',
+            if (bestMode != null) '* 개선도가 가장 높았던 모드는 ${bestMode.modeName}이에요',
           ],
           child: Column(
             children: [

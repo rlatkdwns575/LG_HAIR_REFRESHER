@@ -1,13 +1,15 @@
 import 'model/refresh_history_report.dart';
+import 'api/history_api.dart';
 
-/// 리프레시 기록 리포트 데이터 제공자.
-///
-/// 현재는 mock([RefreshHistoryReport.sample])을 반환하지만, 추후
-/// `features/history/data/api/` 의 Supabase API 결과로 교체할 수 있습니다.
+/// 리프레시 기록 리포트 데이터 소스.
 class RefreshHistoryStore {
   RefreshHistoryStore._();
 
   static final RefreshHistoryStore instance = RefreshHistoryStore._();
 
-  RefreshHistoryReport loadReport() => RefreshHistoryReport.sample;
+  final HistoryApi _api = const HistoryApi();
+
+  Future<RefreshHistoryReport> loadReport({String? userId}) {
+    return _api.fetchReport(userId: userId);
+  }
 }

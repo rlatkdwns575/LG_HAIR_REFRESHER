@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/api/history_api.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
 import '../../data/refresh_history_store.dart';
@@ -29,21 +30,53 @@ class _HistoryPageState extends State<HistoryPage> {
   static const _horizontalPadding = 15.0;
   static final _minMonth = DateTime(1970, 1);
 
-  late final RefreshHistoryReport _report;
+  RefreshHistoryReport? _report;
   late DateTime _visibleMonth;
   DateTime? _selectedDate;
   bool _calendarExpanded = false;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _report = RefreshHistoryStore.instance.loadReport();
-    _visibleMonth = _report.defaultMonth;
-    _selectedDate = _report.monthDataFor(_visibleMonth).latestRecordedDate;
+    _loadReport();
+  }
+
+  Future<void> _loadReport() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final report = await RefreshHistoryStore.instance.loadReport();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _report = report;
+        _visibleMonth = report.defaultMonth;
+        _selectedDate = report.monthDataFor(_visibleMonth).latestRecordedDate;
+        _isLoading = false;
+      });
+    } catch (error, stackTrace) {
+      debugPrint('History report load failed: $error\n$stackTrace');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isLoading = false;
+        _errorMessage = error is HistoryApiException
+            ? error.message
+            : '리프레시 기록을 불러오지 못했어요.';
+      });
+    }
   }
 
   RefreshHistoryMonthData get _visibleMonthData =>
-      _report.monthDataFor(_visibleMonth);
+      _report?.monthDataFor(_visibleMonth) ??
+      RefreshHistoryMonthData.empty(_visibleMonth);
 
   bool get _canGoPreviousMonth {
     return _visibleMonth.year > _minMonth.year ||
@@ -52,7 +85,11 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   bool get _canGoNextMonth {
-    final latest = _report.defaultMonth;
+    final report = _report;
+    if (report == null) {
+      return false;
+    }
+    final latest = report.defaultMonth;
     return _visibleMonth.year < latest.year ||
         (_visibleMonth.year == latest.year &&
             _visibleMonth.month < latest.month);
@@ -95,10 +132,15 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _onCalendarIconTap() async {
+    final report = _report;
+    if (report == null) {
+      return;
+    }
+
     final picked = await showHistoryMonthPicker(
       context: context,
       initialMonth: _visibleMonth,
-      maxMonth: _report.defaultMonth,
+      maxMonth: report.defaultMonth,
       minMonth: _minMonth,
     );
     if (picked == null || !mounted) {
@@ -131,48 +173,81 @@ class _HistoryPageState extends State<HistoryPage> {
         title: '리프레시 내역',
         onBack: _onBack,
       ),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-        children: [
-          _buildTitleArea(),
-          _padded(
-            HistoryTodaySection(
-              report: _report,
-              onRecordDetailTap: _onRecordDetailTap,
-              onRoutineRegisterTap: () => _showComingSoon('루틴 등록 기능은 준비 중이에요.'),
-            ),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage != null) {
+      return _buildErrorState();
+    }
+
+    final report = _report!;
+    return ListView(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+      children: [
+        _buildTitleArea(report),
+        _padded(
+          HistoryTodaySection(
+            report: report,
+            onRecordDetailTap: _onRecordDetailTap,
+            onRoutineRegisterTap: () => _showComingSoon('루틴 등록 기능은 준비 중이에요.'),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          const HistorySectionDivider(),
-          const SizedBox(height: AppSpacing.lg),
-          _padded(
-            HistoryRecentSection(
-              asOfDate: _report.asOfDate,
-              visibleMonth: _visibleMonth,
-              monthData: _visibleMonthData,
-              selectedDate: _selectedDate,
-              calendarExpanded: _calendarExpanded,
-              canGoPreviousMonth: _canGoPreviousMonth,
-              canGoNextMonth: _canGoNextMonth,
-              onPreviousMonth: _onPreviousMonth,
-              onNextMonth: _onNextMonth,
-              onCalendarIconTap: _onCalendarIconTap,
-              onDateSelected: _onDateSelected,
-              onToggleExpanded: _onToggleExpanded,
-              onDayResultDetailTap: () =>
-                  _showComingSoon('선택한 날짜의 상세 결과는 준비 중이에요.'),
-            ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        const HistorySectionDivider(),
+        const SizedBox(height: AppSpacing.lg),
+        _padded(
+          HistoryRecentSection(
+            asOfDate: report.asOfDate,
+            visibleMonth: _visibleMonth,
+            monthData: _visibleMonthData,
+            selectedDate: _selectedDate,
+            calendarExpanded: _calendarExpanded,
+            canGoPreviousMonth: _canGoPreviousMonth,
+            canGoNextMonth: _canGoNextMonth,
+            onPreviousMonth: _onPreviousMonth,
+            onNextMonth: _onNextMonth,
+            onCalendarIconTap: _onCalendarIconTap,
+            onDateSelected: _onDateSelected,
+            onToggleExpanded: _onToggleExpanded,
+            onDayResultDetailTap: () =>
+                _showComingSoon('선택한 날짜의 상세 결과는 준비 중이에요.'),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          const HistorySectionDivider(),
-          const SizedBox(height: AppSpacing.lg),
-          _padded(HistoryTotalSection(summary: _report.totalSummary)),
-        ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        const HistorySectionDivider(),
+        const SizedBox(height: AppSpacing.lg),
+        _padded(HistoryTotalSection(summary: report.totalSummary)),
+      ],
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _errorMessage!,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray700),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextButton(onPressed: _loadReport, child: const Text('다시 시도')),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildTitleArea() {
+  Widget _buildTitleArea(RefreshHistoryReport report) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         _horizontalPadding,
@@ -189,7 +264,7 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            formatKoreanAsOf(_report.asOfDate),
+            formatKoreanAsOf(report.asOfDate),
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
           ),
         ],
