@@ -1,3 +1,5 @@
+import 'home_filter_status.dart';
+
 class HomeQuickRefreshMode {
   const HomeQuickRefreshMode({
     required this.title,
@@ -18,7 +20,7 @@ class HomeDashboardData {
     this.deviceName = '우리 기기 이름',
     this.modelName,
     this.batteryPercent = 60,
-    this.filterStatusLabel = '양호',
+    this.filterStatus = HomeFilterStatus.freshDefault,
     this.recommendMessage = '대기 중 미세먼지량이 많은 하루였어요.\n잠들기 전 리프레시를 통해 안심하고 숙면하세요.',
     this.hasUsageHistory = false,
     this.frequentMode = const HomeQuickRefreshMode(
@@ -27,12 +29,14 @@ class HomeDashboardData {
       captionItems: ['냄새 제거 중', '먼지 제거 중'],
     ),
     this.hasRecentDiagnosisResult = false,
+    this.linkedDeviceId,
   });
 
   final String deviceName;
   final String? modelName;
+  final String? linkedDeviceId;
   final int batteryPercent;
-  final String filterStatusLabel;
+  final HomeFilterStatus filterStatus;
 
   /// 외부 환경 기반 추천 안내 문구.
   final String recommendMessage;
@@ -48,17 +52,19 @@ class HomeDashboardData {
     String? deviceName,
     String? modelName,
     int? batteryPercent,
-    String? filterStatusLabel,
+    HomeFilterStatus? filterStatus,
     String? recommendMessage,
     bool? hasUsageHistory,
     HomeQuickRefreshMode? frequentMode,
     bool? hasRecentDiagnosisResult,
+    String? linkedDeviceId,
   }) {
     return HomeDashboardData(
       deviceName: deviceName ?? this.deviceName,
       modelName: modelName ?? this.modelName,
+      linkedDeviceId: linkedDeviceId ?? this.linkedDeviceId,
       batteryPercent: batteryPercent ?? this.batteryPercent,
-      filterStatusLabel: filterStatusLabel ?? this.filterStatusLabel,
+      filterStatus: filterStatus ?? this.filterStatus,
       recommendMessage: recommendMessage ?? this.recommendMessage,
       hasUsageHistory: hasUsageHistory ?? this.hasUsageHistory,
       frequentMode: frequentMode ?? this.frequentMode,

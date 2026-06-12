@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/supabase_tables.dart';
-import '../../../../core/services/app_env.dart';
+import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/home_dashboard_data.dart';
+import '../model/home_device_status_snapshot.dart';
 import 'consumable_status_mapper.dart';
 
 class HomeApi {
@@ -13,7 +15,7 @@ class HomeApi {
   static const _defaultFilterPercent = 80;
 
   Future<HomeDashboardData> fetchDashboard({String? userId}) async {
-    final resolvedUserId = (userId ?? AppEnv.devUserId).trim();
+    final resolvedUserId = AuthSessionService.resolveUserId(override: userId);
 
     await _logDiagnostics(resolvedUserId);
 
@@ -54,16 +56,16 @@ class HomeApi {
       );
     }
 
-    final filterPercent = _readPercentField(
-      consumable,
-      'filter_remaining_percent',
-      fallback: consumable == null ? _defaultFilterPercent : 0,
-    );
-    final batteryPercent = _readPercentField(
-      consumable,
-      'battery_remaining_percent',
-      fallback: consumable == null ? _defaultBatteryPercent : 0,
-    );
+    final statusSnapshot = _snapshotFromConsumable(consumable);
+
+    if (kDebugMode) {
+      debugPrint(
+        'HomeApi resolved percents for user_id=$resolvedUserId '
+        'device_id=$deviceId: battery=${statusSnapshot.batteryPercent} '
+        'filter=${statusSnapshot.filterStatus.label}',
+      );
+    }
+
     final modelName = device?['model_name'] as String? ?? 'LG Hair Refresher';
 
     final sessionCount = await SupabaseService.client
@@ -79,12 +81,82 @@ class HomeApi {
     return HomeDashboardData(
       deviceName: _formatDeviceName(modelName),
       modelName: modelName,
-      batteryPercent: batteryPercent,
-      filterStatusLabel: ConsumableStatusMapper.filterStatusLabel(
-        filterPercent,
-      ),
+      linkedDeviceId: deviceId,
+      batteryPercent: statusSnapshot.batteryPercent,
+      filterStatus: statusSnapshot.filterStatus,
       hasUsageHistory: hasUsageHistory,
       frequentMode: frequentMode,
+    );
+  }
+
+  /// 연결된 기기의 배터리·필터만 다시 조회합니다.
+  Future<HomeDeviceStatusSnapshot?> fetchDeviceStatusSnapshot({
+    required String deviceId,
+  }) async {
+    final consumable = await _fetchConsumableStatus(deviceId);
+    return _snapshotFromConsumable(consumable);
+  }
+
+  /// `CONSUMABLE_STATUS` 변경을 실시간 반영합니다.
+  RealtimeChannel subscribeDeviceStatus({
+    required String deviceId,
+    required ValueChanged<HomeDeviceStatusSnapshot> onChanged,
+  }) {
+    final channel = SupabaseService.client.channel('home-consumable-$deviceId');
+
+    void emitFromRecord(Map<String, dynamic> record) {
+      onChanged(_snapshotFromConsumable(record));
+    }
+
+    channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: SupabaseTables.consumableStatus,
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'device_id',
+            value: deviceId,
+          ),
+          callback: (payload) => emitFromRecord(payload.newRecord),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: SupabaseTables.consumableStatus,
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'device_id',
+            value: deviceId,
+          ),
+          callback: (payload) => emitFromRecord(payload.newRecord),
+        )
+        .subscribe();
+
+    return channel;
+  }
+
+  Future<void> unsubscribeDeviceStatus(RealtimeChannel channel) async {
+    await SupabaseService.client.removeChannel(channel);
+  }
+
+  HomeDeviceStatusSnapshot _snapshotFromConsumable(
+    Map<String, dynamic>? consumable,
+  ) {
+    final filterPercent = _readPercentField(
+      consumable,
+      'filter_remaining_percent',
+      fallback: consumable == null ? _defaultFilterPercent : 0,
+    );
+    final batteryPercent = _readPercentField(
+      consumable,
+      'battery_remaining_percent',
+      fallback: consumable == null ? _defaultBatteryPercent : 0,
+    );
+
+    return HomeDeviceStatusSnapshot(
+      batteryPercent: batteryPercent,
+      filterStatus: ConsumableStatusMapper.filterStatus(filterPercent),
     );
   }
 
@@ -201,16 +273,8 @@ class HomeApi {
         return null;
       }
 
-      final presetRows = await SupabaseService.client
+      final mode = await SupabaseService.client
           .from(SupabaseTables.refreshMode)
-          .select('display_name, odor_yn, dust_yn, scent_yn')
-          .eq('mode_id', modeId)
-          .maybeSingle();
-
-      Map<String, dynamic>? mode = presetRows;
-
-      mode ??= await SupabaseService.client
-          .from(SupabaseTables.customModes)
           .select('display_name, odor_yn, dust_yn, scent_yn')
           .eq('mode_id', modeId)
           .maybeSingle();

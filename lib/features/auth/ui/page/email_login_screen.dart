@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
 import '../../data/api/auth_api.dart';
+import '../../data/auth_credentials_validator.dart';
 import '../widgets/auth_screen_styles.dart';
 import '../widgets/auth_screen_widgets.dart';
 
@@ -22,26 +23,54 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   bool _obscurePassword = true;
   bool _isSubmitting = false;
 
+  bool get _isFormValid => AuthCredentialsValidator.isLoginFormValid(
+    email: _emailController.text,
+    password: _passwordController.text,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_onFieldChanged);
+    _passwordController.addListener(_onFieldChanged);
+  }
+
+  void _onFieldChanged() => setState(() {});
+
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailController
+      ..removeListener(_onFieldChanged)
+      ..dispose();
+    _passwordController
+      ..removeListener(_onFieldChanged)
+      ..dispose();
     super.dispose();
+  }
+
+  void _showValidationSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
   }
 
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('이메일과 비밀번호를 입력해 주세요.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+    final emailError = AuthCredentialsValidator.emailValidationMessage(email);
+    if (emailError != null) {
+      _showValidationSnackBar(emailError);
+      return;
+    }
+
+    final passwordError = AuthCredentialsValidator.passwordValidationMessage(
+      password,
+    );
+    if (passwordError != null) {
+      _showValidationSnackBar(passwordError);
       return;
     }
 
@@ -88,15 +117,14 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
               const SizedBox(height: 28),
               buildAuthFieldLabel('아이디(이메일)'),
               const SizedBox(height: 8),
-              buildAuthTextField(
+              buildAuthEmailField(
                 controller: _emailController,
                 hintText: '이메일 입력',
-                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 22),
               buildAuthFieldLabel('비밀번호'),
               const SizedBox(height: 8),
-              buildAuthTextField(
+              buildAuthPasswordField(
                 controller: _passwordController,
                 hintText: '비밀번호 입력',
                 obscureText: _obscurePassword,
@@ -110,7 +138,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
               const Spacer(),
               AuthPrimaryButton(
                 label: _isSubmitting ? '로그인 중...' : '로그인',
-                enabled: !_isSubmitting,
+                enabled: !_isSubmitting && _isFormValid,
                 onPressed: _handleLogin,
               ),
               const SizedBox(height: 24),

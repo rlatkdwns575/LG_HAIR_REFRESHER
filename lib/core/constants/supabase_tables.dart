@@ -11,7 +11,6 @@ class SupabaseTables {
   static const consumableStatus = 'CONSUMABLE_STATUS';
   static const measureResults = 'MEASURE_RESULTS';
   static const refreshMode = 'REFRESH_MODE';
-  static const customModes = 'CUSTOM_MODES';
   static const refreshSessions = 'REFRESH_SESSIONS';
   static const calendarEvents = 'CALENDAR_EVENTS';
 }

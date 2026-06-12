@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/auth_credentials_validator.dart';
 import 'auth_screen_styles.dart';
 
 class AuthCloseHeader extends StatelessWidget {
@@ -122,6 +124,7 @@ Widget buildAuthTextField({
   Widget? suffixIcon,
   int? maxLength,
   ValueChanged<String>? onChanged,
+  List<TextInputFormatter>? inputFormatters,
 }) {
   return TextField(
     controller: controller,
@@ -129,12 +132,44 @@ Widget buildAuthTextField({
     keyboardType: keyboardType,
     maxLength: maxLength,
     onChanged: onChanged,
+    inputFormatters: inputFormatters,
     style: const TextStyle(fontSize: 14, color: AuthScreenStyles.textDark),
     decoration: AuthScreenStyles.fieldDecoration(
       hintText: hintText,
       suffixIcon: suffixIcon,
       counterText: maxLength == null ? null : '',
     ),
+  );
+}
+
+Widget buildAuthEmailField({
+  required TextEditingController controller,
+  required String hintText,
+  ValueChanged<String>? onChanged,
+}) {
+  return buildAuthTextField(
+    controller: controller,
+    hintText: hintText,
+    keyboardType: TextInputType.emailAddress,
+    onChanged: onChanged,
+    inputFormatters: [AuthCredentialsValidator.denyKoreanInputFormatter],
+  );
+}
+
+Widget buildAuthPasswordField({
+  required TextEditingController controller,
+  required String hintText,
+  required bool obscureText,
+  required Widget suffixIcon,
+  ValueChanged<String>? onChanged,
+}) {
+  return buildAuthTextField(
+    controller: controller,
+    hintText: hintText,
+    obscureText: obscureText,
+    onChanged: onChanged,
+    inputFormatters: [AuthCredentialsValidator.denyKoreanInputFormatter],
+    suffixIcon: suffixIcon,
   );
 }
 
