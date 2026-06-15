@@ -6,6 +6,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/refresh_result_detail.dart';
+import 'refresh_result_help_icon.dart';
 
 /// Figma 1182-20490 — 냄새 / 먼지 / 모발 상태 섹션.
 class RefreshResultDetailStatusSection extends StatelessWidget {
@@ -20,8 +21,9 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
   /// 섹션 전체 좌우 inset — 제목·카드·지표 row 공통.
   final double horizontalPadding;
 
-  static const _metricRowGap = 18.0;
+  static const _metricRowGap = 12.0;
   static const _metricRowHeight = 24.0;
+  static const _cardContentHorizontalPadding = 16.0;
 
   @override
   Widget build(BuildContext context) {
@@ -49,26 +51,37 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
           _InsightCard(insight: section.insight),
           if (section.changes.isNotEmpty || section.hairMetrics.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.lg),
-            if (section.changes.isNotEmpty) ...[
-              for (var i = 0; i < section.changes.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: i < section.changes.length - 1 ? _metricRowGap : 0,
-                  ),
-                  child: _StatusChangeRow(change: section.changes[i]),
-                ),
-            ],
-            if (section.hairMetrics.isNotEmpty) ...[
-              for (var i = 0; i < section.hairMetrics.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: i < section.hairMetrics.length - 1
-                        ? _metricRowGap
-                        : 0,
-                  ),
-                  child: _HairMetricRow(metric: section.hairMetrics[i]),
-                ),
-            ],
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: _cardContentHorizontalPadding,
+              ),
+              child: Column(
+                children: [
+                  if (section.changes.isNotEmpty) ...[
+                    for (var i = 0; i < section.changes.length; i++)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: i < section.changes.length - 1
+                              ? _metricRowGap
+                              : 0,
+                        ),
+                        child: _StatusChangeRow(change: section.changes[i]),
+                      ),
+                  ],
+                  if (section.hairMetrics.isNotEmpty) ...[
+                    for (var i = 0; i < section.hairMetrics.length; i++)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: i < section.hairMetrics.length - 1
+                              ? _metricRowGap
+                              : 0,
+                        ),
+                        child: _HairMetricRow(metric: section.hairMetrics[i]),
+                      ),
+                  ],
+                ],
+              ),
+            ),
           ],
         ],
       ),
@@ -85,7 +98,11 @@ class _InsightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal:
+            RefreshResultDetailStatusSection._cardContentHorizontalPadding,
+        vertical: 12,
+      ),
       decoration: BoxDecoration(
         color: insight.backgroundColor,
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -170,6 +187,7 @@ class _StatusChangeRow extends StatelessWidget {
               child: _MetricLabel(
                 label: change.label,
                 showHelpIcon: change.showHelpIcon,
+                helpTooltipMessage: change.helpTooltipMessage,
                 bold: true,
               ),
             ),
@@ -214,6 +232,7 @@ class _HairMetricRow extends StatelessWidget {
               child: _MetricLabel(
                 label: metric.label,
                 showHelpIcon: metric.showHelpIcon,
+                helpTooltipMessage: metric.helpTooltipMessage,
               ),
             ),
           ),
@@ -232,11 +251,13 @@ class _MetricLabel extends StatelessWidget {
   const _MetricLabel({
     required this.label,
     this.showHelpIcon = false,
+    this.helpTooltipMessage,
     this.bold = false,
   });
 
   final String label;
   final bool showHelpIcon;
+  final String? helpTooltipMessage;
   final bool bold;
 
   @override
@@ -251,25 +272,11 @@ class _MetricLabel extends StatelessWidget {
             fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
           ),
         ),
-        if (showHelpIcon) ...[
+        if (showHelpIcon &&
+            helpTooltipMessage != null &&
+            helpTooltipMessage!.isNotEmpty) ...[
           const SizedBox(width: 2),
-          Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.gray300),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '?',
-              style: AppTextStyles.labelXs.copyWith(
-                color: AppColors.gray400,
-                fontSize: 10,
-                height: 1,
-              ),
-            ),
-          ),
+          RefreshResultHelpIcon(tooltipMessage: helpTooltipMessage!),
         ],
       ],
     );

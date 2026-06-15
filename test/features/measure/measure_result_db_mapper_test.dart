@@ -38,7 +38,6 @@ void main() {
     test('builds focus label from DB scores', () {
       expect(MeasureResultMapper.focusLabel(sampleRecord), '먼지 중심의 집중 리프레시');
     });
-
     test('maps pollution score labels to five-step scale', () {
       expect(MeasureResultMapper.pollutionScoreLabel(10), '매우낮음');
       expect(MeasureResultMapper.pollutionScoreLabel(35), '낮음');

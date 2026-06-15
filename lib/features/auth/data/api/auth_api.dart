@@ -9,7 +9,8 @@ import '../model/sign_up_draft.dart';
 class AuthApi {
   const AuthApi();
 
-  static const _profileColumns = 'user_id, email, nickname, age, gender';
+  static const _profileColumns =
+      'user_id, email, nickname, age, gender';
 
   /// `AUTH_USERS` 프로필을 조회합니다.
   Future<AuthUserProfile?> fetchProfile({String? userId}) async {

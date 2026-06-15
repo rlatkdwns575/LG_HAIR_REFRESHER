@@ -17,6 +17,23 @@ void main() {
       expect(detail.odorSection.changes, hasLength(3));
     });
 
+    test('uses fallback mode name when recommendedMode is null', () {
+      final detail = RefreshResultDetailMapper.fromRefreshResult(
+        RefreshResult(
+          dustRemovalPercent: 87,
+          odorRemovalPercent: 92,
+          overallImprovementPercent: 40.9,
+          headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
+          headlineAfter: '개선되었어요.',
+          disclaimer: 'disclaimer',
+          dustChange: RefreshResult.sample.dustChange,
+          odorChange: RefreshResult.sample.odorChange,
+        ),
+      );
+
+      expect(detail.modeName, '리프레시 모드');
+    });
+
     test('maps record summary labels', () {
       final detail = RefreshResultDetailMapper.fromRecordSummary(
         modeName: '외부 냄새 리프레시',

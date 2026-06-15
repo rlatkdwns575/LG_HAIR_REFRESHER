@@ -15,7 +15,7 @@ class RefreshResultDetailMapper {
     final dustAfter = _percentFromPollution(result.dustChange.afterLevel);
 
     return RefreshResultDetail(
-      modeName: result.recommendedMode?.name ?? '리프레시',
+      modeName: _modeNameFromResult(result),
       necessityReductionPercent: result.overallImprovementPercent,
       currentCareNeedPercent: _average([odorAfter, dustAfter]),
       metrics: [
@@ -120,6 +120,7 @@ class RefreshResultDetailMapper {
           afterScore: afterScore,
           usePerceptionScore: true,
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeScoreChange(
           label: '잔류 가능성',
@@ -153,6 +154,7 @@ class RefreshResultDetailMapper {
           afterScore: afterScore,
           usePerceptionScore: true,
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeScoreChange(
           label: '잔류 가능성',
@@ -221,6 +223,7 @@ class RefreshResultDetailMapper {
     required int afterScore,
     bool usePerceptionScore = false,
     bool showHelpIcon = false,
+    String? helpTooltipMessage,
   }) {
     final resolvedBeforeScore = usePerceptionScore
         ? MetricBadgeMapper.pollutionScoreStepUp(beforeScore)
@@ -234,11 +237,23 @@ class RefreshResultDetailMapper {
       beforeLabel: MetricBadgeMapper.pollutionScoreLabel(resolvedBeforeScore),
       afterLabel: MetricBadgeMapper.pollutionScoreLabel(resolvedAfterScore),
       showHelpIcon: showHelpIcon,
+      helpTooltipMessage: helpTooltipMessage,
       beforeVariant: AppBadgeSmallVariant.gray,
       beforeStyle: AppBadgeStyle.text,
       afterStyle: AppBadgeStyle.text,
       afterVariant: MetricBadgeMapper.pollutionScoreVariant(resolvedAfterScore),
     );
+  }
+
+  static String _modeNameFromResult(RefreshResult result) {
+    final modeName = result.recommendedMode?.name;
+    if (modeName != null && modeName.isNotEmpty) {
+      return modeName;
+    }
+    if (result.isScentCareResult) {
+      return '향기 케어';
+    }
+    return '리프레시 모드';
   }
 
   static int _scoreFromPollution(RefreshPollutionLevel level) {
