@@ -31,20 +31,29 @@ class RefreshResultHeadline extends StatelessWidget {
           textAlign: TextAlign.center,
           style: _messageStyle,
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text.rich(
-          TextSpan(
-            style: _messageStyle,
-            children: [
-              TextSpan(
-                text: result.overallImprovementLabel,
-                style: _percentStyle,
-              ),
-              TextSpan(text: ' ${result.headlineAfter}'),
-            ],
+        if (result.showImprovementPercent) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text.rich(
+            TextSpan(
+              style: _messageStyle,
+              children: [
+                TextSpan(
+                  text: result.overallImprovementLabel,
+                  style: _percentStyle,
+                ),
+                TextSpan(text: ' ${result.headlineAfter}'),
+              ],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
+        ] else ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            result.headlineAfter,
+            textAlign: TextAlign.center,
+            style: _messageStyle,
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
         Text(
           result.disclaimer,

@@ -4,6 +4,5 @@ import '../../../core/constants/image_assets.dart';
 class MeasureAssets {
   const MeasureAssets._();
 
-  static const analyzingIllustration =
-      ImageAssets.measureAnalyzingIllustration;
+  static const analyzingIllustration = ImageAssets.measureAnalyzingIllustration;
 }

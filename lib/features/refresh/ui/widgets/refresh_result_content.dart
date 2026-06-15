@@ -35,26 +35,31 @@ class RefreshResultContent extends StatelessWidget {
         const RefreshResultHeader(),
         const SizedBox(height: _headerToHeadlineGap),
         RefreshResultHeadline(result: result),
-        const SizedBox(height: _headlineToGraphGap),
-        RefreshResultChangeChart(
-          dustChange: result.dustChange,
-          odorChange: result.odorChange,
-        ),
-        const SizedBox(height: _graphToDetailGap),
+        if (result.showChangeChart) ...[
+          const SizedBox(height: _headlineToGraphGap),
+          RefreshResultChangeChart(
+            dustChange: result.dustChange,
+            odorChange: result.odorChange,
+          ),
+          const SizedBox(height: _graphToDetailGap),
+        ] else
+          const SizedBox(height: _headlineToGraphGap),
         Center(
           child: AppTextLinkButton(
             label: result.detailLinkLabel,
             onPressed: onDetailTap,
           ),
         ),
-        const SizedBox(height: _detailToCardGap),
-        RefreshModeCard(
-          mode: result.recommendedMode,
-          variant: RefreshModeCardVariant.featured,
-          onTap: onRecommendTap,
-          onAction: onRecommendTap,
-        ),
-        const SizedBox(height: AppSpacing.lg),
+        if (result.showScentCareRecommendation) ...[
+          const SizedBox(height: _detailToCardGap),
+          RefreshModeCard(
+            mode: result.recommendedMode!,
+            variant: RefreshModeCardVariant.featured,
+            onTap: onRecommendTap,
+            onAction: onRecommendTap,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+        ],
       ],
     );
   }

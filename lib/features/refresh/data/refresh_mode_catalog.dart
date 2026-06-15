@@ -23,3 +23,31 @@ List<RefreshMode> getAllRefreshModes() {
     ...CustomModeCache.instance.modes,
   ];
 }
+
+/// DB/캐시에서 향기 케어 프리셋 모드를 찾습니다.
+RefreshMode? resolveScentCareMode() {
+  final presets = RefreshPresetModeStore.instance.presets;
+  if (presets.isEmpty) {
+    return null;
+  }
+
+  for (final mode in presets) {
+    if (mode.isScentOnlyCare) {
+      return mode;
+    }
+  }
+
+  for (final mode in presets) {
+    if (mode.scentYn && mode.name.contains('향기')) {
+      return mode;
+    }
+  }
+
+  for (final mode in presets) {
+    if (mode.scentYn) {
+      return mode;
+    }
+  }
+
+  return null;
+}

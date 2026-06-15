@@ -4,7 +4,9 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/api/refresh_api.dart';
 import '../../data/model/refresh_result.dart';
+import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_result_store.dart';
 import '../widgets/refresh_result_content.dart';
 
@@ -38,15 +40,29 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
       );
   }
 
-  void _onRecommendTap() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('${_result.recommendedMode.name} 모드를 선택했어요'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+  Future<void> _onRecommendTap() async {
+    var mode = _result.recommendedMode ?? resolveScentCareMode();
+    mode ??= await const RefreshApi().fetchScentCarePreset();
+    if (mode == null) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('향기 케어 모드를 불러오지 못했어요.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    context.pushRefreshProgress(mode: mode);
   }
 
   @override

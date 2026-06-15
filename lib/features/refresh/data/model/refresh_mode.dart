@@ -43,6 +43,7 @@ class RefreshMode {
     this.odorStrength,
     this.dustStrength,
     this.scentStrength,
+    this.createdAt,
   });
 
   factory RefreshMode.custom({
@@ -80,6 +81,10 @@ class RefreshMode {
   final int? odorStrength;
   final int? dustStrength;
   final int? scentStrength;
+  final DateTime? createdAt;
+
+  /// 먼지·냄새 없이 향기 케어만 수행하는 모드인지 여부.
+  bool get isScentOnlyCare => scentYn && !dustYn && !odorYn;
 
   bool get isDeletable => isCustom || createdByUser;
 
@@ -115,6 +120,7 @@ class RefreshMode {
     int? odorStrength,
     int? dustStrength,
     int? scentStrength,
+    DateTime? createdAt,
   }) {
     return RefreshMode(
       id: id ?? this.id,
@@ -132,6 +138,7 @@ class RefreshMode {
       odorStrength: odorStrength ?? this.odorStrength,
       dustStrength: dustStrength ?? this.dustStrength,
       scentStrength: scentStrength ?? this.scentStrength,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

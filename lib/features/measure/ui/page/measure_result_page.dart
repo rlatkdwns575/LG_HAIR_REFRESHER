@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/measure_result_store.dart';
 import '../../data/model/measure_result.dart';
 import '../widgets/measure_result_content.dart';
 
@@ -16,8 +17,13 @@ class MeasureResultPage extends StatefulWidget {
 }
 
 class _MeasureResultPageState extends State<MeasureResultPage> {
-  /// mock 전환: [MeasureResult.sampleStable] 로 바꾸면 안정형 화면 확인.
-  static const MeasureResult _result = MeasureResult.sample;
+  late final MeasureResult _result;
+
+  @override
+  void initState() {
+    super.initState();
+    _result = MeasureResultStore.instance.consume();
+  }
 
   void _goHome() => context.goHome();
 
@@ -35,14 +41,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
   }
 
   void _onRecommendTap() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('${_result.recommendedMode.name} 모드를 선택했어요'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    context.pushRefreshDetail(mode: _result.recommendedMode);
   }
 
   @override

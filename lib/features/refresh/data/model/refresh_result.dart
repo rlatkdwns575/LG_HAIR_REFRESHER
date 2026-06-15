@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+import '../refresh_mode_catalog.dart';
 import 'refresh_mode.dart';
 import 'refresh_pollution_level.dart';
 import 'refresh_progress_session.dart';
@@ -19,8 +18,11 @@ class RefreshResult {
     required this.disclaimer,
     required this.dustChange,
     required this.odorChange,
-    required this.recommendedMode,
+    this.recommendedMode,
     this.detailLinkLabel = '리프레시 결과 자세히 보기',
+    this.showChangeChart = true,
+    this.isScentCareResult = false,
+    this.showImprovementPercent = true,
   });
 
   final double dustRemovalPercent;
@@ -31,8 +33,14 @@ class RefreshResult {
   final String disclaimer;
   final RefreshResultChange dustChange;
   final RefreshResultChange odorChange;
-  final RefreshMode recommendedMode;
+  final RefreshMode? recommendedMode;
   final String detailLinkLabel;
+  final bool showChangeChart;
+  final bool isScentCareResult;
+  final bool showImprovementPercent;
+
+  /// 향기 케어 모드 추천 카드 노출 여부.
+  bool get showScentCareRecommendation => recommendedMode != null;
 
   String get overallImprovementLabel {
     final value = overallImprovementPercent;
@@ -42,22 +50,35 @@ class RefreshResult {
     return '${value.toStringAsFixed(1)}%';
   }
 
-  static const RefreshMode _scentCareMode = RefreshMode(
-    id: 'scent-care',
-    name: '향기 케어 모드',
-    description: '리프레시 후 은은한 향으로 마무리할 수 있어요',
-    category: RefreshModeTabs.afterOuting,
-    durationSeconds: 120,
-    icon: Icons.local_florist_outlined,
-    tags: ['냄새 흔적 완화', '산뜻한 잔향', '외출 전 추천'],
-    scentYn: true,
-  );
-
   /// 진행 세션 기반 mock 결과. 실제 API 연동 시 이 factory를 교체합니다.
   factory RefreshResult.fromProgressSession({
     required RefreshProgressSession session,
     RefreshMode? mode,
   }) {
+    if (mode != null && mode.isScentOnlyCare) {
+      return RefreshResult(
+        dustRemovalPercent: 0,
+        odorRemovalPercent: 0,
+        overallImprovementPercent: 100,
+        headlineBefore: '은은한 향기 케어가',
+        headlineAfter: '완료되었어요.',
+        disclaimer: '향기는 시간이 지나면 희미해질 수 있어요.',
+        dustChange: const RefreshResultChange(
+          label: '먼지',
+          beforeLevel: RefreshPollutionLevel.good,
+          afterLevel: RefreshPollutionLevel.good,
+        ),
+        odorChange: const RefreshResultChange(
+          label: '냄새',
+          beforeLevel: RefreshPollutionLevel.good,
+          afterLevel: RefreshPollutionLevel.good,
+        ),
+        showChangeChart: false,
+        isScentCareResult: true,
+        showImprovementPercent: false,
+      );
+    }
+
     return RefreshResult(
       dustRemovalPercent: 87,
       odorRemovalPercent: 92,
@@ -75,28 +96,40 @@ class RefreshResult {
         beforeLevel: RefreshPollutionLevel.veryHigh,
         afterLevel: RefreshPollutionLevel.normal,
       ),
-      recommendedMode: _scentCareMode,
+      recommendedMode: _shouldRecommendScentCare(mode)
+          ? resolveScentCareMode()
+          : null,
     );
   }
 
+  /// 실행 모드에 향기 케어가 이미 포함되면 추천하지 않습니다.
+  static bool _shouldRecommendScentCare(RefreshMode? mode) {
+    if (mode == null) {
+      return true;
+    }
+    return !mode.scentYn;
+  }
+
   /// Figma 622-13066 기준 mock.
-  static const sample = RefreshResult(
-    dustRemovalPercent: 87,
-    odorRemovalPercent: 92,
-    overallImprovementPercent: 40.9,
-    headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-    headlineAfter: '개선되었어요.',
-    disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
-    dustChange: RefreshResultChange(
-      label: '먼지',
-      beforeLevel: RefreshPollutionLevel.high,
-      afterLevel: RefreshPollutionLevel.good,
-    ),
-    odorChange: RefreshResultChange(
-      label: '냄새',
-      beforeLevel: RefreshPollutionLevel.veryHigh,
-      afterLevel: RefreshPollutionLevel.normal,
-    ),
-    recommendedMode: _scentCareMode,
-  );
+  static RefreshResult get sample {
+    return RefreshResult(
+      dustRemovalPercent: 87,
+      odorRemovalPercent: 92,
+      overallImprovementPercent: 40.9,
+      headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
+      headlineAfter: '개선되었어요.',
+      disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
+      dustChange: const RefreshResultChange(
+        label: '먼지',
+        beforeLevel: RefreshPollutionLevel.high,
+        afterLevel: RefreshPollutionLevel.good,
+      ),
+      odorChange: const RefreshResultChange(
+        label: '냄새',
+        beforeLevel: RefreshPollutionLevel.veryHigh,
+        afterLevel: RefreshPollutionLevel.normal,
+      ),
+      recommendedMode: resolveScentCareMode(),
+    );
+  }
 }
