@@ -161,7 +161,26 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void _onRecordDetailTap(RefreshHistoryRecord record) {
-    _showComingSoon('${record.modeName} 상세 결과는 준비 중이에요.');
+    context.pushRefreshHistoryRecordDetail(
+      modeName: record.modeName,
+      necessityReductionPercent: record.necessityReductionPercent,
+      odorBeforeLabel: record.odorBeforeStatus?.label,
+      odorAfterLabel: record.odorAfterStatus?.label,
+      dustBeforeLabel: record.dustBeforeStatus?.label,
+      dustAfterLabel: record.dustAfterStatus?.label,
+    );
+  }
+
+  void _onDayResultDetailTap() {
+    final selectedDate = _selectedDate;
+    if (selectedDate == null) {
+      return;
+    }
+    final group = _visibleMonthData.groupForDate(selectedDate);
+    if (group == null || group.records.isEmpty) {
+      return;
+    }
+    _onRecordDetailTap(group.records.first);
   }
 
   @override
@@ -215,8 +234,7 @@ class _HistoryPageState extends State<HistoryPage> {
             onCalendarIconTap: _onCalendarIconTap,
             onDateSelected: _onDateSelected,
             onToggleExpanded: _onToggleExpanded,
-            onDayResultDetailTap: () =>
-                _showComingSoon('선택한 날짜의 상세 결과는 준비 중이에요.'),
+            onDayResultDetailTap: _onDayResultDetailTap,
           ),
         ),
         const SizedBox(height: AppSpacing.lg),

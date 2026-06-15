@@ -21,6 +21,7 @@ import '../../features/refresh/ui/page/refresh_detail_page.dart';
 import '../../features/refresh/ui/page/refresh_page.dart';
 import '../../features/refresh/ui/page/refresh_progress_page.dart';
 import '../../features/refresh/ui/page/refresh_result_collecting_page.dart';
+import '../../features/refresh/ui/page/refresh_result_detail_page.dart';
 import '../../features/refresh/ui/page/refresh_result_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
 import '../../shared/widgets/shared_widget_gallery_page.dart';
@@ -129,6 +130,19 @@ final appRouter = GoRouter(
           name: AppRouteNames.refreshResult,
           path: 'result',
           builder: (context, state) => const RefreshResultPage(),
+          routes: [
+            GoRoute(
+              name: AppRouteNames.refreshResultDetail,
+              path: 'detail',
+              builder: (context, state) {
+                final detail = resolveRefreshResultDetail(state.extra);
+                if (detail == null) {
+                  return const RefreshResultDetailPageFallback();
+                }
+                return RefreshResultDetailPage(detail: detail);
+              },
+            ),
+          ],
         ),
       ],
     ),
