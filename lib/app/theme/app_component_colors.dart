@@ -175,6 +175,7 @@ class AppComponentColors {
   // indicator
   static const indicatorActive = Color(0xFF4E5561);
   static const indicatorInactive = Color(0xFFD9D9D9);
+  static const helpIcon = Color(0xFFD9D9D9);
 
   // button_bottom
   static const bottomBarBackground = Color(0xFFFFFFFF);

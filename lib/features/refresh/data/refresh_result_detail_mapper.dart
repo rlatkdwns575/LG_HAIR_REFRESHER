@@ -119,6 +119,7 @@ class RefreshResultDetailMapper {
           afterLabel: _perceptionLabel(after),
           afterVariant: _afterVariantFromPollution(after),
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeChange(
           label: '잔류 가능성',
@@ -154,6 +155,7 @@ class RefreshResultDetailMapper {
           afterLabel: _perceptionFromLabel(odorAfterLabel),
           afterVariant: _variantFromLabel(odorAfterLabel),
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeChange(
           label: '잔류 가능성',
@@ -413,12 +415,14 @@ class RefreshResultDetailMapper {
     AppBadgeSmallVariant? afterVariant,
     bool preferLowAfter = false,
     bool showHelpIcon = false,
+    String? helpTooltipMessage,
   }) {
     return RefreshResultStatusChange(
       label: label,
       beforeLabel: beforeLabel,
       afterLabel: afterLabel,
       showHelpIcon: showHelpIcon,
+      helpTooltipMessage: helpTooltipMessage,
       beforeVariant: beforeVariant ?? _beforeVariantFromLabel(beforeLabel),
       beforeStyle: AppBadgeStyle.text,
       afterStyle: AppBadgeStyle.text,
@@ -436,6 +440,17 @@ class RefreshResultDetailMapper {
       '낮음' || '좋음' || '불필요' => AppBadgeSmallVariant.low,
       _ => AppBadgeSmallVariant.gray,
     };
+  }
+
+  static String _modeNameFromResult(RefreshResult result) {
+    final modeName = result.recommendedMode?.name;
+    if (modeName != null && modeName.isNotEmpty) {
+      return modeName;
+    }
+    if (result.isScentCareResult) {
+      return '향기 케어';
+    }
+    return '리프레시 모드';
   }
 
   static double _average(List<double> values) {
