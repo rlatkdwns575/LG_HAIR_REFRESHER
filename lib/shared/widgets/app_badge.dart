@@ -33,6 +33,7 @@ class AppBadge extends StatelessWidget {
     this.smallVariant = AppBadgeSmallVariant.gray,
     this.largeVariant = AppBadgeLargeVariant.refreshNotNeeded,
     this.style = AppBadgeStyle.text,
+    this.compact = false,
     super.key,
   });
 
@@ -41,6 +42,7 @@ class AppBadge extends StatelessWidget {
   final AppBadgeSmallVariant smallVariant;
   final AppBadgeLargeVariant largeVariant;
   final AppBadgeStyle style;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -52,18 +54,19 @@ class AppBadge extends StatelessWidget {
 
   Widget _buildSmall() {
     final colors = _smallColors();
-    final fontSize =
-        smallVariant == AppBadgeSmallVariant.primaryLight &&
-            style == AppBadgeStyle.text
+    final fontSize = compact
+        ? 10.0
+        : smallVariant == AppBadgeSmallVariant.primaryLight &&
+              style == AppBadgeStyle.text
         ? 10.0
         : 11.0;
 
     return Container(
-      height: 20,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      height: compact ? 16 : 20,
+      padding: EdgeInsets.symmetric(horizontal: compact ? 5 : 4),
       decoration: BoxDecoration(
         color: colors.$1,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
+        borderRadius: BorderRadius.circular(compact ? 4 : AppRadius.sm),
       ),
       alignment: Alignment.center,
       child: Text(
