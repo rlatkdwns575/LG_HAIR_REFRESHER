@@ -50,6 +50,7 @@ class RefreshResultStatusChange {
     this.beforeStyle = AppBadgeStyle.text,
     this.afterStyle = AppBadgeStyle.text,
     this.showHelpIcon = false,
+    this.helpTooltipMessage,
   });
 
   final String label;
@@ -60,6 +61,7 @@ class RefreshResultStatusChange {
   final AppBadgeStyle beforeStyle;
   final AppBadgeStyle afterStyle;
   final bool showHelpIcon;
+  final String? helpTooltipMessage;
 }
 
 /// 모발 상태 등 단일 배지 행.
@@ -70,6 +72,7 @@ class RefreshResultHairMetric {
     this.variant = AppBadgeSmallVariant.gray,
     this.style = AppBadgeStyle.filled,
     this.showHelpIcon = false,
+    this.helpTooltipMessage,
   });
 
   final String label;
@@ -77,6 +80,7 @@ class RefreshResultHairMetric {
   final AppBadgeSmallVariant variant;
   final AppBadgeStyle style;
   final bool showHelpIcon;
+  final String? helpTooltipMessage;
 }
 
 /// 상태 섹션 (냄새 / 먼지 / 모발).
@@ -117,6 +121,17 @@ class RefreshResultDetail {
   final RefreshResultStatusSection odorSection;
   final RefreshResultStatusSection dustSection;
   final RefreshResultStatusSection hairSection;
+
+  /// 냄새 상태 — 인지 가능도 ? 툴팁.
+  static const odorPerceptionHelpTooltip =
+      '잔여 냄새 반응을 기준으로, 가까운 거리에서 냄새가 '
+      '얼마나 쉽게 인지될 수 있는지 분석한 값이에요.';
+
+  /// 요약 그래프 — 리프레시 필요도 ? 툴팁.
+  static const necessityHelpTooltip =
+      '냄새, 먼지, 모발 컨디션을 종합해 리프레시가 '
+      '얼마나 필요한지 보여줘요. 60% 이상이면 '
+      '케어 권장 구간으로 표시돼요.';
 
   String get necessityReductionLabel {
     final value = necessityReductionPercent;
@@ -186,6 +201,7 @@ class RefreshResultDetail {
           afterLabel: '보통',
           afterVariant: AppBadgeSmallVariant.medium,
           showHelpIcon: true,
+          helpTooltipMessage: odorPerceptionHelpTooltip,
         ),
         RefreshResultStatusChange(
           label: '잔류 가능성',
@@ -245,17 +261,14 @@ class RefreshResultDetail {
           variant: AppBadgeSmallVariant.medium,
           style: AppBadgeStyle.text,
           showHelpIcon: true,
+          helpTooltipMessage:
+              '손상도, 유분량, 수분감을 바탕으로 냄새와 먼지가 모발에 '
+              '얼마나 오래 남기 쉬운지 분석한 값이에요.',
         ),
         RefreshResultHairMetric(
           label: '모발 손상도',
           valueLabel: 'Low',
           variant: AppBadgeSmallVariant.low,
-          style: AppBadgeStyle.text,
-        ),
-        RefreshResultHairMetric(
-          label: '모발 길이',
-          valueLabel: 'label',
-          variant: AppBadgeSmallVariant.gray,
           style: AppBadgeStyle.text,
         ),
         RefreshResultHairMetric(

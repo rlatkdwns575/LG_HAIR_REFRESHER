@@ -8,7 +8,6 @@ import '../../../../shared/widgets/app_section_title.dart';
 import '../../data/history_assets.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
-import 'history_care_badge.dart';
 import 'history_common.dart';
 import 'history_month_calendar.dart';
 
@@ -331,59 +330,19 @@ class _DayRecordTile extends StatelessWidget {
         color: AppColors.gray0,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Text(
-                formatKoreanTime(record.dateTime),
-                style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  record.modeName,
-                  style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+          Text(
+            formatKoreanTime(record.dateTime),
+            style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (record.odorBeforeStatus != null)
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: HistoryCareStatusRow(
-                      label: '냄새관리',
-                      before: record.odorBeforeStatus!,
-                      after: record.odorAfterStatus,
-                      compact: true,
-                    ),
-                  ),
-                ),
-              if (record.odorBeforeStatus != null &&
-                  record.dustBeforeStatus != null)
-                const SizedBox(width: 6),
-              if (record.dustBeforeStatus != null)
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: HistoryCareStatusRow(
-                      label: '먼지관리',
-                      before: record.dustBeforeStatus!,
-                      after: record.dustAfterStatus,
-                      compact: true,
-                    ),
-                  ),
-                ),
-            ],
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              record.modeName,
+              style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

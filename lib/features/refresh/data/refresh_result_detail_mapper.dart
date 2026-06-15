@@ -112,6 +112,7 @@ class RefreshResultDetailMapper {
             afterLabel: change.afterLabel ?? '보통',
             preferLowAfter: change.preferLowAfter,
             showHelpIcon: change.showHelpIcon,
+            helpTooltipMessage: change.helpTooltipMessage,
           ),
       ],
     );
@@ -140,6 +141,7 @@ class RefreshResultDetailMapper {
           afterLabel: _perceptionLabel(after),
           afterVariant: _afterVariantFromPollution(after),
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeChange(
           label: '잔류 가능성',
@@ -175,6 +177,7 @@ class RefreshResultDetailMapper {
           afterLabel: _perceptionFromLabel(odorAfterLabel),
           afterVariant: _variantFromLabel(odorAfterLabel),
           showHelpIcon: true,
+          helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeChange(
           label: '잔류 가능성',
@@ -434,12 +437,14 @@ class RefreshResultDetailMapper {
     AppBadgeSmallVariant? afterVariant,
     bool preferLowAfter = false,
     bool showHelpIcon = false,
+    String? helpTooltipMessage,
   }) {
     return RefreshResultStatusChange(
       label: label,
       beforeLabel: beforeLabel,
       afterLabel: afterLabel,
       showHelpIcon: showHelpIcon,
+      helpTooltipMessage: helpTooltipMessage,
       beforeVariant: beforeVariant ?? _beforeVariantFromLabel(beforeLabel),
       beforeStyle: AppBadgeStyle.text,
       afterStyle: AppBadgeStyle.text,
@@ -485,6 +490,7 @@ class _ChangeTemplate {
     this.afterLabel, {
     this.preferLowAfter = false,
     this.showHelpIcon = false,
+    this.helpTooltipMessage,
   });
 
   final String label;
@@ -492,4 +498,5 @@ class _ChangeTemplate {
   final String? afterLabel;
   final bool preferLowAfter;
   final bool showHelpIcon;
+  final String? helpTooltipMessage;
 }

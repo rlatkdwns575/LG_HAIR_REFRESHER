@@ -7,6 +7,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/refresh_result_detail.dart';
 import 'refresh_result_detail_metric_bars.dart';
 import 'refresh_result_detail_status_section.dart';
+import 'refresh_result_help_icon.dart';
 
 /// Figma 1170-16711 — 리프레시 결과 상세보기 본문.
 class RefreshResultDetailContent extends StatelessWidget {
@@ -195,22 +196,11 @@ class _NecessityHelpRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 3),
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.gray400),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '?',
-              style: AppTextStyles.labelXs.copyWith(
-                color: AppColors.gray500,
-                fontSize: 10,
-                height: 1,
-              ),
-            ),
+          RefreshResultHelpIcon(
+            tooltipMessage: RefreshResultDetail.necessityHelpTooltip,
+            size: 16,
+            placement: RefreshResultHelpTooltipPlacement.belowEnd,
+            tooltipMaxWidth: 240,
           ),
         ],
       ),
