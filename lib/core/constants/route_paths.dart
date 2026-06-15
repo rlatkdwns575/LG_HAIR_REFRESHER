@@ -9,7 +9,6 @@ class AppRoutePaths {
   static const emailLogin = '/login/email';
   static const signUp = '/login/signup';
   static const signUpStepTwo = '/login/signup/step-two';
-  static const signUpStepThree = '/login/signup/step-three';
 
   /// 홈 허브 (하단 탭 없음 — 홈에서 버튼/리스트로 이동)
   static const home = '/';
@@ -17,6 +16,7 @@ class AppRoutePaths {
   static const measureRun = '/measure/run';
   static const measureAnalyzing = '/measure/analyzing';
   static const measureResult = '/measure/result';
+  static const measureResultDetail = '/measure/result/detail';
 
   static const refresh = '/refresh';
   static const refreshDetail = '/refresh/detail';
@@ -38,12 +38,12 @@ class AppRouteNames {
   static const emailLogin = 'emailLogin';
   static const signUp = 'signUp';
   static const signUpStepTwo = 'signUpStepTwo';
-  static const signUpStepThree = 'signUpStepThree';
   static const home = 'home';
   static const measure = 'measure';
   static const measureRun = 'measureRun';
   static const measureAnalyzing = 'measureAnalyzing';
   static const measureResult = 'measureResult';
+  static const measureResultDetail = 'measureResultDetail';
 
   static const refresh = 'refresh';
   static const refreshDetail = 'refreshDetail';

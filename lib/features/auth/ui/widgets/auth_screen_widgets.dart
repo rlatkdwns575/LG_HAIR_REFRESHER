@@ -45,10 +45,10 @@ class AuthCloseHeader extends StatelessWidget {
 class AuthSignupProgressLine extends StatelessWidget {
   const AuthSignupProgressLine({required this.step, super.key});
 
-  /// 1, 2, 3
+  /// 1, 2
   final int step;
 
-  static const _totalSteps = 3;
+  static const _totalSteps = 2;
 
   @override
   Widget build(BuildContext context) {

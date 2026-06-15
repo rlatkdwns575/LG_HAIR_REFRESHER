@@ -5,7 +5,6 @@ import '../../core/constants/route_paths.dart';
 import '../../features/auth/data/model/sign_up_draft.dart';
 import '../../features/auth/ui/page/email_login_screen.dart';
 import '../../features/auth/ui/page/login_screen.dart';
-import '../../features/auth/ui/page/signup_step_three_screen.dart';
 import '../../features/auth/ui/page/signup_step_one_screen.dart';
 import '../../features/auth/ui/page/signup_step_two_screen.dart';
 import '../../features/history/ui/page/history_page.dart';
@@ -13,6 +12,10 @@ import '../../features/home/ui/page/home_page.dart';
 import '../../features/home/ui/page/home_refresh_shortcut_add_page.dart';
 import '../../features/measure/ui/page/measure_page.dart';
 import '../../features/measure/ui/page/measure_analyzing_page.dart';
+import '../../features/measure/data/model/measure_care_level.dart';
+import '../../features/measure/data/model/measure_result.dart';
+import '../../features/measure/data/model/measure_result_headline.dart';
+import '../../features/measure/ui/page/measure_result_detail_page.dart';
 import '../../features/measure/ui/page/measure_result_page.dart';
 import '../../features/measure/ui/page/measure_run_page.dart';
 import '../../features/refresh/data/refresh_route_extra.dart';
@@ -56,17 +59,6 @@ final appRouter = GoRouter(
                 return SignUpStepTwoScreen(draft: draft);
               },
             ),
-            GoRoute(
-              name: AppRouteNames.signUpStepThree,
-              path: 'step-three',
-              builder: (context, state) {
-                final draft = state.extra;
-                if (draft is! SignUpDraft || !draft.isProfileComplete) {
-                  return const SignUpStepOneScreen();
-                }
-                return SignUpStepThreeScreen(draft: draft);
-              },
-            ),
           ],
         ),
       ],
@@ -95,6 +87,26 @@ final appRouter = GoRouter(
           name: AppRouteNames.measureResult,
           path: 'result',
           builder: (context, state) => const MeasureResultPage(),
+          routes: [
+            GoRoute(
+              name: AppRouteNames.measureResultDetail,
+              path: 'detail',
+              builder: (context, state) {
+                final extra = state.extra;
+                if (extra is! MeasureResult) {
+                  return MeasureResultDetailPage(
+                    result: MeasureResult(
+                      odorLevel: MeasureCareLevel.normal,
+                      dustLevel: MeasureCareLevel.normal,
+                      headline: const MeasureResultHeadline.plain(''),
+                      recommendedMode: MeasureResult.sample.recommendedMode,
+                    ),
+                  );
+                }
+                return MeasureResultDetailPage(result: extra);
+              },
+            ),
+          ],
         ),
       ],
     ),

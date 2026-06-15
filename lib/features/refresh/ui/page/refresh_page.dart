@@ -3,10 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_component_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../core/services/auth_session_service.dart';
@@ -226,7 +225,7 @@ class _RefreshPageState extends State<RefreshPage> {
 
   Widget _buildEmptyState() {
     final selectedTab = RefreshModeTabs.all[_selectedChipIndex];
-    final isCustom = selectedTab == RefreshModeTabs.customMode;
+    final isCustom = selectedTab == RefreshModeTabs.customModeTab;
     final message = isCustom ? '아직 제작된 커스텀 모드가 없어요' : '해당 분류의 모드가 아직 없어요';
 
     return Padding(
@@ -242,100 +241,12 @@ class _RefreshPageState extends State<RefreshPage> {
   }
 
   Widget _buildChipTabBar() {
-    return SizedBox(
-      height: 52,
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 18),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                children: List.generate(RefreshModeTabs.all.length, (index) {
-                  final tab = RefreshModeTabs.all[index];
-                  final selected = index == _selectedChipIndex;
-
-                  final chipWidget = GestureDetector(
-                    onTap: () => setState(() => _selectedChipIndex = index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: selected
-                            ? AppComponentColors.chipSelectedBackground
-                            : AppComponentColors.chipNormalBackground,
-                        borderRadius: BorderRadius.circular(AppRadius.chip),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        tab,
-                        style: AppTextStyles.labelM.copyWith(
-                          color: selected
-                              ? AppComponentColors.chipSelectedText
-                              : AppComponentColors.chipNormalText,
-                        ),
-                      ),
-                    ),
-                  );
-
-                  if (index == 1) {
-                    // '커스텀 모드'와 '외출 전' 사이
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        chipWidget,
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 1,
-                          height: 28,
-                          color: const Color(0xFFEFF1F4),
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                    );
-                  }
-
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      chipWidget,
-                      if (index < RefreshModeTabs.all.length - 1)
-                        const SizedBox(width: 8),
-                    ],
-                  );
-                }),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            right: 0,
-            bottom: 0,
-            child: IgnorePointer(
-              child: Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 52,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [Color(0x00FFFFFF), AppColors.gray0],
-                      ),
-                    ),
-                  ),
-                  const ColoredBox(
-                    color: AppColors.gray0,
-                    child: SizedBox(width: 10, height: 52),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return AppChipTabBarShell(
+      child: AppChipTabBar(
+        tabs: RefreshModeTabs.all,
+        selectedIndex: _selectedChipIndex,
+        onChanged: (index) => setState(() => _selectedChipIndex = index),
+        dividerAfterIndex: 1,
       ),
     );
   }

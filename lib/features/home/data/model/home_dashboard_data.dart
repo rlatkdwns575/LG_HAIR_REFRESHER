@@ -23,8 +23,8 @@ const homeFrequentModeFallback = HomeQuickRefreshMode(
 /// [hasUsageHistory]가 false이면 즐겨찾기·자주 사용한 모드 영역을 숨깁니다.
 class HomeDashboardData {
   const HomeDashboardData({
-    this.deviceName = '우리 기기 이름',
-    this.modelName,
+    this.deviceName = 'LG 퓨리헤어',
+    this.modelName = 'LG 퓨리헤어',
     this.batteryPercent = 60,
     this.filterStatus = HomeFilterStatus.freshDefault,
     this.recommendMessage = '대기 중 미세먼지량이 많은 하루였어요.\n잠들기 전 리프레시를 통해 안심하고 숙면하세요.',

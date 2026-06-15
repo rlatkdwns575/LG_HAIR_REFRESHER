@@ -21,6 +21,7 @@ export 'app_refresh_card.dart';
 export 'app_result_card.dart';
 export 'app_search_text_field.dart';
 export 'app_section_title.dart';
+export 'app_text.dart';
 export 'app_segmented_tab_bar.dart';
 export 'app_text_field.dart';
 export 'app_text_link_button.dart';

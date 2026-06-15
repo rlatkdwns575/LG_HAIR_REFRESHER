@@ -4,6 +4,7 @@ import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../../app/theme/app_colors.dart';
 import 'measure_care_level.dart';
 import 'measure_result_headline.dart';
+import 'measure_result_record.dart';
 import 'measure_result_status_item.dart';
 import 'measure_result_view_type.dart';
 
@@ -19,6 +20,7 @@ class MeasureResult {
     required this.recommendedMode,
     this.recommendReason,
     this.detailLinkLabel = '상세 결과 보기',
+    this.sourceRecord,
   });
 
   final MeasureCareLevel odorLevel;
@@ -27,6 +29,9 @@ class MeasureResult {
   final RefreshMode recommendedMode;
   final String? recommendReason;
   final String detailLinkLabel;
+
+  /// Supabase `MEASURE_RESULTS` 원본 행 (상세 화면 퍼센트·문구 매핑용).
+  final MeasureResultRecord? sourceRecord;
 
   MeasureResultViewType get viewType =>
       odorLevel.needsAction || dustLevel.needsAction

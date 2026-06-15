@@ -7,15 +7,28 @@ class MeasureResultStore {
   static final MeasureResultStore instance = MeasureResultStore._();
 
   MeasureResult? _pending;
+  String? _loadError;
 
   void setPending(MeasureResult result) {
     _pending = result;
+    _loadError = null;
+  }
+
+  void setLoadError(String message) {
+    _loadError = message;
+    _pending = null;
   }
 
   MeasureResult? peek() => _pending;
 
-  MeasureResult consume({MeasureResult? fallback}) {
-    final result = _pending ?? fallback ?? MeasureResult.sample;
+  String? consumeLoadError() {
+    final error = _loadError;
+    _loadError = null;
+    return error;
+  }
+
+  MeasureResult? consume({MeasureResult? fallback}) {
+    final result = _pending ?? fallback;
     _pending = null;
     return result;
   }

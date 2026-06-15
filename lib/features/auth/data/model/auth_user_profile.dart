@@ -6,8 +6,6 @@ class AuthUserProfile {
     required this.nickname,
     required this.age,
     required this.gender,
-    required this.hairLength,
-    required this.hairType,
   });
 
   factory AuthUserProfile.fromJson(Map<String, dynamic> json) {
@@ -17,8 +15,6 @@ class AuthUserProfile {
       nickname: json['nickname'] as String? ?? '',
       age: (json['age'] as num?)?.round() ?? 0,
       gender: json['gender'] as String? ?? '',
-      hairLength: json['hair_length'] as String? ?? '',
-      hairType: json['hair_type'] as String? ?? '',
     );
   }
 
@@ -27,8 +23,6 @@ class AuthUserProfile {
   final String nickname;
   final int age;
   final String gender;
-  final String hairLength;
-  final String hairType;
 
   Map<String, dynamic> toInsertJson() => {
     'user_id': userId,
@@ -36,7 +30,5 @@ class AuthUserProfile {
     'nickname': nickname,
     'age': age,
     'gender': gender,
-    'hair_length': hairLength,
-    'hair_type': hairType,
   };
 }
