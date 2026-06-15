@@ -48,6 +48,14 @@ class AuthApi {
     }
   }
 
+  Future<void> signOut() async {
+    try {
+      await SupabaseService.client.auth.signOut();
+    } on AuthException catch (error) {
+      throw AuthApiException(error.message);
+    }
+  }
+
   Future<void> signUp(SignUpDraft draft) async {
     if (!draft.isReadyToSubmit) {
       throw const AuthApiException('회원가입 정보가 충분하지 않습니다.');

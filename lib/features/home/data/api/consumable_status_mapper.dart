@@ -27,7 +27,7 @@ class ConsumableStatusMapper {
     }
     return const HomeFilterStatus(
       tier: HomeFilterStatusTier.fresh,
-      label: '새거',
+      label: '좋음',
     );
   }
 

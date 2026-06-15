@@ -189,23 +189,23 @@ class RefreshResultDetail {
       changes: [
         RefreshResultStatusChange(
           label: '잔여 냄새 수준',
-          beforeLabel: '높음',
+          beforeLabel: '보통',
           beforeVariant: AppBadgeSmallVariant.gray,
-          afterLabel: '보통',
-          afterVariant: AppBadgeSmallVariant.medium,
+          afterLabel: '낮음',
+          afterVariant: AppBadgeSmallVariant.low,
         ),
         RefreshResultStatusChange(
           label: '인지 가능도',
-          beforeLabel: '매우높음',
+          beforeLabel: '높음',
           beforeVariant: AppBadgeSmallVariant.gray,
-          afterLabel: '보통',
-          afterVariant: AppBadgeSmallVariant.medium,
+          afterLabel: '낮음',
+          afterVariant: AppBadgeSmallVariant.low,
           showHelpIcon: true,
           helpTooltipMessage: odorPerceptionHelpTooltip,
         ),
         RefreshResultStatusChange(
           label: '잔류 가능성',
-          beforeLabel: '매우높음',
+          beforeLabel: '보통',
           beforeVariant: AppBadgeSmallVariant.gray,
           afterLabel: '낮음',
           afterVariant: AppBadgeSmallVariant.low,
@@ -235,7 +235,7 @@ class RefreshResultDetail {
         ),
         RefreshResultStatusChange(
           label: '분포 범위',
-          beforeLabel: '넓음',
+          beforeLabel: '높음',
           beforeVariant: AppBadgeSmallVariant.gray,
           afterLabel: '낮음',
           afterVariant: AppBadgeSmallVariant.low,
@@ -257,7 +257,7 @@ class RefreshResultDetail {
       hairMetrics: [
         RefreshResultHairMetric(
           label: '오염 잔류 영향',
-          valueLabel: 'Medium',
+          valueLabel: '보통',
           variant: AppBadgeSmallVariant.medium,
           style: AppBadgeStyle.text,
           showHelpIcon: true,
@@ -267,13 +267,13 @@ class RefreshResultDetail {
         ),
         RefreshResultHairMetric(
           label: '모발 손상도',
-          valueLabel: 'Low',
+          valueLabel: '낮음',
           variant: AppBadgeSmallVariant.low,
           style: AppBadgeStyle.text,
         ),
         RefreshResultHairMetric(
           label: '모발 굵기',
-          valueLabel: 'label',
+          valueLabel: '얇음',
           variant: AppBadgeSmallVariant.gray,
           style: AppBadgeStyle.text,
         ),

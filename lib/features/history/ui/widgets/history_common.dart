@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_section_divider.dart';
 
 const _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -30,7 +31,7 @@ class HistorySectionDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 8, color: AppColors.gray100);
+    return const AppSectionDivider();
   }
 }
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/app_badge.dart';
 import '../../../../shared/widgets/app_battery_status.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
 import '../../data/home_assets.dart';
@@ -117,12 +116,12 @@ class _FilterStatus extends StatelessWidget {
 
   final HomeFilterStatus status;
 
-  static AppBadgeSmallVariant _badgeVariant(HomeFilterStatusTier tier) {
+  static Color _statusColor(HomeFilterStatusTier tier) {
     return switch (tier) {
-      HomeFilterStatusTier.replaceSoon => AppBadgeSmallVariant.veryHigh,
-      HomeFilterStatusTier.replaceRecommended => AppBadgeSmallVariant.high,
-      HomeFilterStatusTier.normal => AppBadgeSmallVariant.gray,
-      HomeFilterStatusTier.fresh => AppBadgeSmallVariant.medium,
+      HomeFilterStatusTier.replaceSoon => AppColors.red800,
+      HomeFilterStatusTier.replaceRecommended => AppColors.orange700,
+      HomeFilterStatusTier.normal => AppColors.gray600,
+      HomeFilterStatusTier.fresh => AppColors.safe500,
     };
   }
 
@@ -148,10 +147,13 @@ class _FilterStatus extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
-            AppBadge(
-              label: status.label,
-              smallVariant: _badgeVariant(status.tier),
-              style: AppBadgeStyle.text,
+            Text(
+              status.label,
+              style: AppTextStyles.bodyS.copyWith(
+                color: _statusColor(status.tier),
+                fontSize: 13,
+                height: 18 / 13,
+              ),
             ),
           ],
         ),

@@ -35,8 +35,9 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
   static const double _labelWidth = 116;
   static const double _percentWidth = 44;
   static const double _barRadius = 10;
-  static const double _thresholdLabelBottom = 20;
-  static const double _barMaxRatio = 0.6;
+  static const double _thresholdLabelTop = 24;
+  static const double _barMaxRatio = 0.64;
+  static const double _horizontalInset = 14;
 
   @override
   Widget build(BuildContext context) {
@@ -58,49 +59,66 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
       ),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableWidth =
-            constraints.maxWidth - _labelWidth - _percentWidth;
-        final barWidth = availableWidth * _barMaxRatio;
-        final barStartX = _labelWidth + (availableWidth - barWidth) / 2;
-        final thresholdLeft = barStartX + barWidth * (thresholdPercent / 100);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MeasureResultDetailNeedBars._horizontalInset,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableWidth =
+              constraints.maxWidth - _labelWidth - _percentWidth;
+          final barWidth = availableWidth * _barMaxRatio;
+          final barStartX = _labelWidth + (availableWidth - barWidth) / 2;
+          final thresholdLeft = barStartX + barWidth * (thresholdPercent / 100);
 
-        return SizedBox(
-          height: items.length * _rowHeight + _thresholdLabelBottom,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                left: thresholdLeft,
-                top: 0,
-                bottom: _thresholdLabelBottom,
-                child: CustomPaint(
-                  size: const Size(1, double.infinity),
-                  painter: _DashedVerticalLinePainter(),
+          return SizedBox(
+            height: _thresholdLabelTop + items.length * _rowHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  children: [
+                    const SizedBox(height: _thresholdLabelTop),
+                    for (final item in items)
+                      _NeedBarRow(item: item, barWidth: barWidth),
+                  ],
                 ),
-              ),
-              Positioned(
-                left: thresholdLeft - 14,
-                bottom: 0,
-                child: Text(
-                  '권장기준',
-                  style: AppTextStyles.labelS.copyWith(
-                    color: AppColors.gray500,
-                    fontSize: 10,
+                Positioned(
+                  left: thresholdLeft,
+                  top: _thresholdLabelTop,
+                  bottom: 0,
+                  child: CustomPaint(
+                    size: const Size(1, double.infinity),
+                    painter: _DashedVerticalLinePainter(),
                   ),
                 ),
-              ),
-              Column(
-                children: [
-                  for (final item in items)
-                    _NeedBarRow(item: item, barWidth: barWidth),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+                Positioned(
+                  left: thresholdLeft - 22,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.gray100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '권장기준',
+                      style: AppTextStyles.labelS.copyWith(
+                        color: AppColors.gray600,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -122,15 +140,13 @@ class _NeedBarRow extends StatelessWidget {
         children: [
           SizedBox(
             width: MeasureResultDetailNeedBars._labelWidth,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                item.label,
-                style: AppTextStyles.labelS.copyWith(
-                  color: AppColors.gray800,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+            child: Text(
+              item.label,
+              textAlign: TextAlign.left,
+              style: AppTextStyles.labelS.copyWith(
+                color: AppColors.gray800,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

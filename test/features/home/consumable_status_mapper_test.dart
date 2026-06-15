@@ -52,11 +52,11 @@ void main() {
     test('returns fresh at 71 percent or above', () {
       expect(
         ConsumableStatusMapper.filterStatus(71),
-        const HomeFilterStatus(tier: HomeFilterStatusTier.fresh, label: '새거'),
+        const HomeFilterStatus(tier: HomeFilterStatusTier.fresh, label: '좋음'),
       );
       expect(
         ConsumableStatusMapper.filterStatus(100),
-        const HomeFilterStatus(tier: HomeFilterStatusTier.fresh, label: '새거'),
+        const HomeFilterStatus(tier: HomeFilterStatusTier.fresh, label: '좋음'),
       );
     });
 
@@ -73,7 +73,7 @@ void main() {
       expect(ConsumableStatusMapper.filterStatusLabel(10), '교체 예정');
       expect(ConsumableStatusMapper.filterStatusLabel(25), '교체 권장');
       expect(ConsumableStatusMapper.filterStatusLabel(50), '보통');
-      expect(ConsumableStatusMapper.filterStatusLabel(90), '새거');
+      expect(ConsumableStatusMapper.filterStatusLabel(90), '좋음');
     });
   });
 }

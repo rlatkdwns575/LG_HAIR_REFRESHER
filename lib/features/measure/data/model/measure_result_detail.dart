@@ -47,13 +47,11 @@ class MeasureResultDetail {
     final odorBadge = MeasureResultMapper.sectionBadge(odorScore);
     final dustBadge = MeasureResultMapper.sectionBadge(dustScore);
     final hairBadge = MeasureResultMapper.hairConditionBadge(record);
-    final sebumBadge = MeasureResultMapper.badgeForHairAttribute(
-      record.hairSebum,
-    );
-    final damageBadge = MeasureResultMapper.badgeForHairAttribute(
+    final sebumBadge = MeasureResultMapper.badgeForHairLevel(record.hairSebum);
+    final damageBadge = MeasureResultMapper.badgeForHairLevel(
       record.hairDamageScore,
     );
-    final thicknessBadge = MeasureResultMapper.badgeForHairAttribute(
+    final thicknessBadge = MeasureResultMapper.badgeForHairThickness(
       record.hairThickness,
     );
     final odorPerceptionScore = MeasureResultMapper.pollutionScoreStepUp(

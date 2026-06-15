@@ -8,6 +8,6 @@ class HomeFilterStatus {
 
   static const freshDefault = HomeFilterStatus(
     tier: HomeFilterStatusTier.fresh,
-    label: '새거',
+    label: '좋음',
   );
 }

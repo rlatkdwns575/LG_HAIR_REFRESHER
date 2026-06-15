@@ -32,7 +32,7 @@ class MeasureResultDetailSectionBlock extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         _AnalysisCard(section: section),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.lg),
         _MetricList(metrics: section.metrics),
       ],
     );
@@ -85,7 +85,7 @@ class _MetricList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < metrics.length; i++) ...[
-          if (i > 0) const SizedBox(height: AppSpacing.sm),
+          if (i > 0) const SizedBox(height: AppSpacing.md),
           MeasureResultDetailMetricTile(metric: metrics[i]),
         ],
       ],

@@ -61,10 +61,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   List<HomeQuickRefreshSlot> get _quickSlots {
     if (!_dashboardData.hasUsageHistory) {
-      return const [];
+      return const [
+        HomeQuickRefreshSlot(
+          type: HomeQuickSlotType.recommendedMode,
+          mode: homeRecommendedModeFallback,
+        ),
+        HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
+      ];
     }
 
     final slots = <HomeQuickRefreshSlot>[
+      HomeQuickRefreshSlot(
+        type: HomeQuickSlotType.frequentMode,
+        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
+      ),
       if (_favoriteMode != null)
         HomeQuickRefreshSlot(
           type: HomeQuickSlotType.favoriteMode,
@@ -73,13 +83,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       else
         const HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
     ];
-
-    slots.add(
-      HomeQuickRefreshSlot(
-        type: HomeQuickSlotType.frequentMode,
-        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
-      ),
-    );
 
     return slots;
   }
@@ -321,15 +324,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           HomeRecommendBanner(message: _recommendMessage!),
                           const SizedBox(height: _sectionGap),
                         ],
-                        if (_dashboardData.hasUsageHistory) ...[
-                          HomeQuickRefreshRow(
-                            slots: _quickSlots,
-                            onFavoriteAddPressed: _handleFavoriteAdd,
-                            onModePressed: (mode) => context
-                                .pushRefreshProgress(modeName: mode.title),
-                          ),
-                          const SizedBox(height: _sectionGap),
-                        ],
+                        HomeQuickRefreshRow(
+                          slots: _quickSlots,
+                          onFavoriteAddPressed: _handleFavoriteAdd,
+                          onModePressed: (mode) =>
+                              context.pushRefreshProgress(modeName: mode.title),
+                        ),
+                        const SizedBox(height: _sectionGap),
                         HomeNavigationMenu(
                           onRefreshPressed: context.pushRefresh,
                           onDiagnosisPressed: _handleDiagnosisTap,
