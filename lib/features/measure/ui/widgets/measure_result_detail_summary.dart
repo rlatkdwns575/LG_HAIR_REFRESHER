@@ -59,47 +59,64 @@ class _Headline extends StatelessWidget {
   Widget build(BuildContext context) {
     final suffix = detail.exceedsThreshold ? '로 권장 기준을 넘었어요.' : '로 안정 범위예요.';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '리프레시 필요도가',
-          style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${detail.refreshNeedPercent}%',
-              style: AppTextStyles.headlineL.copyWith(
-                fontSize: 48,
-                height: 1,
-                color: AppColors.gray900,
-                fontWeight: FontWeight.w700,
+    return Padding(
+      padding: const EdgeInsets.only(left: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '리프레시 필요도가',
+            style: AppTextStyles.titleS.copyWith(
+              color: AppColors.gray800,
+              height: 1.25,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${detail.refreshNeedPercent}%',
+                style: AppTextStyles.headlineL.copyWith(
+                  fontSize: 48,
+                  height: 1.05,
+                  color: AppColors.gray900,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 2, bottom: 0),
-              child: Text(
-                suffix,
-                style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
+              Padding(
+                padding: const EdgeInsets.only(left: 2, bottom: 2),
+                child: Text(
+                  suffix,
+                  style: AppTextStyles.titleS.copyWith(
+                    color: AppColors.gray800,
+                    height: 1.25,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Text(
-              detail.refreshFocusLabel,
-              style: AppTextStyles.titleS.copyWith(color: AppColors.orange700),
-            ),
-            Text(
-              '가 필요해요.',
-              style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Text(
+                detail.refreshFocusLabel,
+                style: AppTextStyles.titleS.copyWith(
+                  color: AppColors.orange700,
+                  height: 1.25,
+                ),
+              ),
+              Text(
+                '가 필요해요.',
+                style: AppTextStyles.titleS.copyWith(
+                  color: AppColors.gray800,
+                  height: 1.25,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

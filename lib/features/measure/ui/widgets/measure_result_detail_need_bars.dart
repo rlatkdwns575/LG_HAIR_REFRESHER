@@ -30,13 +30,13 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
   final int hairPercent;
   final int thresholdPercent;
 
-  static const double _barHeight = 16;
-  static const double _rowHeight = 30;
-  static const double _labelWidth = 100;
-  static const double _percentWidth = 36;
-  static const double _barRadius = 8;
+  static const double _barHeight = 20;
+  static const double _rowHeight = 34;
+  static const double _labelWidth = 116;
+  static const double _percentWidth = 44;
+  static const double _barRadius = 10;
   static const double _thresholdLabelBottom = 20;
-  static const double _barMaxRatio = 0.66;
+  static const double _barMaxRatio = 0.6;
 
   @override
   Widget build(BuildContext context) {
@@ -123,12 +123,13 @@ class _NeedBarRow extends StatelessWidget {
           SizedBox(
             width: MeasureResultDetailNeedBars._labelWidth,
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.centerRight,
               child: Text(
                 item.label,
                 style: AppTextStyles.labelS.copyWith(
                   color: AppColors.gray800,
-                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -169,16 +170,17 @@ class _NeedBarRow extends StatelessWidget {
           SizedBox(
             width: MeasureResultDetailNeedBars._percentWidth,
             child: Align(
-              alignment: Alignment.centerRight,
+              alignment: Alignment.centerLeft,
               child: Text(
                 '${item.percent}%',
                 style: AppTextStyles.labelS.copyWith(
                   color: item.emphasized
                       ? AppColors.gray900
                       : AppColors.gray600,
+                  fontSize: 13,
                   fontWeight: item.emphasized
-                      ? FontWeight.w700
-                      : FontWeight.w400,
+                      ? FontWeight.w800
+                      : FontWeight.w600,
                 ),
               ),
             ),
