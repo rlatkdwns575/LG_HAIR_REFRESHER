@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/measure_result_headline.dart' as model;
 
 /// 진단 결과 상태 메시지 (안정형/경고형 공통 스타일).
@@ -17,7 +18,7 @@ class MeasureResultHeadline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!headline.isHighlighted) {
-      return Text(
+      return AppText(
         headline.text!,
         textAlign: TextAlign.center,
         style: _baseStyle,

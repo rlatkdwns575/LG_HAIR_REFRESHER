@@ -14,7 +14,7 @@ class RefreshResultDetailMapper {
     final dustAfter = _percentFromPollution(result.dustChange.afterLevel);
 
     return RefreshResultDetail(
-      modeName: _modeNameFromResult(result),
+      modeName: result.recommendedMode?.name ?? '리프레시',
       necessityReductionPercent: result.overallImprovementPercent,
       currentCareNeedPercent: _average([odorAfter, dustAfter]),
       metrics: [
@@ -93,28 +93,6 @@ class RefreshResultDetailMapper {
         dustAfterLabel: dustAfterLabel,
       ),
       hairSection: RefreshResultDetail.sample.hairSection,
-    );
-  }
-
-  static RefreshResultStatusSection _sectionFromLabels({
-    required RefreshResultStatusSection template,
-    required List<_ChangeTemplate> changes,
-  }) {
-    return RefreshResultStatusSection(
-      title: template.title,
-      description: template.description,
-      insight: template.insight,
-      changes: [
-        for (final change in changes)
-          _makeChange(
-            label: change.label,
-            beforeLabel: change.beforeLabel ?? '높음',
-            afterLabel: change.afterLabel ?? '보통',
-            preferLowAfter: change.preferLowAfter,
-            showHelpIcon: change.showHelpIcon,
-            helpTooltipMessage: change.helpTooltipMessage,
-          ),
-      ],
     );
   }
 
@@ -481,22 +459,4 @@ class RefreshResultDetailMapper {
     }
     return values.reduce((a, b) => a + b) / values.length;
   }
-}
-
-class _ChangeTemplate {
-  const _ChangeTemplate(
-    this.label,
-    this.beforeLabel,
-    this.afterLabel, {
-    this.preferLowAfter = false,
-    this.showHelpIcon = false,
-    this.helpTooltipMessage,
-  });
-
-  final String label;
-  final String? beforeLabel;
-  final String? afterLabel;
-  final bool preferLowAfter;
-  final bool showHelpIcon;
-  final String? helpTooltipMessage;
 }

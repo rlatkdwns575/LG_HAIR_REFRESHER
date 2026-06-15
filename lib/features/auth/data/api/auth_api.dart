@@ -1,12 +1,37 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/supabase_tables.dart';
+import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/auth_user_profile.dart';
 import '../model/sign_up_draft.dart';
 
 class AuthApi {
   const AuthApi();
+
+  static const _profileColumns =
+      'user_id, email, nickname, age, gender';
+
+  /// `AUTH_USERS` 프로필을 조회합니다.
+  Future<AuthUserProfile?> fetchProfile({String? userId}) async {
+    final resolvedUserId = AuthSessionService.resolveUserId(override: userId);
+
+    try {
+      final row = await SupabaseService.client
+          .from(SupabaseTables.authUsers)
+          .select(_profileColumns)
+          .eq('user_id', resolvedUserId)
+          .maybeSingle();
+
+      if (row == null) {
+        return null;
+      }
+
+      return AuthUserProfile.fromJson(Map<String, dynamic>.from(row));
+    } on PostgrestException {
+      return null;
+    }
+  }
 
   Future<void> signIn({required String email, required String password}) async {
     try {
@@ -45,8 +70,6 @@ class AuthApi {
         nickname: draft.nickname!,
         age: draft.age!,
         gender: draft.gender!,
-        hairLength: draft.hairLength!,
-        hairType: draft.hairType!,
       );
 
       await SupabaseService.client

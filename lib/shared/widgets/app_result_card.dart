@@ -4,6 +4,7 @@ import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_badge.dart';
+import 'app_text.dart';
 import 'app_text_link_button.dart';
 
 class AppResultCardTag {
@@ -50,7 +51,7 @@ class AppResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
+          AppText(
             title,
             textAlign: TextAlign.center,
             style: AppTextStyles.titleM.copyWith(

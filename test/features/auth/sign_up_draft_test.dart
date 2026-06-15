@@ -4,17 +4,13 @@ import 'package:lg_hair_refresher/features/auth/data/model/sign_up_draft.dart';
 
 void main() {
   group('SignUpDraft', () {
-    test('isReadyToSubmit is false until hair profile is filled', () {
+    test('isReadyToSubmit is false until profile is filled', () {
       const draft = SignUpDraft(
         email: 'user@example.com',
         password: 'password123',
-        nickname: '민지',
-        age: 24,
-        gender: '여성',
       );
 
-      expect(draft.isProfileComplete, isTrue);
-      expect(draft.isHairProfileComplete, isFalse);
+      expect(draft.isProfileComplete, isFalse);
       expect(draft.isReadyToSubmit, isFalse);
     });
 
@@ -25,8 +21,6 @@ void main() {
         nickname: '민지',
         age: 24,
         gender: '여성',
-        hairLength: '중단발',
-        hairType: '웨이브',
       );
 
       expect(draft.isReadyToSubmit, isTrue);
@@ -41,8 +35,6 @@ void main() {
         nickname: '테스트유저',
         age: 24,
         gender: '여성',
-        hairLength: '중단발',
-        hairType: '웨이브',
       );
 
       expect(profile.toInsertJson(), {
@@ -51,8 +43,6 @@ void main() {
         'nickname': '테스트유저',
         'age': 24,
         'gender': '여성',
-        'hair_length': '중단발',
-        'hair_type': '웨이브',
       });
     });
   });

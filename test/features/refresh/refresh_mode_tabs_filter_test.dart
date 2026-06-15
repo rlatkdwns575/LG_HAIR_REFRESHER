@@ -84,7 +84,7 @@ void main() {
     test('커스텀 모드 탭은 사용자 생성 모드만 최신순으로 반환한다', () {
       final result = filterRefreshModes(
         allModes: allModes,
-        selectedTab: RefreshModeTabs.customMode,
+        selectedTab: RefreshModeTabs.customModeTab,
       );
 
       expect(result.map((mode) => mode.id), ['custom-new', 'custom-old']);
@@ -117,6 +117,32 @@ void main() {
         'before-long',
         'custom-before',
       ]);
+    });
+
+    test('기타 탭은 기타 카테고리만 소요시간 오름차순으로 반환한다', () {
+      final etcShort = RefreshMode(
+        id: 'etc-short',
+        name: '기타 짧은',
+        description: '기타',
+        category: RefreshModeTabs.etc,
+        durationSeconds: 120,
+        icon: Icons.auto_awesome_outlined,
+      );
+      final etcLong = RefreshMode(
+        id: 'etc-long',
+        name: '기타 긴',
+        description: '기타',
+        category: RefreshModeTabs.etc,
+        durationSeconds: 480,
+        icon: Icons.auto_awesome_outlined,
+      );
+
+      final result = filterRefreshModes(
+        allModes: [...allModes, etcShort, etcLong],
+        selectedTab: RefreshModeTabs.etc,
+      );
+
+      expect(result.map((mode) => mode.id), ['etc-short', 'etc-long']);
     });
   });
 }

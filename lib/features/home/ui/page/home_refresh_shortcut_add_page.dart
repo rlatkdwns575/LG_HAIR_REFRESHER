@@ -163,7 +163,7 @@ class _HomeRefreshShortcutAddPageState
 
   Widget _buildEmptyState() {
     final selectedTab = RefreshModeTabs.all[_selectedChipIndex];
-    final isCustom = selectedTab == RefreshModeTabs.customMode;
+    final isCustom = selectedTab == RefreshModeTabs.customModeTab;
     final message = isCustom ? '아직 제작된 커스텀 모드가 없어요' : '해당 분류의 모드가 아직 없어요';
 
     return Padding(
@@ -179,45 +179,12 @@ class _HomeRefreshShortcutAddPageState
   }
 
   Widget _buildChipTabBar() {
-    return SizedBox(
-      height: 52,
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 18, left: 15, right: 15),
-            child: AppChipTabBar(
-              tabs: RefreshModeTabs.all,
-              selectedIndex: _selectedChipIndex,
-              onChanged: (index) => setState(() => _selectedChipIndex = index),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            right: 0,
-            bottom: 0,
-            child: IgnorePointer(
-              child: Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 52,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [Color(0x00FFFFFF), AppColors.gray0],
-                      ),
-                    ),
-                  ),
-                  const ColoredBox(
-                    color: AppColors.gray0,
-                    child: SizedBox(width: 10, height: 52),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return AppChipTabBarShell(
+      child: AppChipTabBar(
+        tabs: RefreshModeTabs.all,
+        selectedIndex: _selectedChipIndex,
+        onChanged: (index) => setState(() => _selectedChipIndex = index),
+        dividerAfterIndex: 1,
       ),
     );
   }

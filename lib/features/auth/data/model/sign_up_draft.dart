@@ -6,8 +6,6 @@ class SignUpDraft {
     this.nickname,
     this.age,
     this.gender,
-    this.hairLength,
-    this.hairType,
   });
 
   final String email;
@@ -15,8 +13,6 @@ class SignUpDraft {
   final String? nickname;
   final int? age;
   final String? gender;
-  final String? hairLength;
-  final String? hairType;
 
   bool get isProfileComplete =>
       nickname != null &&
@@ -25,13 +21,7 @@ class SignUpDraft {
       gender != null &&
       gender!.isNotEmpty;
 
-  bool get isHairProfileComplete =>
-      hairLength != null &&
-      hairLength!.isNotEmpty &&
-      hairType != null &&
-      hairType!.isNotEmpty;
-
-  bool get isReadyToSubmit => isProfileComplete && isHairProfileComplete;
+  bool get isReadyToSubmit => isProfileComplete;
 
   SignUpDraft copyWith({
     String? email,
@@ -39,8 +29,6 @@ class SignUpDraft {
     String? nickname,
     int? age,
     String? gender,
-    String? hairLength,
-    String? hairType,
   }) {
     return SignUpDraft(
       email: email ?? this.email,
@@ -48,8 +36,6 @@ class SignUpDraft {
       nickname: nickname ?? this.nickname,
       age: age ?? this.age,
       gender: gender ?? this.gender,
-      hairLength: hairLength ?? this.hairLength,
-      hairType: hairType ?? this.hairType,
     );
   }
 }

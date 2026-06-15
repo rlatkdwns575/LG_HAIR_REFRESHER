@@ -10,6 +10,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
 import '../../data/model/refresh_result.dart';
@@ -230,7 +231,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
                                     ),
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
-                                  Text(
+                                  AppText(
                                     _pausedHint,
                                     textAlign: TextAlign.center,
                                     style: AppTextStyles.bodyM1.copyWith(
@@ -249,7 +250,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
                                     ),
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
-                                  Text(
+                                  AppText(
                                     _session.deviceGuide,
                                     textAlign: TextAlign.center,
                                     style: AppTextStyles.bodyM1.copyWith(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'app_text.dart';
 
 class AppSectionTitle extends StatelessWidget {
   const AppSectionTitle({required this.title, this.subtitle, super.key});
@@ -22,7 +23,7 @@ class AppSectionTitle extends StatelessWidget {
         ),
         if (subtitle != null) ...[
           const SizedBox(height: 6),
-          Text(
+          AppText(
             subtitle!,
             style: AppTextStyles.bodyS.copyWith(
               color: AppComponentColors.sectionSubtitle,
