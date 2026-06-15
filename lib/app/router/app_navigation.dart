@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
+import '../../features/refresh/data/model/refresh_result.dart';
+import '../../features/refresh/data/model/refresh_result_detail.dart';
+import '../../features/refresh/data/refresh_result_detail_mapper.dart';
 
 /// 화면에서 route path 문자열을 직접 쓰지 않고 이동할 때 사용합니다.
 ///
@@ -38,6 +41,35 @@ extension AppNavigation on BuildContext {
 
   void pushRefreshResult() => push(AppRoutePaths.refreshResult);
 
+  void pushRefreshResultDetail({
+    RefreshResultDetail? detail,
+    RefreshResult? result,
+  }) {
+    assert(detail == null || result == null, 'detail 또는 result 중 하나만 전달하세요.');
+    push(AppRoutePaths.refreshResultDetail, extra: detail ?? result);
+  }
+
+  void pushRefreshHistoryRecordDetail({
+    required String modeName,
+    double? necessityReductionPercent,
+    String? odorBeforeLabel,
+    String? odorAfterLabel,
+    String? dustBeforeLabel,
+    String? dustAfterLabel,
+  }) {
+    push(
+      AppRoutePaths.refreshResultDetail,
+      extra: RefreshResultDetailMapper.fromRecordSummary(
+        modeName: modeName,
+        necessityReductionPercent: necessityReductionPercent,
+        odorBeforeLabel: odorBeforeLabel,
+        odorAfterLabel: odorAfterLabel,
+        dustBeforeLabel: dustBeforeLabel,
+        dustAfterLabel: dustAfterLabel,
+      ),
+    );
+  }
+
   /// 커스텀 모드 생성 화면으로 이동하고, 저장 성공 여부를 반환합니다.
   Future<bool?> pushRefreshCustomCreate() =>
       push<bool>(AppRoutePaths.refreshCustomCreate);
@@ -70,6 +102,9 @@ extension AppNavigation on BuildContext {
       pushNamed(AppRouteNames.refreshResultCollecting);
 
   void pushRefreshResultNamed() => pushNamed(AppRouteNames.refreshResult);
+
+  void pushRefreshResultDetailNamed({Object? extra}) =>
+      pushNamed(AppRouteNames.refreshResultDetail, extra: extra);
 
   void pushHistoryNamed() => pushNamed(AppRouteNames.history);
 

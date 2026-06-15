@@ -28,14 +28,7 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
   void _goHome() => context.goHome();
 
   void _onDetailTap() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('상세 결과 화면은 준비 중이에요.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    context.pushRefreshResultDetail(result: _result);
   }
 
   void _onRecommendTap() {

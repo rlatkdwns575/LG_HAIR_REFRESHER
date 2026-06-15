@@ -16,6 +16,7 @@ class ImageAssets {
   static const homeFilterIcon = '$homeDir/filter.png';
   static const measureAnalyzingIllustration = '$measureDir/analyzing.png';
   static const refreshTrashIcon = '$refreshDir/trash.png';
+  static const refreshShareIcon = '$refreshDir/wifi.png';
   static const refreshCollectingIllustration = '$refreshDir/refrash.png';
   static const historyCalendarIcon = '$historyDir/calendar.png';
 

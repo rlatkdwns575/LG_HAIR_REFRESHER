@@ -185,6 +185,11 @@ class AppCommonTopHeader extends StatelessWidget
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (onShare != null)
+              _HeaderIconButton(
+                icon: Icons.ios_share_outlined,
+                onPressed: onShare,
+              ),
             if (onSettings != null)
               _HeaderIconButton(
                 icon: Icons.settings_outlined,
