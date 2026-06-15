@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -8,12 +9,12 @@ import '../../data/home_assets.dart';
 import '../../../../shared/widgets/app_recommend_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 
-/// Figma `card_recommend` (631:18545) — 330×52, sparkle + 추천 문구.
+/// Figma `card_recommend` (1244:25476) — 330×62, sparkle + 추천 문구.
 class HomeRecommendBanner extends StatelessWidget {
   const HomeRecommendBanner({required this.message, super.key});
 
-  static const bannerHeight = 52.0;
-  static const _sparkleSize = 16.0;
+  static const bannerHeight = 62.0;
+  static const _sparkleSize = 24.0;
 
   final String message;
 
@@ -24,19 +25,8 @@ class HomeRecommendBanner extends StatelessWidget {
       height: bannerHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
+          color: AppColors.gray0,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppComponentColors.recommendCardGradientStart.withValues(
-                alpha: 0.6,
-              ),
-              AppComponentColors.recommendCardGradientEnd.withValues(
-                alpha: 0.6,
-              ),
-            ],
-          ),
           border: GradientBoxBorder(
             gradient: LinearGradient(
               begin: const Alignment(-0.2, 0.9),
@@ -50,7 +40,7 @@ class HomeRecommendBanner extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

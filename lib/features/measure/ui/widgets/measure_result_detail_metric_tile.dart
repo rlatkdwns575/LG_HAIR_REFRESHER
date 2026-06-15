@@ -7,37 +7,42 @@ import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/measure_result_detail_metric.dart';
 import 'measure_result_metric_help_icon.dart';
 
-/// Figma Card_small — 지표 행 (테두리 없음, 한 줄 전체).
+/// Figma Card_small — 지표 행 (좌우 여백 + 라벨·뱃지 간격).
 class MeasureResultDetailMetricTile extends StatelessWidget {
   const MeasureResultDetailMetricTile({required this.metric, super.key});
 
   final MeasureResultDetailMetric metric;
 
+  static const double _horizontalInset = 14;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Flexible(
-                child: Text(
-                  metric.label,
-                  style: AppTextStyles.titleXs.copyWith(
-                    color: AppColors.gray800,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: _horizontalInset),
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    metric.label,
+                    style: AppTextStyles.titleXs.copyWith(
+                      color: AppColors.gray800,
+                    ),
                   ),
                 ),
-              ),
-              if (metric.showHelpIcon && metric.helpMessage != null) ...[
-                const SizedBox(width: 2),
-                MeasureResultMetricHelpIcon(message: metric.helpMessage!),
+                if (metric.showHelpIcon && metric.helpMessage != null) ...[
+                  const SizedBox(width: 2),
+                  MeasureResultMetricHelpIcon(message: metric.helpMessage!),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        _BadgeGroup(metric: metric),
-      ],
+          const SizedBox(width: AppSpacing.md),
+          _BadgeGroup(metric: metric),
+        ],
+      ),
     );
   }
 }

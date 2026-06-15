@@ -123,9 +123,9 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(
-                      15,
+                      0,
                       AppSpacing.sm,
-                      15,
+                      0,
                       0,
                     ),
                     children: [

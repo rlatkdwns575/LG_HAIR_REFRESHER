@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../shared/widgets/app_section_divider.dart';
 import '../../data/model/measure_result_detail.dart';
 import 'measure_result_detail_header.dart';
 import 'measure_result_detail_section_block.dart';
@@ -20,20 +21,34 @@ class MeasureResultDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const MeasureResultDetailHeader(),
-        const SizedBox(height: AppSpacing.xl),
-        MeasureResultDetailSummary(
-          detail: detail,
-          onRecommendTap: onRecommendTap,
+        DetailPageHorizontalPadding(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const MeasureResultDetailHeader(),
+              const SizedBox(height: AppSpacing.xl),
+              MeasureResultDetailSummary(
+                detail: detail,
+                onRecommendTap: onRecommendTap,
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 40),
-        MeasureResultDetailSectionBlock(section: detail.odorSection),
-        const SizedBox(height: 40),
-        MeasureResultDetailSectionBlock(section: detail.dustSection),
-        const SizedBox(height: 40),
-        MeasureResultDetailSectionBlock(section: detail.hairSection),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: MeasureResultDetailSectionBlock(section: detail.odorSection),
+        ),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: MeasureResultDetailSectionBlock(section: detail.dustSection),
+        ),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: MeasureResultDetailSectionBlock(section: detail.hairSection),
+        ),
         const SizedBox(height: AppSpacing.xl),
       ],
     );

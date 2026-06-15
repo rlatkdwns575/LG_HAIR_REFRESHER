@@ -40,23 +40,15 @@ void main() {
       );
 
       final odorChanges = detail.odorSection.changes;
-      expect(odorChanges[0].beforeLabel, '높음');
+      expect(odorChanges[0].beforeLabel, '매우높음');
       expect(odorChanges[0].beforeVariant, AppBadgeSmallVariant.gray);
       expect(odorChanges[0].beforeStyle, AppBadgeStyle.text);
+      expect(odorChanges[0].afterLabel, '낮음');
       expect(odorChanges[2].afterLabel, '낮음');
       expect(odorChanges[2].afterVariant, AppBadgeSmallVariant.low);
-      expect(
-        detail.odorSection.insight.badgeBackgroundColor,
-        AppColors.gray0,
-      );
-      expect(
-        detail.odorSection.insight.badgeTextColor,
-        AppColors.primary500,
-      );
-      expect(
-        detail.odorSection.insight.badgeBorderColor,
-        AppColors.primary300,
-      );
+      expect(detail.odorSection.insight.badgeBackgroundColor, AppColors.gray0);
+      expect(detail.odorSection.insight.badgeTextColor, AppColors.primary500);
+      expect(detail.odorSection.insight.badgeBorderColor, AppColors.primary300);
     });
 
     test('maps dust section to figma display labels', () {
@@ -67,10 +59,10 @@ void main() {
       );
 
       final dustChanges = detail.dustSection.changes;
-      expect(dustChanges[0].beforeLabel, '높음');
+      expect(dustChanges[0].beforeLabel, '보통');
       expect(dustChanges[0].afterLabel, '낮음');
       expect(dustChanges[0].afterVariant, AppBadgeSmallVariant.low);
-      expect(dustChanges[1].beforeLabel, '넓음');
+      expect(dustChanges[1].beforeLabel, '보통');
       expect(dustChanges[1].afterLabel, '낮음');
       expect(dustChanges[1].afterVariant, AppBadgeSmallVariant.low);
     });

@@ -28,16 +28,16 @@ class MeasureResultDetailSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _Headline(detail: detail),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.xl),
         MeasureResultDetailNeedBars(
           odorPercent: detail.odorNeedPercent,
           dustPercent: detail.dustNeedPercent,
           hairPercent: detail.hairImpactPercent,
           thresholdPercent: detail.recommendedThresholdPercent,
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.xl),
         _AnalysisSummary(detail: detail),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.xl),
         RefreshModeCard(
           mode: detail.recommendedMode,
           variant: RefreshModeCardVariant.featured,
@@ -129,24 +129,25 @@ class _AnalysisSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           decoration: BoxDecoration(
             color: AppColors.gray50,
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: AppText(
             detail.analysisSummary,
+            textAlign: TextAlign.center,
             style: AppTextStyles.bodyXs.copyWith(
               color: AppColors.gray700,
               height: 16 / 12,
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.sm),
         Align(
           alignment: Alignment.centerRight,
           child: Row(

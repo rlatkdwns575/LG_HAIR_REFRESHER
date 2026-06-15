@@ -1,3 +1,4 @@
+import '../../../../shared/utils/metric_badge_mapper.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../../history/data/api/history_session_mapper.dart';
 import '../../../history/data/model/care_status.dart';
@@ -58,32 +59,14 @@ class MeasureResultMapper {
     };
   }
 
-  static String pollutionScoreLabel(int score) {
-    final status = HistorySessionMapper.fromPollutionScore(score);
-    return switch (status) {
-      CareStatus.good || CareStatus.notNeeded => '낮음',
-      CareStatus.normal => '보통',
-      CareStatus.recommend => '보통',
-      CareStatus.focusedRecommend => '높음',
-      CareStatus.focusedRequired => '매우높음',
-      null => '보통',
-    };
-  }
+  static String pollutionScoreLabel(int score) =>
+      MetricBadgeMapper.pollutionScoreLabel(score);
 
-  static AppBadgeSmallVariant pollutionScoreVariant(int score) {
-    final status = HistorySessionMapper.fromPollutionScore(score);
-    return switch (status) {
-      CareStatus.good || CareStatus.notNeeded => AppBadgeSmallVariant.low,
-      CareStatus.normal || CareStatus.recommend => AppBadgeSmallVariant.medium,
-      CareStatus.focusedRecommend => AppBadgeSmallVariant.high,
-      CareStatus.focusedRequired => AppBadgeSmallVariant.veryHigh,
-      null => AppBadgeSmallVariant.medium,
-    };
-  }
+  static AppBadgeSmallVariant pollutionScoreVariant(int score) =>
+      MetricBadgeMapper.pollutionScoreVariant(score);
 
-  static int pollutionScoreStepUp(int score) {
-    return (score + 12).clamp(0, 100);
-  }
+  static int pollutionScoreStepUp(int score) =>
+      MetricBadgeMapper.pollutionScoreStepUp(score);
 
   static String focusLabel(MeasureResultRecord record) {
     if (record.hairDustScore > record.hairOdorScore + 5) {
@@ -110,38 +93,24 @@ class MeasureResultMapper {
     return '냄새와 먼지 케어가 함께 필요해요.\n균형 잡힌 리프레시를 권장해요.';
   }
 
+  static (String label, AppBadgeSmallVariant variant) badgeForHairLevel(
+    String? raw, {
+    String fallbackLabel = '-',
+  }) => MetricBadgeMapper.badgeForHairLevel(raw, fallbackLabel: fallbackLabel);
+
+  static (String label, AppBadgeSmallVariant variant) badgeForHairThickness(
+    String? raw, {
+    String fallbackLabel = '-',
+  }) => MetricBadgeMapper.badgeForHairThickness(
+    raw,
+    fallbackLabel: fallbackLabel,
+  );
+
   static (String label, AppBadgeSmallVariant variant) badgeForHairAttribute(
     String? raw, {
     String fallbackLabel = '-',
   }) {
-    if (raw == null || raw.trim().isEmpty) {
-      return (fallbackLabel, AppBadgeSmallVariant.gray);
-    }
-
-    final normalized = raw.trim();
-    final lower = normalized.toLowerCase();
-    final variant = switch (lower) {
-      'low' || '낮음' => AppBadgeSmallVariant.low,
-      'medium' || '보통' || '중간' => AppBadgeSmallVariant.medium,
-      'high' || '높음' => AppBadgeSmallVariant.high,
-      'very high' ||
-      'veryhigh' ||
-      '매우높음' ||
-      '매우 높음' => AppBadgeSmallVariant.veryHigh,
-      _ => AppBadgeSmallVariant.gray,
-    };
-
-    return (_displayHairLabel(normalized), variant);
-  }
-
-  static String _displayHairLabel(String value) {
-    return switch (value.toLowerCase()) {
-      'low' => 'Low',
-      'medium' => 'Medium',
-      'high' => 'High',
-      'very high' || 'veryhigh' => 'Very High',
-      _ => value,
-    };
+    return badgeForHairLevel(raw, fallbackLabel: fallbackLabel);
   }
 
   static (String, AppBadgeSmallVariant) sectionBadge(int score) {

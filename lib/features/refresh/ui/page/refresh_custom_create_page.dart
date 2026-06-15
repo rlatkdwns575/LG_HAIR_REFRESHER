@@ -26,7 +26,7 @@ enum _CareType {
 
   final String label;
 
-  static const displayOrder = [dust, odor, scent];
+  static const displayOrder = [odor, dust, scent];
 }
 
 /// 케어 강도 (집중관리 / 일반관리 / 간편관리).
@@ -57,6 +57,7 @@ class RefreshCustomCreatePage extends StatefulWidget {
 class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   static const int _minDuration = 2;
   static const int _maxDuration = 15;
+  static const double _sectionGap = 20;
 
   final _customModeApi = const CustomModeApi();
   final _nameController = TextEditingController();
@@ -190,22 +191,16 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                15,
-                AppSpacing.lg,
-                15,
-                AppSpacing.lg,
-              ),
+              padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 18),
               children: [
+                _buildPreviewRoadmap(),
                 _buildNameSection(),
-                const SizedBox(height: AppSpacing.lg),
-                _buildPreview(),
-                const SizedBox(height: AppSpacing.lg),
-                _buildCareSection(),
-                const SizedBox(height: AppSpacing.xl),
-                _buildDurationSection(),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: _sectionGap),
                 _buildCategorySection(),
+                const SizedBox(height: _sectionGap),
+                _buildCareSection(),
+                const SizedBox(height: _sectionGap),
+                _buildDurationSection(),
               ],
             ),
           ),
@@ -237,7 +232,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     );
   }
 
-  /// 복합 케어 권장 순서: 먼지 제거 → 냄새 제거 → 향기 케어.
+  /// Figma 커스텀 생성 순서: 냄새 제거 → 먼지 제거 → 향기 케어.
   static const List<_CareType> _previewOrder = _CareType.displayOrder;
 
   List<int> _previewDurationsSeconds(List<_CareType> selected) {
@@ -269,39 +264,65 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     return results;
   }
 
-  Widget _buildPreview() {
+  Widget _buildPreviewRoadmap() {
     final selected = _previewOrder
         .where((type) => _enabled[type] == true)
         .toList();
     if (selected.isEmpty) {
-      return const Divider(height: 1, color: AppColors.gray100);
+      return const SizedBox.shrink();
     }
 
     final durationsSeconds = _previewDurationsSeconds(selected);
 
-    return Stack(
-      children: [
-        // 점들이 얹히는 가로 연결선 (점 중심 높이에 맞춤).
-        const Positioned(
-          top: 4,
-          left: 0,
-          right: 0,
-          child: Divider(height: 1, color: AppColors.gray100),
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < selected.length; i++)
-              Expanded(
-                child: _PreviewItem(
-                  careLabel: selected[i].label,
-                  durationLabel: CareDurationSplit.formatKoreanTime(
-                    durationsSeconds[i],
-                  ),
-                  level: _levels[selected[i]],
-                ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final sideInset = selected.length <= 1
+              ? constraints.maxWidth / 2
+              : constraints.maxWidth / selected.length / 2;
+
+          return Stack(
+            children: [
+              // 점 중심 사이만 연결해 타임라인이 화면 끝까지 밀리지 않게 합니다.
+              Positioned(
+                top: 4,
+                left: sideInset,
+                right: sideInset,
+                child: const Divider(height: 1, color: AppColors.gray100),
               ),
-          ],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < selected.length; i++)
+                    Expanded(
+                      child: _PreviewItem(
+                        careLabel: selected[i].label,
+                        durationLabel: CareDurationSplit.formatKoreanTime(
+                          durationsSeconds[i],
+                        ),
+                        level: _levels[selected[i]],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionTitle('언제 사용하려고 하나요?'),
+        const SizedBox(height: AppSpacing.md),
+        _CategoryChips(
+          selected: _selectedCategory,
+          onSelected: (category) =>
+              setState(() => _selectedCategory = category),
         ),
       ],
     );
@@ -314,7 +335,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         const _SectionTitle('무엇을 케어할까요?'),
         const SizedBox(height: AppSpacing.md),
         for (var i = 0; i < _CareType.displayOrder.length; i++) ...[
-          if (i > 0) const SizedBox(height: AppSpacing.lg),
+          if (i > 0) const SizedBox(height: AppSpacing.md),
           _buildCareRow(_CareType.displayOrder[i]),
         ],
       ],
@@ -368,33 +389,13 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
     );
   }
 
-  Widget _buildCategorySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _SectionTitle('언제 사용하실건가요?'),
-        const SizedBox(height: AppSpacing.md),
-        _CategoryChips(
-          selected: _selectedCategory,
-          onSelected: (category) =>
-              setState(() => _selectedCategory = category),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSubmitBar() {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          15,
-          AppSpacing.sm,
-          15,
-          AppSpacing.md,
-        ),
+        padding: const EdgeInsets.fromLTRB(15, 10, 15, 20),
         child: AppBoxButton(
-          label: _isSaving ? '저장 중...' : '이 설정으로 시작하기',
+          label: _isSaving ? '저장 중...' : '리프레시 저장',
           onPressed: _canSave && !_isSaving ? _onSave : null,
           variant: _canSave && !_isSaving
               ? AppBoxButtonVariant.active
@@ -557,8 +558,8 @@ class _LevelChip extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+        child: SizedBox(
+          height: 40,
           child: Center(
             child: Text(
               label,

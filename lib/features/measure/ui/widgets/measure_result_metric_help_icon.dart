@@ -4,7 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
-/// 진단 상세 지표 옆 (i) 도움말 — 호버·탭 시 설명 표시.
+/// 진단 상세 지표 옆 (?) 도움말 — 호버·탭 시 설명 표시.
 class MeasureResultMetricHelpIcon extends StatelessWidget {
   const MeasureResultMetricHelpIcon({required this.message, super.key});
 
@@ -42,7 +42,7 @@ class MeasureResultMetricHelpIcon extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.sm),
           child: const Padding(
             padding: EdgeInsets.all(2),
-            child: Icon(Icons.info_outline, size: 14, color: AppColors.gray500),
+            child: Icon(Icons.help_outline, size: 14, color: AppColors.gray500),
           ),
         ),
       ),

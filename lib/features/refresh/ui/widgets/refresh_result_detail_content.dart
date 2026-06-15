@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_section_divider.dart';
 import '../../data/model/refresh_result_detail.dart';
 import 'refresh_result_detail_metric_bars.dart';
 import 'refresh_result_detail_status_section.dart';
@@ -30,29 +31,38 @@ class RefreshResultDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSummaryHeader(),
-        const SizedBox(height: 20),
-        _buildHeadline(),
-        const SizedBox(height: 20),
-        RefreshResultDetailMetricBars(metrics: detail.metrics),
-        const SizedBox(height: 8),
-        _SummaryMessageCard(message: detail.summaryMessage),
-        const SizedBox(height: 6),
-        const _NecessityHelpRow(),
+        DetailPageHorizontalPadding(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSummaryHeader(),
+              const SizedBox(height: 20),
+              _buildHeadline(),
+              const SizedBox(height: 20),
+              RefreshResultDetailMetricBars(metrics: detail.metrics),
+              const SizedBox(height: 8),
+              _SummaryMessageCard(message: detail.summaryMessage),
+              const SizedBox(height: 6),
+              const _NecessityHelpRow(),
+            ],
+          ),
+        ),
         const SizedBox(height: AppSpacing.xl),
-        const _SectionDivider(),
-        const SizedBox(height: AppSpacing.xl),
-        RefreshResultDetailStatusSection(section: detail.odorSection),
-        const SizedBox(height: AppSpacing.xl),
-        const _SectionDivider(),
-        const SizedBox(height: AppSpacing.xl),
-        RefreshResultDetailStatusSection(section: detail.dustSection),
-        const SizedBox(height: AppSpacing.xl),
-        const _SectionDivider(),
-        const SizedBox(height: AppSpacing.xl),
-        RefreshResultDetailStatusSection(section: detail.hairSection),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: RefreshResultDetailStatusSection(section: detail.odorSection),
+        ),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: RefreshResultDetailStatusSection(section: detail.dustSection),
+        ),
+        const AppSectionDivider(),
+        DetailPageHorizontalPadding(
+          child: RefreshResultDetailStatusSection(section: detail.hairSection),
+        ),
       ],
     );
   }
@@ -215,14 +225,5 @@ class _NecessityHelpRow extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _SectionDivider extends StatelessWidget {
-  const _SectionDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(height: 1, color: AppColors.gray100);
   }
 }

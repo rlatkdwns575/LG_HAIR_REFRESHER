@@ -38,6 +38,23 @@ void main() {
     test('builds focus label from DB scores', () {
       expect(MeasureResultMapper.focusLabel(sampleRecord), '먼지 중심의 집중 리프레시');
     });
+
+    test('maps pollution score labels to five-step scale', () {
+      expect(MeasureResultMapper.pollutionScoreLabel(10), '매우낮음');
+      expect(MeasureResultMapper.pollutionScoreLabel(35), '낮음');
+      expect(MeasureResultMapper.pollutionScoreLabel(55), '보통');
+      expect(MeasureResultMapper.pollutionScoreLabel(75), '높음');
+      expect(MeasureResultMapper.pollutionScoreLabel(90), '매우높음');
+    });
+
+    test('maps hair level and thickness badge labels', () {
+      expect(MeasureResultMapper.badgeForHairLevel('Low').$1, '낮음');
+      expect(MeasureResultMapper.badgeForHairLevel('Medium').$1, '보통');
+      expect(MeasureResultMapper.badgeForHairLevel('High').$1, '높음');
+      expect(MeasureResultMapper.badgeForHairThickness('굵은').$1, '굵음');
+      expect(MeasureResultMapper.badgeForHairThickness('중간').$1, '보통');
+      expect(MeasureResultMapper.badgeForHairThickness('가는').$1, '얇음');
+    });
   });
 
   group('MeasureResultDetail.fromMeasureResult with record', () {
@@ -58,11 +75,12 @@ void main() {
       expect(detail.hairImpactPercent, 15);
       expect(detail.refreshFocusLabel, '먼지 중심의 집중 리프레시');
       expect(detail.hairSection.metrics[0].label, '오염 잔류 영향');
-      expect(detail.hairSection.metrics[0].badgeLabel, 'Medium');
-      expect(detail.hairSection.metrics[1].badgeLabel, 'Low');
+      expect(detail.hairSection.metrics[0].badgeLabel, '보통');
+      expect(detail.hairSection.metrics[1].badgeLabel, '낮음');
       expect(detail.hairSection.metrics, hasLength(3));
       expect(detail.hairSection.metrics[2].label, '모발 굵기');
-      expect(detail.hairSection.metrics[2].badgeLabel, '가는');
+      expect(detail.hairSection.metrics[2].badgeLabel, '얇음');
+      expect(detail.odorSection.metrics.first.badgeLabel, '높음');
       expect(detail.odorSection.metrics, hasLength(4));
       expect(detail.odorSection.metrics.last.label, '냄새 유형');
       expect(detail.odorSection.metrics.last.tagLabels, ['땀']);
