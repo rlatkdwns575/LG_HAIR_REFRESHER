@@ -17,6 +17,7 @@ class MeasureResult {
     required this.dustLevel,
     required this.headline,
     required this.recommendedMode,
+    this.recommendReason,
     this.detailLinkLabel = '상세 결과 보기',
   });
 
@@ -24,6 +25,7 @@ class MeasureResult {
   final MeasureCareLevel dustLevel;
   final MeasureResultHeadline headline;
   final RefreshMode recommendedMode;
+  final String? recommendReason;
   final String detailLinkLabel;
 
   MeasureResultViewType get viewType =>
@@ -70,6 +72,7 @@ class MeasureResult {
       highlightColor: AppColors.orange700,
     ),
     recommendedMode: _outdoorSafeRefresh,
+    recommendReason: '냄새·먼지 상태가 집중 관리가 필요해 외출 후 안심 리프레시를 추천해요.',
   );
 
   /// 안정형 mock — Figma 621-12875 (냄새/먼지 보통).
@@ -78,6 +81,7 @@ class MeasureResult {
     dustLevel: MeasureCareLevel.normal,
     headline: MeasureResultHeadline.plain('현재 헤어 상태는 안정적이에요.\n가벼운 관리만으로 충분해요.'),
     recommendedMode: _dailyRefresh,
+    recommendReason: '현재 헤어 상태가 안정적이어서 가벼운 관리 모드를 추천해요.',
   );
 
   /// 화면 기본 mock. 개발 중 타입 확인 시 [sampleStable] 로 교체 가능.

@@ -47,6 +47,7 @@ class MeasureResultContent extends StatelessWidget {
         RefreshModeCard(
           mode: result.recommendedMode,
           variant: RefreshModeCardVariant.featured,
+          badgeLabel: '추천',
           onTap: onRecommendTap,
           onAction: onRecommendTap,
         ),

@@ -6,11 +6,27 @@ import 'package:lg_hair_refresher/features/refresh/data/refresh_mode_filter.dart
 void main() {
   final presets = [
     RefreshMode(
-      id: 'before-1',
-      name: '외출 전 모드',
+      id: 'weather-long',
+      name: '날씨 긴 모드',
+      description: '날씨',
+      category: RefreshModeTabs.weather,
+      durationSeconds: 480,
+      icon: Icons.wb_sunny_outlined,
+    ),
+    RefreshMode(
+      id: 'before-long',
+      name: '외출 전 긴 모드',
       description: '외출 전',
       category: RefreshModeTabs.beforeOuting,
-      durationSeconds: 300,
+      durationSeconds: 480,
+      icon: Icons.directions_walk_outlined,
+    ),
+    RefreshMode(
+      id: 'before-short',
+      name: '외출 전 짧은 모드',
+      description: '외출 전',
+      category: RefreshModeTabs.beforeOuting,
+      durationSeconds: 120,
       icon: Icons.directions_walk_outlined,
     ),
     RefreshMode(
@@ -18,65 +34,69 @@ void main() {
       name: '외출 후 모드',
       description: '외출 후',
       category: RefreshModeTabs.afterOuting,
-      durationSeconds: 480,
+      durationSeconds: 300,
       icon: Icons.home_outlined,
     ),
     RefreshMode(
-      id: 'weather-1',
-      name: '날씨 모드',
+      id: 'weather-short',
+      name: '날씨 짧은 모드',
       description: '날씨',
       category: RefreshModeTabs.weather,
-      durationSeconds: 360,
+      durationSeconds: 180,
       icon: Icons.wb_sunny_outlined,
     ),
   ];
 
-  final custom = RefreshMode.custom(
-    id: 'custom-1',
-    name: '나만의 모드',
+  final customOld = RefreshMode.custom(
+    id: 'custom-old',
+    name: '이전 커스텀',
     description: '커스텀',
     durationMinutes: 4,
-  );
+  ).copyWith(createdAt: DateTime(2026, 1, 1));
 
-  final allModes = [...presets, custom];
+  final customNew = RefreshMode.custom(
+    id: 'custom-new',
+    name: '최신 커스텀',
+    description: '커스텀',
+    durationMinutes: 5,
+  ).copyWith(createdAt: DateTime(2026, 6, 1));
+
+  final allModes = [...presets, customOld, customNew];
 
   group('filterRefreshModes', () {
-    test('전체 탭은 프리셋과 커스텀을 모두 반환한다', () {
+    test('전체 탭은 커스텀을 제외하고 카테고리·소요시간 순으로 정렬한다', () {
       final result = filterRefreshModes(
         allModes: allModes,
         selectedTab: RefreshModeTabs.allTab,
       );
 
-      expect(result, hasLength(4));
+      expect(result, hasLength(5));
+      expect(result.every((mode) => !mode.isCustom), isTrue);
+      expect(result.map((mode) => mode.id), [
+        'before-short',
+        'before-long',
+        'after-1',
+        'weather-short',
+        'weather-long',
+      ]);
     });
 
-    test('커스텀 모드 탭은 사용자 생성 모드만 반환한다', () {
+    test('커스텀 모드 탭은 사용자 생성 모드만 최신순으로 반환한다', () {
       final result = filterRefreshModes(
         allModes: allModes,
         selectedTab: RefreshModeTabs.customMode,
       );
 
-      expect(result, hasLength(1));
-      expect(result.first.id, 'custom-1');
+      expect(result.map((mode) => mode.id), ['custom-new', 'custom-old']);
     });
 
-    test('카테고리 탭은 해당 프리셋만 반환한다', () {
-      final result = filterRefreshModes(
-        allModes: allModes,
-        selectedTab: RefreshModeTabs.weather,
-      );
-
-      expect(result, hasLength(1));
-      expect(result.first.id, 'weather-1');
-    });
-
-    test('카테고리 탭은 해당 카테고리 모드만 반환한다', () {
+    test('카테고리 탭은 해당 카테고리만 소요시간 오름차순으로 반환한다', () {
       final result = filterRefreshModes(
         allModes: allModes,
         selectedTab: RefreshModeTabs.beforeOuting,
       );
 
-      expect(result.map((mode) => mode.id), ['before-1']);
+      expect(result.map((mode) => mode.id), ['before-short', 'before-long']);
     });
 
     test('카테고리가 일치하는 커스텀 모드도 카테고리 탭에 포함된다', () {
@@ -85,17 +105,18 @@ void main() {
         name: '커스텀 외출 전',
         description: '커스텀',
         durationMinutes: 5,
-      ).copyWith(category: RefreshModeTabs.beforeOuting);
+      ).copyWith(category: RefreshModeTabs.beforeOuting, durationSeconds: 600);
 
       final result = filterRefreshModes(
         allModes: [...allModes, customBefore],
         selectedTab: RefreshModeTabs.beforeOuting,
       );
 
-      expect(
-        result.map((mode) => mode.id),
-        containsAll(['before-1', 'custom-before']),
-      );
+      expect(result.map((mode) => mode.id), [
+        'before-short',
+        'before-long',
+        'custom-before',
+      ]);
     });
   });
 }

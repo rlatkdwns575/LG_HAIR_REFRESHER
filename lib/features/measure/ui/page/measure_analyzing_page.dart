@@ -8,6 +8,9 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/api/measure_refresh_recommend_service.dart';
+import '../../data/measure_result_store.dart';
+import '../../data/model/measure_result.dart';
 import '../widgets/measure_analyzing_illustration.dart';
 import '../widgets/measure_prepare_instruction.dart';
 
@@ -24,12 +27,16 @@ class MeasureAnalyzingPage extends StatefulWidget {
 class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
   static const Duration _analyzingDuration = Duration(seconds: 3);
 
+  final _recommendService = const MeasureRefreshRecommendService();
+
   Timer? _timer;
   bool _navigated = false;
+  Future<MeasureResult>? _recommendFuture;
 
   @override
   void initState() {
     super.initState();
+    _recommendFuture = _recommendService.buildMeasureResult();
     _timer = Timer(_analyzingDuration, _goToResult);
   }
 
@@ -39,11 +46,24 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
     super.dispose();
   }
 
-  void _goToResult() {
+  Future<void> _goToResult() async {
     if (!mounted || _navigated) {
       return;
     }
     _navigated = true;
+
+    try {
+      final result =
+          await (_recommendFuture ?? _recommendService.buildMeasureResult());
+      MeasureResultStore.instance.setPending(result);
+    } catch (error, stackTrace) {
+      debugPrint('MeasureAnalyzingPage recommend failed: $error\n$stackTrace');
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     context.pushReplacementNamed(AppRouteNames.measureResult);
   }
 

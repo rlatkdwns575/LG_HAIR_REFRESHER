@@ -28,4 +28,41 @@ class RefreshApi {
       return const [];
     }
   }
+
+  /// 향기 케어 프리셋 모드를 조회합니다.
+  Future<RefreshMode?> fetchScentCarePreset() async {
+    try {
+      final rows = await SupabaseService.client
+          .from(SupabaseTables.refreshMode)
+          .select(RefreshModeMapper.selectColumns)
+          .eq('custom_yn', false)
+          .eq('scent_yn', true)
+          .order('display_name');
+
+      final modes = rows
+          .map(
+            (row) => RefreshModeMapper.fromRefreshModeRow(
+              Map<String, dynamic>.from(row),
+            ),
+          )
+          .toList();
+
+      for (final mode in modes) {
+        if (mode.isScentOnlyCare) {
+          return mode;
+        }
+      }
+
+      for (final mode in modes) {
+        if (mode.name.contains('향기')) {
+          return mode;
+        }
+      }
+
+      return modes.isEmpty ? null : modes.first;
+    } catch (error, stackTrace) {
+      debugPrint('RefreshApi.fetchScentCarePreset failed: $error\n$stackTrace');
+      return null;
+    }
+  }
 }

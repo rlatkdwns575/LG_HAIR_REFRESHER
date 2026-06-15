@@ -8,7 +8,7 @@ class RefreshModeMapper {
   static const selectColumns =
       'mode_id, user_id, display_name, category, description, duration_time, '
       'custom_yn, odor_yn, dust_yn, scent_yn, '
-      'odor_strength, dust_strength, scent_strength';
+      'odor_strength, dust_strength, scent_strength, created_at';
 
   static RefreshMode fromCustomModeRow(Map<String, dynamic> row) {
     return fromRefreshModeRow({...row, 'custom_yn': true});
@@ -56,7 +56,15 @@ class RefreshModeMapper {
       odorStrength: odorStrength,
       dustStrength: dustStrength,
       scentStrength: scentStrength,
+      createdAt: _readDateTime(row['created_at']),
     );
+  }
+
+  static DateTime? _readDateTime(Object? value) {
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+    return null;
   }
 
   static String strengthLabel(int? strength) {
