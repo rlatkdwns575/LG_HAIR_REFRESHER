@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/measure/data/api/measure_result_mapper.dart';
-import 'package:lg_hair_refresher/features/measure/data/model/measure_care_level.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result_detail.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result_record.dart';

@@ -123,7 +123,7 @@ class RefreshRecommendApi {
     final text = parts
         .map((part) => (part as Map<String, dynamic>)['text'] as String? ?? '')
         .join();
-    if (text == null || text.trim().isEmpty) {
+    if (text.trim().isEmpty) {
       return null;
     }
 

@@ -320,7 +320,7 @@ class HomeApi {
     final minutes = durationSeconds ~/ 60;
     final seconds = durationSeconds % 60;
     if (minutes == 0) {
-      return '${seconds}초';
+      return '$seconds초';
     }
     if (seconds == 0) {
       return '$minutes분';
