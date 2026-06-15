@@ -14,7 +14,7 @@ class RefreshResultDetailMapper {
     final dustAfter = _percentFromPollution(result.dustChange.afterLevel);
 
     return RefreshResultDetail(
-      modeName: result.recommendedMode.name,
+      modeName: _modeNameFromResult(result),
       necessityReductionPercent: result.overallImprovementPercent,
       currentCareNeedPercent: _average([odorAfter, dustAfter]),
       metrics: [
@@ -457,6 +457,17 @@ class RefreshResultDetailMapper {
       '낮음' || '좋음' || '불필요' => AppBadgeSmallVariant.low,
       _ => AppBadgeSmallVariant.gray,
     };
+  }
+
+  static String _modeNameFromResult(RefreshResult result) {
+    final modeName = result.recommendedMode?.name;
+    if (modeName != null && modeName.isNotEmpty) {
+      return modeName;
+    }
+    if (result.isScentCareResult) {
+      return '향기 케어';
+    }
+    return '리프레시 모드';
   }
 
   static double _average(List<double> values) {
