@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_result.dart';
 
 /// 리프레시 결과 상단 개선율 메시지.
@@ -26,7 +27,7 @@ class RefreshResultHeadline extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
+        AppText(
           result.headlineBefore,
           textAlign: TextAlign.center,
           style: _messageStyle,
@@ -48,14 +49,14 @@ class RefreshResultHeadline extends StatelessWidget {
           ),
         ] else ...[
           const SizedBox(height: AppSpacing.xs),
-          Text(
+          AppText(
             result.headlineAfter,
             textAlign: TextAlign.center,
             style: _messageStyle,
           ),
         ],
         const SizedBox(height: AppSpacing.lg),
-        Text(
+        AppText(
           result.disclaimer,
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),

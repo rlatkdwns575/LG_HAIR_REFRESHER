@@ -5,6 +5,7 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_title.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/history_assets.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
@@ -302,7 +303,7 @@ class _SelectedDayCard extends StatelessWidget {
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 2),
-          Text(
+          AppText(
             group.summaryMessage,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),

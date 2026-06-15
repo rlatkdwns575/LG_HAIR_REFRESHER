@@ -6,6 +6,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_badge.dart';
 import 'app_capsule_icon_button.dart';
+import 'app_text.dart';
 
 enum AppRefreshCardVariant { defaultStyle, compact, small }
 
@@ -78,7 +79,7 @@ class AppRefreshCard extends StatelessWidget {
               ),
               if (description != null) ...[
                 const SizedBox(height: AppSpacing.xs),
-                Text(
+                AppText(
                   description!,
                   style: AppTextStyles.bodyS.copyWith(
                     color: AppComponentColors.refreshCardBody,

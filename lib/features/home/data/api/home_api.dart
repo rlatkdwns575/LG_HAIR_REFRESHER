@@ -13,6 +13,8 @@ class HomeApi {
 
   static const _defaultBatteryPercent = 60;
   static const _defaultFilterPercent = 80;
+  static const _defaultModelName = 'LG 퓨리헤어';
+  static const _legacyHairRefresherKey = 'lghairrefresher';
 
   Future<HomeDashboardData> fetchDashboard({String? userId}) async {
     final resolvedUserId = AuthSessionService.resolveUserId(override: userId);
@@ -66,7 +68,8 @@ class HomeApi {
       );
     }
 
-    final modelName = device?['model_name'] as String? ?? 'LG Hair Refresher';
+    final rawModelName = device?['model_name'] as String? ?? _defaultModelName;
+    final displayModelName = _displayModelName(rawModelName);
 
     final sessionCount = await SupabaseService.client
         .from(SupabaseTables.refreshSessions)
@@ -82,8 +85,8 @@ class HomeApi {
         : null;
 
     return HomeDashboardData(
-      deviceName: _formatDeviceName(modelName),
-      modelName: modelName,
+      deviceName: displayModelName,
+      modelName: displayModelName,
       linkedDeviceId: deviceId,
       batteryPercent: statusSnapshot.batteryPercent,
       filterStatus: statusSnapshot.filterStatus,
@@ -297,12 +300,17 @@ class HomeApi {
     }
   }
 
-  String _formatDeviceName(String modelName) {
+  String _displayModelName(String modelName) {
     final normalized = modelName.replaceAll('_', ' ').trim();
-    if (normalized.isEmpty) {
-      return '우리 기기';
+    if (normalized.isEmpty || _isLegacyHairRefresherName(normalized)) {
+      return _defaultModelName;
     }
     return normalized;
+  }
+
+  bool _isLegacyHairRefresherName(String name) {
+    final compact = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+    return compact == _legacyHairRefresherKey;
   }
 
   String _formatDurationLabel(int durationSeconds) {
@@ -312,7 +320,7 @@ class HomeApi {
     final minutes = durationSeconds ~/ 60;
     final seconds = durationSeconds % 60;
     if (minutes == 0) {
-      return '${seconds}초';
+      return '$seconds초';
     }
     if (seconds == 0) {
       return '$minutes분';

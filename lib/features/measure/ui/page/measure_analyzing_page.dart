@@ -8,6 +8,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../data/api/measure_api.dart';
 import '../../data/api/measure_refresh_recommend_service.dart';
 import '../../data/measure_result_store.dart';
 import '../../data/model/measure_result.dart';
@@ -36,7 +37,7 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
   @override
   void initState() {
     super.initState();
-    _recommendFuture = _recommendService.buildMeasureResult();
+    _recommendFuture = _recommendService.runDiagnosis();
     _timer = Timer(_analyzingDuration, _goToResult);
   }
 
@@ -54,9 +55,13 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
 
     try {
       final result =
-          await (_recommendFuture ?? _recommendService.buildMeasureResult());
+          await (_recommendFuture ?? _recommendService.runDiagnosis());
       MeasureResultStore.instance.setPending(result);
+    } on MeasureApiException catch (error) {
+      MeasureResultStore.instance.setLoadError(error.message);
+      debugPrint('MeasureAnalyzingPage recommend failed: $error');
     } catch (error, stackTrace) {
+      MeasureResultStore.instance.setLoadError('진단 결과 저장에 실패했습니다.');
       debugPrint('MeasureAnalyzingPage recommend failed: $error\n$stackTrace');
     }
 

@@ -4,6 +4,7 @@ import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_capsule_button.dart';
+import 'app_text.dart';
 
 /// Figma `card_recommend` — recommendation message with capsule CTA.
 class AppRecommendCard extends StatelessWidget {
@@ -49,7 +50,7 @@ class AppRecommendCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           children: [
-            Text(
+            AppText(
               message,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyS.copyWith(

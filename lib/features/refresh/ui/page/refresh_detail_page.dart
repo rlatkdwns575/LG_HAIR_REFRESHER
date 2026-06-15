@@ -8,6 +8,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_mode_detail.dart';
 import '../widgets/refresh_detail_timeline.dart';
@@ -236,7 +237,7 @@ class _PreCheckSection extends StatelessWidget {
         for (final item in items)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-            child: Text(
+            child: AppText(
               '- $item',
               style: AppTextStyles.bodyS.copyWith(
                 color: AppColors.gray600,

@@ -7,6 +7,7 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_title.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_history_report.dart';
 import 'history_common.dart';
 
@@ -35,7 +36,7 @@ class HistoryTotalSection extends StatelessWidget {
           subtitle: '지금까지의 리프레시 기록을 확인해보세요.',
         ),
         const SizedBox(height: AppSpacing.lg),
-        Text(
+        AppText(
           summary.introMessage,
           textAlign: TextAlign.center,
           style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
@@ -223,7 +224,7 @@ class _InsightCard extends StatelessWidget {
               ),
               child: i == 0
                   ? _buildFirstDescription(_descriptions[i])
-                  : Text(
+                  : AppText(
                       _descriptions[i],
                       style: AppTextStyles.bodyS.copyWith(
                         color: AppColors.gray600,
@@ -242,7 +243,7 @@ class _InsightCard extends StatelessWidget {
     final phrase = firstDescriptionBoldPhrase;
 
     if (phrase == null || !text.contains(phrase)) {
-      return Text(text, style: baseStyle);
+      return AppText(text, style: baseStyle);
     }
 
     final index = text.indexOf(phrase);
