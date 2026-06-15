@@ -6,6 +6,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/ui/widgets/duration_badge.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 enum RefreshShortcutSelectState { normal, selected, dimmed }
 
@@ -91,7 +92,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(
+                AppText(
                   mode.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

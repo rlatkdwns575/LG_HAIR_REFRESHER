@@ -17,10 +17,13 @@ void main() {
       expect(MeasureResultStore.instance.peek(), isNull);
     });
 
-    test('consume without pending returns fallback sample', () {
-      final result = MeasureResultStore.instance.consume();
+    test('consume without pending returns null', () {
+      expect(MeasureResultStore.instance.consume(), isNull);
+    });
 
-      expect(result, MeasureResult.sample);
+    test('consume without pending and explicit fallback uses fallback', () {
+      const fallback = MeasureResult.sampleStable;
+      expect(MeasureResultStore.instance.consume(fallback: fallback), fallback);
     });
   });
 }

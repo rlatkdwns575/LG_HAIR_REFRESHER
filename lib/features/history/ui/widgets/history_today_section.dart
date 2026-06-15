@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
 import 'history_care_badge.dart';
@@ -51,7 +52,7 @@ class HistoryTodaySection extends StatelessWidget {
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 4),
-          Text(
+          AppText(
             report.todaySummarySubtitle,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
@@ -83,7 +84,7 @@ class HistoryTodaySection extends StatelessWidget {
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 6),
-          Text(
+          AppText(
             '리프레시를 통해 외출 후 컨디션을 가볍게 정리해보세요.',
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
@@ -245,7 +246,7 @@ class _RoutineCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 3),
-                      Text(
+                      AppText(
                         suggestion.subtitle,
                         style: AppTextStyles.titleXs.copyWith(
                           color: AppColors.gray900,

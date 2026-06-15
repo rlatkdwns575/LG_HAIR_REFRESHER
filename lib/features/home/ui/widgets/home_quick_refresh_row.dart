@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/home_dashboard_data.dart';
 
-/// Figma `631:18545` Frame 4943 — `card_refresh` 162×130 × 2, gap 6.
+/// Figma `1244:25476` Frame 4943 — `card_refresh` 162×110 × 2, gap 6.
 class HomeQuickRefreshRow extends StatelessWidget {
   const HomeQuickRefreshRow({
     required this.slots,
@@ -14,7 +15,7 @@ class HomeQuickRefreshRow extends StatelessWidget {
     super.key,
   });
 
-  static const cardHeight = 130.0;
+  static const cardHeight = 110.0;
   static const cardGap = 6.0;
   static const cardPadding = 15.0;
 
@@ -44,6 +45,13 @@ class HomeQuickRefreshRow extends StatelessWidget {
 
   Widget _buildSlot(HomeQuickRefreshSlot slot) {
     switch (slot.type) {
+      case HomeQuickSlotType.recommendedMode:
+        return _RefreshModeQuickCard(
+          mode: slot.mode ?? homeRecommendedModeFallback,
+          leadingBadgeLabel: '추천',
+          onPressed: () =>
+              onModePressed?.call(slot.mode ?? homeRecommendedModeFallback),
+        );
       case HomeQuickSlotType.favoriteAdd:
         return _RefreshModeAddCard(onPressed: onFavoriteAddPressed);
       case HomeQuickSlotType.favoriteMode:
@@ -52,7 +60,7 @@ class HomeQuickRefreshRow extends StatelessWidget {
         final isFavorite = slot.type == HomeQuickSlotType.favoriteMode;
         return _RefreshModeQuickCard(
           mode: mode,
-          secondaryBadgeLabel: isFavorite ? '즐겨찾기' : '자주 사용',
+          leadingBadgeLabel: isFavorite ? '즐겨찾기' : null,
           onPressed: () => onModePressed?.call(mode),
         );
     }
@@ -76,11 +84,9 @@ class _RefreshModeAddCard extends StatelessWidget {
           child: Ink(
             padding: const EdgeInsets.all(HomeQuickRefreshRow.cardPadding),
             decoration: BoxDecoration(
-              color: AppComponentColors.refreshCardAddBackground,
+              color: AppColors.gray100,
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: AppComponentColors.refreshCardAddBorder,
-              ),
+              border: Border.all(color: AppColors.gray300),
             ),
             child: Stack(
               fit: StackFit.expand,
@@ -88,7 +94,7 @@ class _RefreshModeAddCard extends StatelessWidget {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    '리프레시 모드 추가하기',
+                    '자주 쓰는 리프레시를\n홈에 등록해보세요.',
                     style: AppTextStyles.titleXs.copyWith(
                       color: AppComponentColors.refreshCardAddTitle,
                       fontWeight: FontWeight.w600,
@@ -117,17 +123,15 @@ class _RefreshModeQuickCard extends StatelessWidget {
   const _RefreshModeQuickCard({
     required this.mode,
     required this.onPressed,
-    required this.secondaryBadgeLabel,
+    this.leadingBadgeLabel,
   });
 
   final HomeQuickRefreshMode mode;
   final VoidCallback? onPressed;
-  final String secondaryBadgeLabel;
+  final String? leadingBadgeLabel;
 
   @override
   Widget build(BuildContext context) {
-    final captionLabels = [secondaryBadgeLabel];
-
     return SizedBox(
       height: HomeQuickRefreshRow.cardHeight,
       child: Material(
@@ -152,7 +156,7 @@ class _RefreshModeQuickCard extends StatelessWidget {
                   children: [
                     _BadgeRow(
                       durationLabel: mode.durationLabel,
-                      captionLabels: captionLabels,
+                      leadingBadgeLabel: leadingBadgeLabel,
                     ),
                     const SizedBox(height: 4),
                     Expanded(
@@ -161,7 +165,7 @@ class _RefreshModeQuickCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.titleXs.copyWith(
-                          color: AppComponentColors.refreshCardTitle,
+                          color: AppColors.gray800,
                           fontWeight: FontWeight.w600,
                           height: 20 / 14,
                         ),
@@ -183,14 +187,14 @@ class _RefreshModeQuickCard extends StatelessWidget {
   }
 }
 
-/// Figma Frame 4955 — `소요시간 N분` 60×20 + caption 배지 한 줄.
+/// Figma Frame 4955 — caption 배지 + `소요시간 N분` 한 줄.
 class _BadgeRow extends StatelessWidget {
-  const _BadgeRow({required this.durationLabel, required this.captionLabels});
+  const _BadgeRow({required this.durationLabel, this.leadingBadgeLabel});
 
   static const badgeGap = 4.0;
 
   final String durationLabel;
-  final List<String> captionLabels;
+  final String? leadingBadgeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -198,12 +202,43 @@ class _BadgeRow extends StatelessWidget {
       height: _DurationBadge.height,
       child: Row(
         children: [
-          _DurationBadge(durationLabel: durationLabel),
-          for (final label in captionLabels) ...[
+          if (leadingBadgeLabel != null) ...[
+            _FilledBadge(label: leadingBadgeLabel!),
             const SizedBox(width: badgeGap),
-            Flexible(child: _OutlineBadge(label: label)),
           ],
+          _DurationBadge(durationLabel: durationLabel),
         ],
+      ),
+    );
+  }
+}
+
+class _FilledBadge extends StatelessWidget {
+  const _FilledBadge({required this.label});
+
+  static const height = 20.0;
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: AppColors.primary500,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.labelXs.copyWith(
+          fontSize: 10,
+          height: 1,
+          color: AppColors.primary100,
+        ),
       ),
     );
   }
@@ -239,40 +274,6 @@ class _DurationBadge extends StatelessWidget {
               color: AppComponentColors.badgeSmallPrimaryLightText,
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OutlineBadge extends StatelessWidget {
-  const _OutlineBadge({required this.label});
-
-  static const height = 20.0;
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: AppComponentColors.refreshCardCompactBackground,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-        border: Border.all(
-          color: AppComponentColors.refreshCardOutlineBadgeBorder,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: AppTextStyles.labelXs.copyWith(
-          fontSize: 10,
-          height: 1,
-          color: AppComponentColors.refreshCardCaption,
         ),
       ),
     );
@@ -326,14 +327,10 @@ class _NeutralCapsuleIconButton extends StatelessWidget {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: AppComponentColors.capsuleIconOnlyNeutral,
+            color: AppColors.gray300,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: AppComponentColors.capsuleIconOnlyNeutralIcon,
-          ),
+          child: Icon(icon, size: 16, color: AppColors.gray500),
         ),
       ),
     );

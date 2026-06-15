@@ -65,4 +65,25 @@ class RefreshApi {
       return null;
     }
   }
+
+  Future<RefreshMode?> fetchModeById(String modeId) async {
+    try {
+      final row = await SupabaseService.client
+          .from(SupabaseTables.refreshMode)
+          .select(RefreshModeMapper.selectColumns)
+          .eq('mode_id', modeId)
+          .maybeSingle();
+
+      if (row == null) {
+        return null;
+      }
+
+      return RefreshModeMapper.fromRefreshModeRow(
+        Map<String, dynamic>.from(row),
+      );
+    } catch (error, stackTrace) {
+      debugPrint('RefreshApi.fetchModeById failed: $error\n$stackTrace');
+      return null;
+    }
+  }
 }

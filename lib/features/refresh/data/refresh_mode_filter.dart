@@ -52,7 +52,7 @@ List<RefreshMode> filterRefreshModes({
       ..sort(_compareByCategoryThenDuration);
   }
 
-  if (selectedTab == RefreshModeTabs.customMode) {
+  if (selectedTab == RefreshModeTabs.customModeTab) {
     return allModes.where(_isCustomMode).toList()
       ..sort(_compareByCreatedAtDesc);
   }

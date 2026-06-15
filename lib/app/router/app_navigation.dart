@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
+import '../../features/measure/data/model/measure_result.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
 import '../../features/refresh/data/model/refresh_result.dart';
 import '../../features/refresh/data/model/refresh_result_detail.dart';
@@ -24,6 +25,10 @@ extension AppNavigation on BuildContext {
   void pushMeasureAnalyzing() => push(AppRoutePaths.measureAnalyzing);
 
   void pushMeasureResult() => push(AppRoutePaths.measureResult);
+
+  void pushMeasureResultDetail({required MeasureResult result}) {
+    push(AppRoutePaths.measureResultDetail, extra: result);
+  }
 
   void pushRefresh() => push(AppRoutePaths.refresh);
 
@@ -93,6 +98,10 @@ extension AppNavigation on BuildContext {
   void pushMeasureAnalyzingNamed() => pushNamed(AppRouteNames.measureAnalyzing);
 
   void pushMeasureResultNamed() => pushNamed(AppRouteNames.measureResult);
+
+  void pushMeasureResultDetailNamed({required MeasureResult result}) {
+    pushNamed(AppRouteNames.measureResultDetail, extra: result);
+  }
 
   void pushRefreshNamed() => pushNamed(AppRouteNames.refresh);
 

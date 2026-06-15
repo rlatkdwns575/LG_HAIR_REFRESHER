@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'home_navigation_card.dart';
 
-/// 홈 하단 네비 — 리프레시/진단/내역 모두 62px + chevron 행 탭.
+/// 홈 하단 네비 — 리프레시/진단/기록 모두 56px + chevron 행 탭.
 class HomeNavigationMenu extends StatelessWidget {
   const HomeNavigationMenu({
     required this.onRefreshPressed,
@@ -24,7 +24,7 @@ class HomeNavigationMenu extends StatelessWidget {
       children: [
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '헤어 리프레시',
+            title: '리프레시 모드 보기',
             onTap: onRefreshPressed,
           ),
         ),
@@ -38,7 +38,7 @@ class HomeNavigationMenu extends StatelessWidget {
         const SizedBox(height: cardGap),
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '리프레시 내역',
+            title: '리프레시 기록 보기',
             onTap: onHistoryPressed,
           ),
         ),

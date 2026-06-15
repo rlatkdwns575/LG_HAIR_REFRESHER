@@ -8,8 +8,18 @@ class RefreshModeTabs {
 
   static const allTab = '전체';
 
-  static const all = [allTab, '커스텀 모드', '외출 전', '외출 후', '날씨'];
+  static const customModeTab = '커스텀';
 
+  static const all = [
+    allTab,
+    customModeTab,
+    beforeOuting,
+    afterOuting,
+    weather,
+    etc,
+  ];
+
+  /// 커스텀 모드 기본 카테고리(내부·DB).
   static const customMode = '커스텀 모드';
   static const beforeOuting = '외출 전';
   static const afterOuting = '외출 후';

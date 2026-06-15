@@ -12,6 +12,12 @@ class HomeQuickRefreshMode {
   final List<String> captionItems;
 }
 
+/// 첫 진입 또는 추천 모드를 못 가져올 때 노출하는 기본 리프레시 카드.
+const homeRecommendedModeFallback = HomeQuickRefreshMode(
+  title: '취침 전 안심 케어',
+  durationLabel: '10분',
+);
+
 /// API에서 자주 사용 모드를 못 가져올 때 우측 카드 기본값.
 const homeFrequentModeFallback = HomeQuickRefreshMode(
   title: '자주 사용한 모드',
@@ -20,11 +26,11 @@ const homeFrequentModeFallback = HomeQuickRefreshMode(
 
 /// 홈 대시보드 목 데이터.
 ///
-/// [hasUsageHistory]가 false이면 즐겨찾기·자주 사용한 모드 영역을 숨깁니다.
+/// 홈 대시보드에 표시되는 디바이스/추천/바로가기 데이터.
 class HomeDashboardData {
   const HomeDashboardData({
-    this.deviceName = '우리 기기 이름',
-    this.modelName,
+    this.deviceName = 'LG 퓨리헤어',
+    this.modelName = 'LG 퓨리헤어',
     this.batteryPercent = 60,
     this.filterStatus = HomeFilterStatus.freshDefault,
     this.recommendMessage = '대기 중 미세먼지량이 많은 하루였어요.\n잠들기 전 리프레시를 통해 안심하고 숙면하세요.',
@@ -82,6 +88,9 @@ class HomeDashboardData {
 
 /// 간편 리프레시 행 슬롯 종류.
 enum HomeQuickSlotType {
+  /// 첫 진입 추천 리프레시 모드.
+  recommendedMode,
+
   /// 즐겨찾기 미등록 — "즐겨찾기 추천 추가하기" 카드.
   favoriteAdd,
 

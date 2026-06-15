@@ -56,7 +56,7 @@ class CareDurationSplit {
     final remainSeconds = totalSeconds % 60;
 
     if (minutes == 0) {
-      return '${remainSeconds}초';
+      return '$remainSeconds초';
     }
     if (remainSeconds == 0) {
       return '$minutes분';

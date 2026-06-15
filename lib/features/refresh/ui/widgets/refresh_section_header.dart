@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 class RefreshSectionHeader extends StatelessWidget {
   const RefreshSectionHeader({
@@ -37,7 +38,7 @@ class RefreshSectionHeader extends StatelessWidget {
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.xs),
-                  Text(
+                  AppText(
                     subtitle!,
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.gray500,

@@ -8,6 +8,9 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../measure/data/api/measure_api.dart';
+import '../../../measure/data/api/measure_refresh_recommend_service.dart';
+import '../../../measure/data/measure_result_store.dart';
 import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/api/refresh_recommend_api.dart';
 import '../../../refresh/data/api/refresh_recommend_fallback.dart';
@@ -44,6 +47,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _homeApi = const HomeApi();
   final _deviceStatusWatcher = HomeDeviceStatusWatcher();
   final _weatherApi = const WeatherApi();
+  final _measureApi = const MeasureApi();
+  final _measureRecommendService = const MeasureRefreshRecommendService();
   final _refreshApi = const RefreshApi();
   final _geminiRecommendApi = const GeminiRecommendApi();
   final _refreshRecommendApi = const RefreshRecommendApi();
@@ -56,10 +61,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   List<HomeQuickRefreshSlot> get _quickSlots {
     if (!_dashboardData.hasUsageHistory) {
-      return const [];
+      return const [
+        HomeQuickRefreshSlot(
+          type: HomeQuickSlotType.recommendedMode,
+          mode: homeRecommendedModeFallback,
+        ),
+        HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
+      ];
     }
 
     final slots = <HomeQuickRefreshSlot>[
+      HomeQuickRefreshSlot(
+        type: HomeQuickSlotType.frequentMode,
+        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
+      ),
       if (_favoriteMode != null)
         HomeQuickRefreshSlot(
           type: HomeQuickSlotType.favoriteMode,
@@ -68,13 +83,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       else
         const HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
     ];
-
-    slots.add(
-      HomeQuickRefreshSlot(
-        type: HomeQuickSlotType.frequentMode,
-        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
-      ),
-    );
 
     return slots;
   }
@@ -163,8 +171,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return;
     }
 
+    var hasRecentDiagnosis = false;
+    try {
+      hasRecentDiagnosis = await _measureApi.hasRecentResult();
+    } catch (error, stackTrace) {
+      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
+    }
+
     setState(() {
-      _dashboardData = dashboard;
+      _dashboardData = dashboard.copyWith(
+        hasRecentDiagnosisResult: hasRecentDiagnosis,
+      );
       _recommendMessage = recommendMessage;
       _isLoading = false;
     });
@@ -250,6 +267,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (result == true) {
       context.pushMeasure();
     } else if (result == false) {
+      try {
+        final measureResult = await _measureRecommendService
+            .buildMeasureResult();
+        MeasureResultStore.instance.setPending(measureResult);
+      } catch (error, stackTrace) {
+        debugPrint('Home measure result preload failed: $error\n$stackTrace');
+      }
+      if (!mounted) {
+        return;
+      }
       context.pushMeasureResult();
     }
   }
@@ -297,15 +324,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           HomeRecommendBanner(message: _recommendMessage!),
                           const SizedBox(height: _sectionGap),
                         ],
-                        if (_dashboardData.hasUsageHistory) ...[
-                          HomeQuickRefreshRow(
-                            slots: _quickSlots,
-                            onFavoriteAddPressed: _handleFavoriteAdd,
-                            onModePressed: (mode) => context
-                                .pushRefreshProgress(modeName: mode.title),
-                          ),
-                          const SizedBox(height: _sectionGap),
-                        ],
+                        HomeQuickRefreshRow(
+                          slots: _quickSlots,
+                          onFavoriteAddPressed: _handleFavoriteAdd,
+                          onModePressed: (mode) =>
+                              context.pushRefreshProgress(modeName: mode.title),
+                        ),
+                        const SizedBox(height: _sectionGap),
                         HomeNavigationMenu(
                           onRefreshPressed: context.pushRefresh,
                           onDiagnosisPressed: _handleDiagnosisTap,

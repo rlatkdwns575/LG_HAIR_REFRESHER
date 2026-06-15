@@ -119,10 +119,7 @@ class AppCommonTopHeader extends StatelessWidget
                 onPressed: onAlarm,
               ),
             if (onShare != null)
-              _HeaderIconButton(
-                icon: Icons.ios_share_outlined,
-                onPressed: onShare,
-              ),
+              _HeaderIconButton(icon: Icons.share_outlined, onPressed: onShare),
             if (onClose != null)
               _HeaderIconButton(icon: Icons.close, onPressed: onClose),
             ...actions,
@@ -186,10 +183,7 @@ class AppCommonTopHeader extends StatelessWidget
           mainAxisSize: MainAxisSize.min,
           children: [
             if (onShare != null)
-              _HeaderIconButton(
-                icon: Icons.ios_share_outlined,
-                onPressed: onShare,
-              ),
+              _HeaderIconButton(icon: Icons.share_outlined, onPressed: onShare),
             if (onSettings != null)
               _HeaderIconButton(
                 icon: Icons.settings_outlined,
@@ -228,17 +222,32 @@ class AppCommonTopHeader extends StatelessWidget
 }
 
 class _HeaderIconButton extends StatelessWidget {
-  const _HeaderIconButton({required this.icon, this.onPressed, this.size = 24});
+  const _HeaderIconButton({
+    this.icon,
+    this.assetPath,
+    this.onPressed,
+    this.size = 24,
+  }) : assert(icon != null || assetPath != null);
 
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final VoidCallback? onPressed;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final iconWidget = assetPath != null
+        ? Image.asset(
+            assetPath!,
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+          )
+        : Icon(icon, size: size, color: AppComponentColors.headerTitle);
+
     return IconButton(
       onPressed: onPressed,
-      icon: Icon(icon, size: size, color: AppComponentColors.headerTitle),
+      icon: iconWidget,
       padding: const EdgeInsets.all(4),
       constraints: BoxConstraints(minWidth: size, minHeight: size),
     );

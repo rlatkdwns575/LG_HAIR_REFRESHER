@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode_detail.dart';
 
 /// 리프레시 상세 — 총 소요 시간 + 단계별 타임라인 (Figma 833:14941).
@@ -150,7 +151,7 @@ class _TimelineStepRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
+                AppText(
                   step.description,
                   style: AppTextStyles.bodyM1.copyWith(
                     color: AppColors.gray500,

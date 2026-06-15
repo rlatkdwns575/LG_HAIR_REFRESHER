@@ -5,6 +5,7 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_shadows.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_assets.dart';
 import 'duration_badge.dart';
@@ -30,6 +31,8 @@ class RefreshModeCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   String get _badge => badgeLabel ?? mode.category;
+
+  bool get _isUserCustomMode => mode.isCustom || mode.createdByUser;
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +65,16 @@ class RefreshModeCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (_isUserCustomMode) ...[
+                const SizedBox(width: 6),
+                _Badge(label: RefreshModeTabs.customModeTab),
+              ],
               const SizedBox(width: AppSpacing.sm),
               DurationBadge(totalSeconds: mode.durationSeconds),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             mode.description,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray700),
           ),
@@ -119,15 +126,27 @@ class RefreshModeCard extends StatelessWidget {
         children: [
           DurationBadge(totalSeconds: mode.durationSeconds),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            mode.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.titleS.copyWith(color: AppColors.primary900),
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  mode.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.titleS.copyWith(
+                    color: AppColors.primary900,
+                  ),
+                ),
+              ),
+              if (_isUserCustomMode) ...[
+                const SizedBox(width: 6),
+                _Badge(label: RefreshModeTabs.customModeTab),
+              ],
+            ],
           ),
           const SizedBox(height: 6),
-          Text(
-            mode.description.replaceAll('\n', ' '),
+          AppText(
+            mode.description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),

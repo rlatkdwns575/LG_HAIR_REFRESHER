@@ -217,9 +217,7 @@ class _HistoryPageState extends State<HistoryPage> {
             onRoutineRegisterTap: () => _showComingSoon('루틴 등록 기능은 준비 중이에요.'),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
         const HistorySectionDivider(),
-        const SizedBox(height: AppSpacing.lg),
         _padded(
           HistoryRecentSection(
             asOfDate: report.asOfDate,
@@ -237,9 +235,7 @@ class _HistoryPageState extends State<HistoryPage> {
             onDayResultDetailTap: _onDayResultDetailTap,
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
         const HistorySectionDivider(),
-        const SizedBox(height: AppSpacing.lg),
         _padded(HistoryTotalSection(summary: report.totalSummary)),
       ],
     );
