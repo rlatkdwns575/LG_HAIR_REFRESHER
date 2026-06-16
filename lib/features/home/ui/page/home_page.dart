@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../app/layout/app_layout.dart';
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -16,6 +19,7 @@ import '../../../refresh/data/api/refresh_recommend_api.dart';
 import '../../../refresh/data/api/refresh_recommend_fallback.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
+import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
 import '../../data/api/weather_api.dart';
@@ -52,29 +56,45 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshApi = const RefreshApi();
   final _geminiRecommendApi = const GeminiRecommendApi();
   final _refreshRecommendApi = const RefreshRecommendApi();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   HomeDashboardData _dashboardData = const HomeDashboardData();
   bool _isLoading = true;
+  bool _isScentCartridgeAttached = false;
   String? _recommendMessage;
+  HomeQuickRefreshMode? _recommendedQuickMode;
+  bool _useRecommendForQuickSlot = false;
   HomeQuickRefreshMode? get _favoriteMode =>
       HomeShortcutStore.instance.favoriteQuickMode;
 
+  HomeQuickRefreshSlot _primaryQuickSlot() {
+    if (_useRecommendForQuickSlot && _recommendedQuickMode != null) {
+      return HomeQuickRefreshSlot(
+        type: HomeQuickSlotType.recommendedMode,
+        mode: _recommendedQuickMode,
+      );
+    }
+
+    final mode = _dashboardData.hasUsageHistory
+        ? (_dashboardData.frequentMode ?? homeFrequentModeFallback)
+        : homeFrequentModeFallback;
+
+    return HomeQuickRefreshSlot(
+      type: HomeQuickSlotType.frequentMode,
+      mode: mode,
+    );
+  }
+
   List<HomeQuickRefreshSlot> get _quickSlots {
     if (!_dashboardData.hasUsageHistory) {
-      return const [
-        HomeQuickRefreshSlot(
-          type: HomeQuickSlotType.recommendedMode,
-          mode: homeRecommendedModeFallback,
-        ),
-        HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
+      return [
+        _primaryQuickSlot(),
+        const HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
       ];
     }
 
-    final slots = <HomeQuickRefreshSlot>[
-      HomeQuickRefreshSlot(
-        type: HomeQuickSlotType.frequentMode,
-        mode: _dashboardData.frequentMode ?? homeFrequentModeFallback,
-      ),
+    return [
+      _primaryQuickSlot(),
       if (_favoriteMode != null)
         HomeQuickRefreshSlot(
           type: HomeQuickSlotType.favoriteMode,
@@ -83,8 +103,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       else
         const HomeQuickRefreshSlot(type: HomeQuickSlotType.favoriteAdd),
     ];
-
-    return slots;
   }
 
   @override
@@ -128,22 +146,33 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     String? recommendMessage = HomeRecommendCache.instance.message;
+    HomeQuickRefreshMode? recommendedQuickMode;
+    var useRecommendForQuickSlot = false;
+    EnvironmentSnapshot? environment;
 
-    if (recommendMessage != null) {
-      debugPrint('Home banner using cached recommend message.');
-    } else {
-      EnvironmentSnapshot? environment;
+    try {
+      environment = await _weatherApi.fetchSnapshot();
+      debugPrint(
+        'Home weather loaded: '
+        '${environment.temperatureCelsius}°C, '
+        'humidity ${environment.humidityPercent}%, '
+        'rain=${environment.isRaining}, snow=${environment.isSnowing}',
+      );
 
-      try {
-        environment = await _weatherApi.fetchSnapshot();
+      final apiRecommendedMode = await _resolveRecommendApiMode(environment);
+      if (apiRecommendedMode != null) {
+        recommendedQuickMode = apiRecommendedMode.toHomeQuickRefreshMode();
+        useRecommendForQuickSlot = true;
         debugPrint(
-          'Home weather loaded: '
-          '${environment.temperatureCelsius}°C, '
-          'humidity ${environment.humidityPercent}%, '
-          'rain=${environment.isRaining}, snow=${environment.isSnowing}',
+          'Home quick slot using RECOMMEND API mode: ${apiRecommendedMode.name}',
         );
+      } else {
+        debugPrint('Home quick slot falling back to frequent mode.');
+      }
 
-        final recommendedMode = await _resolveRecommendedMode(environment);
+      if (recommendMessage == null) {
+        final recommendedMode =
+            apiRecommendedMode ?? await _resolveRecommendedMode(environment);
         final recommendedModeName = recommendedMode?.name;
 
         try {
@@ -162,9 +191,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
 
         HomeRecommendCache.instance.save(recommendMessage);
-      } catch (error, stackTrace) {
-        debugPrint('Home weather failed: $error\n$stackTrace');
+      } else {
+        debugPrint('Home banner using cached recommend message.');
       }
+    } catch (error, stackTrace) {
+      debugPrint('Home weather/recommend load failed: $error\n$stackTrace');
     }
 
     if (!mounted) {
@@ -178,11 +209,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
     }
 
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+
     setState(() {
       _dashboardData = dashboard.copyWith(
         hasRecentDiagnosisResult: hasRecentDiagnosis,
       );
       _recommendMessage = recommendMessage;
+      _recommendedQuickMode = recommendedQuickMode;
+      _useRecommendForQuickSlot = useRecommendForQuickSlot;
+      _isScentCartridgeAttached = cartridge.isAttached;
       _isLoading = false;
     });
 
@@ -219,6 +256,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _refreshDeviceStatus() => _deviceStatusWatcher.refresh();
+
+  Future<RefreshMode?> _resolveRecommendApiMode(
+    EnvironmentSnapshot environment,
+  ) async {
+    try {
+      final presets = await _refreshApi.fetchPresetModes();
+      RefreshPresetModeStore.instance.setPresets(presets);
+      if (presets.isEmpty) {
+        return null;
+      }
+
+      return await _refreshRecommendApi.recommendMode(
+        candidates: presets,
+        environment: environment,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Home RECOMMEND API failed: $error\n$stackTrace');
+      return null;
+    }
+  }
 
   Future<RefreshMode?> _resolveRecommendedMode(
     EnvironmentSnapshot environment,
@@ -306,37 +363,46 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               onRefresh: _refreshDeviceStatus,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                padding: AppSystemInsets.onlyBottom(
+                  context,
+                  extra: AppSpacing.xl,
+                ),
                 children: [
                   HomeDeviceStatusSection(
                     data: _dashboardData,
-                    onDeviceManagePressed: () {},
+                    onDeviceManagePressed: context.pushDeviceManage,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: _contentHorizontalPadding,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: _sectionGap),
-                        if (_recommendMessage != null) ...[
-                          HomeRecommendBanner(message: _recommendMessage!),
+                  AppMaxWidthPageShell(
+                    backgroundColor: AppColors.homeBackground,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: _contentHorizontalPadding,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
                           const SizedBox(height: _sectionGap),
+                          if (_recommendMessage != null) ...[
+                            HomeRecommendBanner(message: _recommendMessage!),
+                            const SizedBox(height: _sectionGap),
+                          ],
+                          HomeQuickRefreshRow(
+                            slots: _quickSlots,
+                            isScentCartridgeAttached: _isScentCartridgeAttached,
+                            onFavoriteAddPressed: _handleFavoriteAdd,
+                            onScentUnavailable: () =>
+                                showRefreshScentUnavailableSnackBar(context),
+                            onModePressed: (mode) => context
+                                .pushRefreshProgress(modeName: mode.title),
+                          ),
+                          const SizedBox(height: _sectionGap),
+                          HomeNavigationMenu(
+                            onRefreshPressed: context.pushRefresh,
+                            onDiagnosisPressed: _handleDiagnosisTap,
+                            onHistoryPressed: context.pushHistory,
+                          ),
                         ],
-                        HomeQuickRefreshRow(
-                          slots: _quickSlots,
-                          onFavoriteAddPressed: _handleFavoriteAdd,
-                          onModePressed: (mode) =>
-                              context.pushRefreshProgress(modeName: mode.title),
-                        ),
-                        const SizedBox(height: _sectionGap),
-                        HomeNavigationMenu(
-                          onRefreshPressed: context.pushRefresh,
-                          onDiagnosisPressed: _handleDiagnosisTap,
-                          onHistoryPressed: context.pushHistory,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],

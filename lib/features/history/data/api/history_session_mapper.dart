@@ -1,3 +1,4 @@
+import '../../../measure/data/model/measure_result_record.dart';
 import '../model/care_status.dart';
 import '../model/refresh_history_record.dart';
 
@@ -6,12 +7,19 @@ class HistorySessionMapper {
   const HistorySessionMapper._();
 
   static const sessionColumns =
+      'session_id, mode_id, measure_id, started_at, duration_time, '
+      'pollution_score_before, pollution_score_after, '
+      'dust_score_before, dust_score_after, odor_score_before, odor_score_after';
+
+  static const sessionColumnsWithoutMeasureId =
       'session_id, mode_id, started_at, duration_time, '
+      'pollution_score_before, pollution_score_after, '
       'dust_score_before, dust_score_after, odor_score_before, odor_score_after';
 
   static RefreshHistoryRecord fromSessionRow({
     required Map<String, dynamic> session,
     required Map<String, dynamic>? mode,
+    Map<String, dynamic>? measure,
   }) {
     final startedAtRaw = session['started_at'];
     final startedAt = startedAtRaw is String
@@ -19,18 +27,27 @@ class HistorySessionMapper {
         : DateTime.fromMillisecondsSinceEpoch(0);
 
     final durationSeconds = (session['duration_time'] as num?)?.round();
-    final odorBefore = _readScore(session, 'odor_score_before');
-    final odorAfter = _readScore(session, 'odor_score_after');
-    final dustBefore = _readScore(session, 'dust_score_before');
-    final dustAfter = _readScore(session, 'dust_score_after');
+    final measureRecord = measure == null
+        ? null
+        : MeasureResultRecord.fromJson(measure);
+
+    final odorBefore = _readOdorBefore(session, measureRecord);
+    final odorAfter = _readOdorAfter(session, odorBefore);
+    final dustBefore = _readDustBefore(session, measureRecord);
+    final dustAfter = _readDustAfter(session, dustBefore);
 
     final odorYn = mode?['odor_yn'] == true;
     final dustYn = mode?['dust_yn'] == true;
+    final scentYn = mode?['scent_yn'] == true;
 
     return RefreshHistoryRecord(
       dateTime: startedAt.toLocal(),
       modeName: mode?['display_name'] as String? ?? '리프레시',
-      careType: _resolveCareType(odorYn: odorYn, dustYn: dustYn),
+      careType: _resolveCareType(
+        odorYn: odorYn,
+        dustYn: dustYn,
+        scentYn: scentYn,
+      ),
       duration: durationSeconds == null || durationSeconds <= 0
           ? null
           : Duration(seconds: durationSeconds),
@@ -70,6 +87,7 @@ class HistorySessionMapper {
   static CareType _resolveCareType({
     required bool odorYn,
     required bool dustYn,
+    required bool scentYn,
   }) {
     if (odorYn && dustYn) {
       return CareType.both;
@@ -80,7 +98,38 @@ class HistorySessionMapper {
     if (dustYn) {
       return CareType.dust;
     }
+    if (scentYn) {
+      return CareType.odor;
+    }
     return CareType.both;
+  }
+
+  static int? _readOdorBefore(
+    Map<String, dynamic> session,
+    MeasureResultRecord? measure,
+  ) {
+    return _readScore(session, 'odor_score_before') ??
+        _readScore(session, 'hair_odor_score_before') ??
+        measure?.hairOdorScore;
+  }
+
+  static int? _readOdorAfter(Map<String, dynamic> session, int? odorBefore) {
+    return _readScore(session, 'odor_score_after') ??
+        _readScore(session, 'hair_odor_score_after');
+  }
+
+  static int? _readDustBefore(
+    Map<String, dynamic> session,
+    MeasureResultRecord? measure,
+  ) {
+    return _readScore(session, 'dust_score_before') ??
+        _readScore(session, 'hair_dust_score_before') ??
+        measure?.hairDustScore;
+  }
+
+  static int? _readDustAfter(Map<String, dynamic> session, int? dustBefore) {
+    return _readScore(session, 'dust_score_after') ??
+        _readScore(session, 'hair_dust_score_after');
   }
 
   static int? _readScore(Map<String, dynamic> row, String field) {

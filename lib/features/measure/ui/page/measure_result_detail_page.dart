@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
+import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_box_button.dart';
@@ -24,16 +28,28 @@ class MeasureResultDetailPage extends StatefulWidget {
 
 class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
   final _recommendService = const MeasureRefreshRecommendService();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   MeasureResult? _result;
   MeasureResultDetail? _detail;
   bool _isLoading = true;
+  bool _isScentCartridgeAttached = false;
   String? _loadError;
 
   @override
   void initState() {
     super.initState();
+    _loadScentCartridgeStatus();
     _resolveResult();
+  }
+
+  Future<void> _loadScentCartridgeStatus() async {
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _isScentCartridgeAttached = cartridge.isAttached);
   }
 
   Future<void> _resolveResult() async {
@@ -122,16 +138,26 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      0,
-                      AppSpacing.sm,
-                      0,
-                      0,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(0, AppSpacing.sm, 0, 0),
                     children: [
                       MeasureResultDetailContent(
                         detail: detail,
+                        isRecommendEnabled: RefreshModeAvailability.isEnabled(
+                          result.recommendedMode,
+                          ScentCartridgeStatus(
+                            isAttached: _isScentCartridgeAttached,
+                          ),
+                        ),
                         onRecommendTap: () {
+                          if (!RefreshModeAvailability.isEnabled(
+                            result.recommendedMode,
+                            ScentCartridgeStatus(
+                              isAttached: _isScentCartridgeAttached,
+                            ),
+                          )) {
+                            showRefreshScentUnavailableSnackBar(context);
+                            return;
+                          }
                           context.pushRefreshDetail(
                             mode: result.recommendedMode,
                           );

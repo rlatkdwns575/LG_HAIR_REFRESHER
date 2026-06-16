@@ -5,6 +5,7 @@ import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/measure_result_detail.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/widgets/refresh_mode_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import 'measure_result_detail_need_bars.dart';
@@ -16,11 +17,13 @@ class MeasureResultDetailSummary extends StatelessWidget {
   const MeasureResultDetailSummary({
     required this.detail,
     this.onRecommendTap,
+    this.isRecommendEnabled = true,
     super.key,
   });
 
   final MeasureResultDetail detail;
   final VoidCallback? onRecommendTap;
+  final bool isRecommendEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +45,10 @@ class MeasureResultDetailSummary extends StatelessWidget {
           mode: detail.recommendedMode,
           variant: RefreshModeCardVariant.featured,
           badgeLabel: '추천',
+          enabled: isRecommendEnabled,
+          disabledReason: isRecommendEnabled
+              ? null
+              : RefreshModeAvailability.unavailableReason,
           onTap: onRecommendTap,
           onAction: onRecommendTap,
         ),

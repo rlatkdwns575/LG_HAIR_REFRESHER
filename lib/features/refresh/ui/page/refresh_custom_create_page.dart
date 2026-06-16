@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
+import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -11,6 +13,8 @@ import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_toggle.dart';
 import '../../../../core/services/auth_session_service.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../data/api/custom_mode_api.dart';
 import '../../data/care_duration_split.dart';
 import '../../data/custom_mode_cache.dart';
@@ -60,8 +64,11 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   static const double _sectionGap = 20;
 
   final _customModeApi = const CustomModeApi();
+  final _deviceConsumableService = const DeviceConsumableService();
   final _nameController = TextEditingController();
   bool _isSaving = false;
+  ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
+  bool _isCartridgeLoading = true;
 
   final Map<_CareType, bool> _enabled = {
     for (final type in _CareType.values) type: false,
@@ -72,6 +79,30 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
 
   int _durationMinutes = _minDuration;
   String _selectedCategory = RefreshModeTabs.beforeOuting;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadScentCartridgeStatus();
+  }
+
+  Future<void> _loadScentCartridgeStatus() async {
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _scentCartridge = cartridge;
+      _isCartridgeLoading = false;
+      if (!cartridge.isAttached) {
+        _enabled[_CareType.scent] = false;
+        _levels[_CareType.scent] = null;
+      }
+    });
+  }
+
+  bool get _isScentCareAvailable => _scentCartridge.isAttached;
 
   @override
   void dispose() {
@@ -94,6 +125,9 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   }
 
   void _toggleCare(_CareType type, bool value) {
+    if (type == _CareType.scent && value && !_isScentCareAvailable) {
+      return;
+    }
     setState(() {
       _enabled[type] = value;
       if (!value) {
@@ -191,7 +225,11 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 18),
+              padding: AppSystemInsets.pageHorizontal(
+                context,
+                top: AppSpacing.lg,
+                extraBottom: 18,
+              ),
               children: [
                 _buildPreviewRoadmap(),
                 _buildNameSection(),
@@ -344,6 +382,8 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
 
   Widget _buildCareRow(_CareType type) {
     final enabled = _enabled[type] ?? false;
+    final isScentUnavailable =
+        type == _CareType.scent && !_isScentCareAvailable;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,14 +391,34 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         Row(
           children: [
             Expanded(
-              child: Text(
-                type.label,
-                style: AppTextStyles.bodyL.copyWith(color: AppColors.gray800),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    type.label,
+                    style: AppTextStyles.bodyL.copyWith(
+                      color: isScentUnavailable
+                          ? AppColors.gray400
+                          : AppColors.gray800,
+                    ),
+                  ),
+                  if (isScentUnavailable) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '향 카트리지가 없어 향기 케어를 사용할 수 없어요.',
+                      style: AppTextStyles.labelS.copyWith(
+                        color: AppColors.gray500,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
             AppToggle(
               value: enabled,
-              onChanged: (value) => _toggleCare(type, value),
+              onChanged: isScentUnavailable || _isCartridgeLoading
+                  ? null
+                  : (value) => _toggleCare(type, value),
             ),
           ],
         ),
@@ -623,6 +683,7 @@ class _DurationPickerSheet extends StatefulWidget {
   }) {
     return showModalBottomSheet<int>(
       context: context,
+      constraints: AppLayout.popupConstraints,
       backgroundColor: AppColors.gray0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

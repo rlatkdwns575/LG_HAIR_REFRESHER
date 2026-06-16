@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 
+/// 헤어 상태 진단 진입 단계 (모발 유형 1 + 준비 3).
+class MeasureIntroStepIndicator {
+  const MeasureIntroStepIndicator._();
+
+  static const totalSteps = 4;
+  static const hairProfileStepIndex = 0;
+  static const prepareStepOffset = 1;
+}
+
 class MeasureStepIndicator extends StatelessWidget {
   const MeasureStepIndicator({
     required this.currentStep,

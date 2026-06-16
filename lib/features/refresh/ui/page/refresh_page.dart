@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -9,6 +10,8 @@ import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../core/services/auth_session_service.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../home/data/api/weather_api.dart';
 import '../../data/api/custom_mode_api.dart';
 import '../../data/api/refresh_api.dart';
@@ -16,8 +19,10 @@ import '../../data/api/refresh_recommend_api.dart';
 import '../../data/api/refresh_recommend_fallback.dart';
 import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
+import '../../data/refresh_mode_availability.dart';
 import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_mode_filter.dart';
+import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_mode_card.dart';
 import '../widgets/refresh_section_header.dart';
 
@@ -33,9 +38,11 @@ class _RefreshPageState extends State<RefreshPage> {
   final _customModeApi = const CustomModeApi();
   final _weatherApi = const WeatherApi();
   final _refreshRecommendApi = const RefreshRecommendApi();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   List<RefreshMode> _presetModes = const [];
   RefreshMode? _recommendedMode;
+  ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
   bool _isLoading = true;
   int _selectedChipIndex = 0;
 
@@ -46,7 +53,14 @@ class _RefreshPageState extends State<RefreshPage> {
 
   List<RefreshMode> get _filteredModes {
     final selectedTab = RefreshModeTabs.all[_selectedChipIndex];
-    return filterRefreshModes(allModes: _allModes, selectedTab: selectedTab);
+    final filtered = filterRefreshModes(
+      allModes: _allModes,
+      selectedTab: selectedTab,
+    );
+    return RefreshModeAvailability.orderSelectableFirst(
+      modes: filtered,
+      cartridge: _scentCartridge,
+    );
   }
 
   RefreshMode? get _featuredMode {
@@ -69,6 +83,8 @@ class _RefreshPageState extends State<RefreshPage> {
     final userId = AuthSessionService.resolveUserId();
     final presets = await _refreshApi.fetchPresetModes();
     final customModes = await _customModeApi.fetchForUser(userId);
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
     RefreshPresetModeStore.instance.setPresets(presets);
     CustomModeCache.instance.setModes(customModes);
 
@@ -94,6 +110,7 @@ class _RefreshPageState extends State<RefreshPage> {
     setState(() {
       _presetModes = presets;
       _recommendedMode = recommended;
+      _scentCartridge = cartridge;
       _isLoading = false;
     });
   }
@@ -106,7 +123,15 @@ class _RefreshPageState extends State<RefreshPage> {
     setState(() {});
   }
 
+  bool _isModeEnabled(RefreshMode mode) {
+    return RefreshModeAvailability.isEnabled(mode, _scentCartridge);
+  }
+
   void _onModeTap(RefreshMode mode) {
+    if (!_isModeEnabled(mode)) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
     context.pushRefreshDetail(mode: mode);
   }
 
@@ -154,7 +179,10 @@ class _RefreshPageState extends State<RefreshPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+              padding: AppSystemInsets.onlyBottom(
+                context,
+                extra: AppSpacing.xl,
+              ),
               children: [
                 if (_featuredMode != null) ...[
                   _buildRecommendedSection(_featuredMode!),
@@ -181,6 +209,10 @@ class _RefreshPageState extends State<RefreshPage> {
             mode: mode,
             variant: RefreshModeCardVariant.featured,
             badgeLabel: 'AI 추천',
+            enabled: _isModeEnabled(mode),
+            disabledReason: _isModeEnabled(mode)
+                ? null
+                : RefreshModeAvailability.unavailableReason,
             onTap: () => _onModeTap(mode),
           ),
         ),
@@ -210,6 +242,10 @@ class _RefreshPageState extends State<RefreshPage> {
                       if (i > 0) const SizedBox(height: AppSpacing.md),
                       RefreshModeCard(
                         mode: modes[i],
+                        enabled: _isModeEnabled(modes[i]),
+                        disabledReason: _isModeEnabled(modes[i])
+                            ? null
+                            : RefreshModeAvailability.unavailableReason,
                         onTap: () => _onModeTap(modes[i]),
                         onDelete: modes[i].isDeletable
                             ? () => _confirmDeleteMode(modes[i])

@@ -30,7 +30,12 @@ void main() {
           'dust_score_before': 52,
           'dust_score_after': 20,
         },
-        mode: {'display_name': '외부 냄새 리프레시', 'odor_yn': true, 'dust_yn': true},
+        mode: {
+          'display_name': '외부 냄새 리프레시',
+          'odor_yn': true,
+          'dust_yn': true,
+          'scent_yn': false,
+        },
       );
 
       expect(record.modeName, '외부 냄새 리프레시');

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
+import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_box_button.dart';
@@ -20,15 +24,27 @@ class MeasureResultPage extends StatefulWidget {
 
 class _MeasureResultPageState extends State<MeasureResultPage> {
   final _recommendService = const MeasureRefreshRecommendService();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   MeasureResult? _result;
   bool _isLoading = true;
+  bool _isScentCartridgeAttached = false;
   String? _loadError;
 
   @override
   void initState() {
     super.initState();
+    _loadScentCartridgeStatus();
     _resolveResult();
+  }
+
+  Future<void> _loadScentCartridgeStatus() async {
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _isScentCartridgeAttached = cartridge.isAttached);
   }
 
   Future<void> _resolveResult() async {
@@ -103,7 +119,25 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
     if (result == null) {
       return;
     }
+    if (!RefreshModeAvailability.isEnabled(
+      result.recommendedMode,
+      ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
+    )) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
     context.pushRefreshDetail(mode: result.recommendedMode);
+  }
+
+  bool get _isRecommendEnabled {
+    final result = _result;
+    if (result == null) {
+      return true;
+    }
+    return RefreshModeAvailability.isEnabled(
+      result.recommendedMode,
+      ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
+    );
   }
 
   @override
@@ -169,6 +203,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                           result: result,
                           onDetailTap: _onDetailTap,
                           onRecommendTap: _onRecommendTap,
+                          isRecommendEnabled: _isRecommendEnabled,
                         ),
                       ],
                     ),

@@ -22,15 +22,18 @@ class HistoryReportBuilder {
     DateTime? asOfDate,
   }) {
     final asOf = _dateOnly(asOfDate ?? DateTime.now());
-    final refreshRecords =
-        records.where((record) => !record.isDiagnosis).toList()
-          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    final sortedRecords = List<RefreshHistoryRecord>.from(records)
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
+    final refreshRecords = sortedRecords
+        .where((record) => !record.isDiagnosis)
+        .toList();
 
     final todayRecords = refreshRecords
         .where((record) => _isSameDay(record.dateTime, asOf))
         .toList();
 
-    final monthHistory = _buildMonthHistory(refreshRecords, asOf);
+    final monthHistory = _buildMonthHistory(sortedRecords, asOf);
     final totalSummary = _buildTotalSummary(refreshRecords, userName);
 
     return RefreshHistoryReport(
@@ -182,6 +185,7 @@ class HistoryReportBuilder {
     var odorFocus = 0;
     var dustFocus = 0;
     var bothFocus = 0;
+    var diagnosisCount = 0;
 
     for (final record in records) {
       switch (record.careType) {
@@ -192,8 +196,12 @@ class HistoryReportBuilder {
         case CareType.both:
           bothFocus++;
         case CareType.diagnosis:
-          break;
+          diagnosisCount++;
       }
+    }
+
+    if (diagnosisCount > 0 && refreshCount(records) == 0) {
+      return '헤어 상태 진단을 진행한 날이에요.';
     }
 
     if (bothFocus >= odorFocus && bothFocus >= dustFocus && bothFocus > 0) {
@@ -205,7 +213,14 @@ class HistoryReportBuilder {
     if (dustFocus > 0) {
       return '먼지관리에 집중했던 날이에요.';
     }
+    if (diagnosisCount > 0) {
+      return '진단과 케어 기록이 함께 있는 날이에요.';
+    }
     return '가벼운 케어 위주로 사용했어요.';
+  }
+
+  static int refreshCount(List<RefreshHistoryRecord> records) {
+    return records.where((record) => !record.isDiagnosis).length;
   }
 
   static RefreshMonthlySummary _monthlySummary(
@@ -215,6 +230,7 @@ class HistoryReportBuilder {
   ) {
     final monthRecords = records
         .where((record) => _isSameMonth(record.dateTime, month))
+        .where((record) => !record.isDiagnosis)
         .toList();
     final previousMonth = RefreshHistoryReport.monthBefore(month);
     final previousSummary = computed[previousMonth];

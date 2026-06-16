@@ -10,8 +10,10 @@ import '../../data/model/home_dashboard_data.dart';
 class HomeQuickRefreshRow extends StatelessWidget {
   const HomeQuickRefreshRow({
     required this.slots,
+    this.isScentCartridgeAttached = true,
     this.onFavoriteAddPressed,
     this.onModePressed,
+    this.onScentUnavailable,
     super.key,
   });
 
@@ -20,8 +22,10 @@ class HomeQuickRefreshRow extends StatelessWidget {
   static const cardPadding = 15.0;
 
   final List<HomeQuickRefreshSlot> slots;
+  final bool isScentCartridgeAttached;
   final VoidCallback? onFavoriteAddPressed;
   final ValueChanged<HomeQuickRefreshMode>? onModePressed;
+  final VoidCallback? onScentUnavailable;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +53,9 @@ class HomeQuickRefreshRow extends StatelessWidget {
         return _RefreshModeQuickCard(
           mode: slot.mode ?? homeRecommendedModeFallback,
           leadingBadgeLabel: '추천',
+          enabled: _isModeEnabled(slot.mode ?? homeRecommendedModeFallback),
           onPressed: () =>
-              onModePressed?.call(slot.mode ?? homeRecommendedModeFallback),
+              _handleModePressed(slot.mode ?? homeRecommendedModeFallback),
         );
       case HomeQuickSlotType.favoriteAdd:
         return _RefreshModeAddCard(onPressed: onFavoriteAddPressed);
@@ -60,10 +65,23 @@ class HomeQuickRefreshRow extends StatelessWidget {
         final isFavorite = slot.type == HomeQuickSlotType.favoriteMode;
         return _RefreshModeQuickCard(
           mode: mode,
-          leadingBadgeLabel: isFavorite ? '즐겨찾기' : null,
-          onPressed: () => onModePressed?.call(mode),
+          leadingBadgeLabel: isFavorite ? '즐겨찾기' : '자주쓰는',
+          enabled: _isModeEnabled(mode),
+          onPressed: () => _handleModePressed(mode),
         );
     }
+  }
+
+  bool _isModeEnabled(HomeQuickRefreshMode mode) {
+    return !mode.requiresScentCartridge || isScentCartridgeAttached;
+  }
+
+  void _handleModePressed(HomeQuickRefreshMode mode) {
+    if (!_isModeEnabled(mode)) {
+      onScentUnavailable?.call();
+      return;
+    }
+    onModePressed?.call(mode);
   }
 }
 
@@ -124,61 +142,78 @@ class _RefreshModeQuickCard extends StatelessWidget {
     required this.mode,
     required this.onPressed,
     this.leadingBadgeLabel,
+    this.enabled = true,
   });
 
   final HomeQuickRefreshMode mode;
   final VoidCallback? onPressed;
   final String? leadingBadgeLabel;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: HomeQuickRefreshRow.cardHeight,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          child: Ink(
-            padding: const EdgeInsets.all(HomeQuickRefreshRow.cardPadding),
-            decoration: BoxDecoration(
-              color: AppComponentColors.refreshCardCompactBackground,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: AppComponentColors.refreshCardCompactBorder,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            child: Ink(
+              padding: const EdgeInsets.all(HomeQuickRefreshRow.cardPadding),
+              decoration: BoxDecoration(
+                color: AppComponentColors.refreshCardCompactBackground,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: enabled
+                      ? AppComponentColors.refreshCardCompactBorder
+                      : AppColors.gray200,
+                ),
               ),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _BadgeRow(
-                      durationLabel: mode.durationLabel,
-                      leadingBadgeLabel: leadingBadgeLabel,
-                    ),
-                    const SizedBox(height: 4),
-                    Expanded(
-                      child: Text(
-                        mode.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.titleXs.copyWith(
-                          color: AppColors.gray800,
-                          fontWeight: FontWeight.w600,
-                          height: 20 / 14,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _BadgeRow(
+                        durationLabel: mode.durationLabel,
+                        leadingBadgeLabel: leadingBadgeLabel,
+                      ),
+                      const SizedBox(height: 4),
+                      Expanded(
+                        child: Text(
+                          mode.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.titleXs.copyWith(
+                            color: enabled
+                                ? AppColors.gray800
+                                : AppColors.gray500,
+                            fontWeight: FontWeight.w600,
+                            height: 20 / 14,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: _ActionCapsuleIconButton(onPressed: onPressed),
-                ),
-              ],
+                      if (!enabled) ...[
+                        Text(
+                          '카트리지 없음',
+                          style: AppTextStyles.labelXs.copyWith(
+                            color: AppColors.gray500,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: _ActionCapsuleIconButton(onPressed: onPressed),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

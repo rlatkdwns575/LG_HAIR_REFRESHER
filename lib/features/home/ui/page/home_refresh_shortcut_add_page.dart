@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -9,11 +10,15 @@ import '../../../../shared/widgets/app_bottom_button_bar.dart';
 import '../../../../shared/widgets/app_chip_tab_bar.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../core/services/auth_session_service.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../refresh/data/api/custom_mode_api.dart';
 import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/custom_mode_cache.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
+import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../../refresh/ui/widgets/refresh_section_header.dart';
 import '../widgets/refresh_shortcut_select_card.dart';
 import '../../../refresh/data/refresh_mode_filter.dart';
@@ -31,10 +36,12 @@ class _HomeRefreshShortcutAddPageState
     extends State<HomeRefreshShortcutAddPage> {
   final _refreshApi = const RefreshApi();
   final _customModeApi = const CustomModeApi();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   bool _isLoading = true;
   int _selectedChipIndex = 0;
   String? _selectedModeId;
+  ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
 
   List<RefreshMode> get _allModes => getAllRefreshModes();
 
@@ -53,6 +60,8 @@ class _HomeRefreshShortcutAddPageState
     final userId = AuthSessionService.resolveUserId();
     final presets = await _refreshApi.fetchPresetModes();
     final customModes = await _customModeApi.fetchForUser(userId);
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
     RefreshPresetModeStore.instance.setPresets(presets);
     CustomModeCache.instance.setModes(customModes);
 
@@ -60,16 +69,34 @@ class _HomeRefreshShortcutAddPageState
       return;
     }
 
-    setState(() => _isLoading = false);
+    setState(() {
+      _scentCartridge = cartridge;
+      _isLoading = false;
+    });
+  }
+
+  bool _isModeEnabled(RefreshMode mode) {
+    return RefreshModeAvailability.isEnabled(mode, _scentCartridge);
   }
 
   RefreshShortcutSelectState _stateFor(RefreshMode mode) {
+    if (!_isModeEnabled(mode)) {
+      return RefreshShortcutSelectState.disabled;
+    }
     if (_selectedModeId == null) {
       return RefreshShortcutSelectState.normal;
     }
     return mode.id == _selectedModeId
         ? RefreshShortcutSelectState.selected
         : RefreshShortcutSelectState.dimmed;
+  }
+
+  void _selectMode(RefreshMode mode) {
+    if (!_isModeEnabled(mode)) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
+    setState(() => _selectedModeId = mode.id);
   }
 
   Future<void> _openCustomCreate() async {
@@ -89,7 +116,8 @@ class _HomeRefreshShortcutAddPageState
       }
     }
 
-    if (selected == null) {
+    if (selected == null || !_isModeEnabled(selected)) {
+      showRefreshScentUnavailableSnackBar(context);
       return;
     }
 
@@ -113,7 +141,10 @@ class _HomeRefreshShortcutAddPageState
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    padding: AppSystemInsets.onlyBottom(
+                      context,
+                      extra: AppSpacing.md,
+                    ),
                     children: [
                       RefreshSectionHeader(
                         title: '리프레시 모드',
@@ -139,9 +170,7 @@ class _HomeRefreshShortcutAddPageState
                                     RefreshShortcutSelectCard(
                                       mode: modes[i],
                                       state: _stateFor(modes[i]),
-                                      onTap: () => setState(
-                                        () => _selectedModeId = modes[i].id,
-                                      ),
+                                      onTap: () => _selectMode(modes[i]),
                                     ),
                                   ],
                                 ],

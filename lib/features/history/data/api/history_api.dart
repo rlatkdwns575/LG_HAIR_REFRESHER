@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/supabase_tables.dart';
 import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/refresh_history_report.dart';
+import 'history_measure_mapper.dart';
 import 'history_report_builder.dart';
 import 'history_session_mapper.dart';
 
@@ -31,7 +33,19 @@ class HistoryApi {
     }
 
     final userDeviceId = userDevice['user_device_id'] as String;
+    if (kDebugMode) {
+      debugPrint(
+        'HistoryApi: loading history for user_device_id=$userDeviceId',
+      );
+    }
+
     final userName = await _fetchUserName(resolvedUserId);
+    final measures = await _fetchMeasureResults(userDeviceId);
+    final measureById = {
+      for (final row in measures)
+        if (row['measure_id'] is String) row['measure_id'] as String: row,
+    };
+
     final sessions = await _fetchSessions(userDeviceId);
     final modeById = await _fetchModesById(
       sessions
@@ -41,30 +55,95 @@ class HistoryApi {
           .toList(),
     );
 
-    final records = sessions
+    final linkedMeasureIds = sessions
+        .map((row) => row['measure_id'])
+        .whereType<String>()
+        .toSet();
+
+    final sessionRecords = sessions
         .map(
           (row) => HistorySessionMapper.fromSessionRow(
             session: row,
             mode: modeById[row['mode_id'] as String?],
+            measure: measureById[row['measure_id'] as String?],
           ),
         )
         .toList();
+
+    final diagnosisRecords = measures
+        .where((row) {
+          final measureId = row['measure_id'];
+          return measureId is! String || !linkedMeasureIds.contains(measureId);
+        })
+        .map(HistoryMeasureMapper.fromMeasureRow)
+        .toList();
+
+    final records = [...sessionRecords, ...diagnosisRecords];
+
+    if (kDebugMode) {
+      debugPrint(
+        'HistoryApi: loaded ${sessionRecords.length} refresh sessions, '
+        '${diagnosisRecords.length} measure results.',
+      );
+    }
 
     return HistoryReportBuilder.build(records: records, userName: userName);
   }
 
   Future<List<Map<String, dynamic>>> _fetchSessions(String userDeviceId) async {
     try {
-      final rows = await SupabaseService.client
-          .from(SupabaseTables.refreshSessions)
-          .select(HistorySessionMapper.sessionColumns)
-          .eq('user_device_id', userDeviceId)
-          .order('started_at', ascending: false);
+      final rows = await _selectSessions(
+        userDeviceId,
+        HistorySessionMapper.sessionColumns,
+      );
+      return rows;
+    } on PostgrestException catch (error) {
+      if (!error.message.contains('measure_id')) {
+        debugPrint('HistoryApi.fetchSessions failed: ${error.message}');
+        rethrow;
+      }
 
-      return [for (final row in rows) Map<String, dynamic>.from(row)];
+      debugPrint(
+        'HistoryApi: REFRESH_SESSIONS.measure_id column missing, retrying '
+        'without measure_id.',
+      );
+      return _selectSessions(
+        userDeviceId,
+        HistorySessionMapper.sessionColumnsWithoutMeasureId,
+      );
     } catch (error, stackTrace) {
       debugPrint('HistoryApi.fetchSessions failed: $error\n$stackTrace');
       rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _selectSessions(
+    String userDeviceId,
+    String columns,
+  ) async {
+    final rows = await SupabaseService.client
+        .from(SupabaseTables.refreshSessions)
+        .select(columns)
+        .eq('user_device_id', userDeviceId)
+        .order('started_at', ascending: false);
+
+    return [for (final row in rows) Map<String, dynamic>.from(row)];
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchMeasureResults(
+    String userDeviceId,
+  ) async {
+    try {
+      final rows = await SupabaseService.client
+          .from(SupabaseTables.measureResults)
+          .select(HistoryMeasureMapper.resultColumns)
+          .eq('user_device_id', userDeviceId)
+          .order('created_at', ascending: false);
+
+      return [for (final row in rows) Map<String, dynamic>.from(row)];
+    } catch (error, stackTrace) {
+      debugPrint('HistoryApi.fetchMeasureResults failed: $error\n$stackTrace');
+      return const [];
     }
   }
 

@@ -96,7 +96,12 @@ class _MeasurePreparePageState extends State<MeasurePreparePage> {
           ? const MeasurePrepareSkeleton()
           : Column(
               children: [
-                MeasureStepIndicator(currentStep: _currentStep.index),
+                MeasureStepIndicator(
+                  currentStep:
+                      _currentStep.index +
+                      MeasureIntroStepIndicator.prepareStepOffset,
+                  totalSteps: MeasureIntroStepIndicator.totalSteps,
+                ),
                 Expanded(child: MeasurePrepareBody(step: _currentStep)),
                 MeasurePrepareBottomBar(
                   label: '진단 시작',

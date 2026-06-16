@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/layout/app_layout.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../data/api/auth_api.dart';
-import '../../data/model/hair_profile_options.dart';
+import '../../../../core/constants/hair_profile_options.dart';
 import '../../data/model/sign_up_draft.dart';
 import '../widgets/auth_screen_styles.dart';
 import '../widgets/auth_screen_widgets.dart';
@@ -57,75 +58,77 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
 
     showModalBottomSheet<void>(
       context: context,
+      constraints: AppLayout.popupConstraints,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetContext) {
-        return SizedBox(
-          height: 300,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '나이 선택',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AuthScreenStyles.textDark,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() => _selectedAge = tempAge);
-                        Navigator.pop(sheetContext);
-                      },
-                      child: const Text(
-                        '완료',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AuthScreenStyles.primaryBlue,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              SizedBox(
-                height: 260,
-                child: CupertinoPicker(
-                  itemExtent: 44,
-                  scrollController: FixedExtentScrollController(
-                    initialItem: tempAge - _minAge,
+        return SafeArea(
+          child: SizedBox(
+            height: 280,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
                   ),
-                  onSelectedItemChanged: (index) {
-                    tempAge = _minAge + index;
-                  },
-                  children: List.generate(_maxAge - _minAge + 1, (index) {
-                    final age = _minAge + index;
-                    return Center(
-                      child: Text(
-                        '$age세',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '나이 선택',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
                           color: AuthScreenStyles.textDark,
                         ),
                       ),
-                    );
-                  }),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _selectedAge = tempAge);
+                          Navigator.pop(sheetContext);
+                        },
+                        child: const Text(
+                          '완료',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AuthScreenStyles.primaryBlue,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const Divider(height: 1),
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 44,
+                    scrollController: FixedExtentScrollController(
+                      initialItem: tempAge - _minAge,
+                    ),
+                    onSelectedItemChanged: (index) {
+                      tempAge = _minAge + index;
+                    },
+                    children: List.generate(_maxAge - _minAge + 1, (index) {
+                      final age = _minAge + index;
+                      return Center(
+                        child: Text(
+                          '$age세',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: AuthScreenStyles.textDark,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -146,9 +149,22 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      await _authApi.signUp(draft);
+      final result = await _authApi.signUp(draft);
 
       if (!mounted) {
+        return;
+      }
+
+      if (result.sessionCreated) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('회원가입이 완료되었습니다.'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        context.go(AppRoutePaths.home);
         return;
       }
 
@@ -156,7 +172,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('회원가입이 완료되었습니다.'),
+            content: Text('회원가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
