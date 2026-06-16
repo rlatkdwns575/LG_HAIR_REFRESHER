@@ -8,6 +8,7 @@ class HomeAssets {
   static const batteryIconStates = ImageAssets.homeBatteryIconStates;
 
   static const filterIcon = ImageAssets.homeFilterIcon;
+  static const deviceImage = ImageAssets.homeDeviceImage;
   static const recommendSparkleIcon = ImageAssets.homeRecommendSparkleIcon;
   static const checkIcon = ImageAssets.checkIcon;
 

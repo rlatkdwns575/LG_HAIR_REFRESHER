@@ -14,6 +14,7 @@ class ImageAssets {
   static const googleIcon = '$authDir/Google.png';
   static const checkIcon = '$commonDir/check.png';
   static const homeFilterIcon = '$homeDir/filter.png';
+  static const homeDeviceImage = '$homeDir/device_purihair.png';
   static const homeRecommendSparkleIcon = '$homeDir/recommend_sparkle.png';
   static const measureAnalyzingIllustration = '$measureDir/analyzing.png';
   static const refreshTrashIcon = '$refreshDir/trash.png';

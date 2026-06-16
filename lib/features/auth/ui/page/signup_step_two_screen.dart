@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/layout/app_layout.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../data/api/auth_api.dart';
 import '../../../../core/constants/hair_profile_options.dart';
@@ -57,6 +58,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
 
     showModalBottomSheet<void>(
       context: context,
+      constraints: AppLayout.popupConstraints,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

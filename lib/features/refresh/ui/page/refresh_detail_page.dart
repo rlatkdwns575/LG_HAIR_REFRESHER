@@ -198,6 +198,7 @@ class RefreshDetailPageFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
         title: '리프레시 상세',

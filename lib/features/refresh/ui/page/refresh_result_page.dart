@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
@@ -106,11 +107,10 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
           onBack: _goHome,
         ),
         body: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            15,
-            AppSpacing.xl,
-            15,
-            AppSpacing.xl,
+          padding: AppSystemInsets.pageHorizontal(
+            context,
+            top: AppSpacing.xl,
+            extraBottom: AppSpacing.xl,
           ),
           children: [
             RefreshResultContent(

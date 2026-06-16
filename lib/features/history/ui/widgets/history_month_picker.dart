@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -68,6 +69,7 @@ Future<DateTime?> showHistoryMonthPicker({
           }
 
           return Dialog(
+            constraints: AppLayout.popupConstraintsFor(context),
             backgroundColor: AppComponentColors.dialogBackground,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.dialog),

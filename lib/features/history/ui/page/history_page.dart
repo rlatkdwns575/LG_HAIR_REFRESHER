@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -207,7 +208,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     final report = _report!;
     return ListView(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+      padding: AppSystemInsets.onlyBottom(context, extra: AppSpacing.xl),
       children: [
         _buildTitleArea(report),
         _padded(

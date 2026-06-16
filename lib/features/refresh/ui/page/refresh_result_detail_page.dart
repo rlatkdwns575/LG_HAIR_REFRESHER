@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/constants/image_assets.dart';
@@ -45,7 +46,13 @@ class RefreshResultDetailPage extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(0, AppSpacing.md, 0, AppSpacing.xl),
+        padding: EdgeInsets.only(
+          top: AppSpacing.md,
+          bottom: AppSystemInsets.onlyBottom(
+            context,
+            extra: AppSpacing.xl,
+          ).bottom,
+        ),
         children: [RefreshResultDetailContent(detail: detail)],
       ),
     );

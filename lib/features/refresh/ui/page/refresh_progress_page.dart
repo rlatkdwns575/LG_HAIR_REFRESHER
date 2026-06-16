@@ -285,7 +285,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
             Positioned(
               left: 0,
               right: 0,
-              bottom: _pauseButtonBottom,
+              bottom: _pauseButtonBottom + MediaQuery.paddingOf(context).bottom,
               child: _buildBottomAction(),
             ),
           ],

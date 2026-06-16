@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../layout/app_layout.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_spacing.dart';
@@ -32,6 +33,15 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
+      ),
+      dialogTheme: DialogThemeData(
+        constraints: AppLayout.popupConstraints,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.dialog),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        constraints: AppLayout.popupConstraints,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,

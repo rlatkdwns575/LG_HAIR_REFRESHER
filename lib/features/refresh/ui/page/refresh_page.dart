@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -178,7 +179,10 @@ class _RefreshPageState extends State<RefreshPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+              padding: AppSystemInsets.onlyBottom(
+                context,
+                extra: AppSpacing.xl,
+              ),
               children: [
                 if (_featuredMode != null) ...[
                   _buildRecommendedSection(_featuredMode!),
