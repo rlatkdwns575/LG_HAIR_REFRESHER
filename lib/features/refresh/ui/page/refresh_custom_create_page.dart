@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
+import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -223,7 +225,11 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 18),
+              padding: AppSystemInsets.pageHorizontal(
+                context,
+                top: AppSpacing.lg,
+                extraBottom: 18,
+              ),
               children: [
                 _buildPreviewRoadmap(),
                 _buildNameSection(),
@@ -677,6 +683,7 @@ class _DurationPickerSheet extends StatefulWidget {
   }) {
     return showModalBottomSheet<int>(
       context: context,
+      constraints: AppLayout.popupConstraints,
       backgroundColor: AppColors.gray0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

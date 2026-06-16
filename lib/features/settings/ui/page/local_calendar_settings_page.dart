@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -100,7 +101,11 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
         onRefresh: _refreshConnection,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 24),
+          padding: AppSystemInsets.pageHorizontal(
+            context,
+            top: AppSpacing.lg,
+            extraBottom: 24,
+          ),
           children: [
             _ConnectionHero(status: _status),
             const SizedBox(height: AppSpacing.lg),

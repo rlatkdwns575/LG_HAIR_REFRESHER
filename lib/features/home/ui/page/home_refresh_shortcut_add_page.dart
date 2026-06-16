@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -140,7 +141,10 @@ class _HomeRefreshShortcutAddPageState
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    padding: AppSystemInsets.onlyBottom(
+                      context,
+                      extra: AppSpacing.md,
+                    ),
                     children: [
                       RefreshSectionHeader(
                         title: '리프레시 모드',

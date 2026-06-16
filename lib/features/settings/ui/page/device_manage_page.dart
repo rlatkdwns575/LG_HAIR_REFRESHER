@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -86,7 +87,11 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
               onRefresh: _loadDevice,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 24),
+                padding: AppSystemInsets.pageHorizontal(
+                  context,
+                  top: AppSpacing.lg,
+                  extraBottom: 24,
+                ),
                 children: [
                   DeviceManageStatusPanel(device: _device),
                   const SizedBox(height: AppSpacing.lg),

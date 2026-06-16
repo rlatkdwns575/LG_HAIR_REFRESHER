@@ -65,7 +65,7 @@ class HomeQuickRefreshRow extends StatelessWidget {
         final isFavorite = slot.type == HomeQuickSlotType.favoriteMode;
         return _RefreshModeQuickCard(
           mode: mode,
-          leadingBadgeLabel: isFavorite ? '즐겨찾기' : null,
+          leadingBadgeLabel: isFavorite ? '즐겨찾기' : '자주쓰는',
           enabled: _isModeEnabled(mode),
           onPressed: () => _handleModePressed(mode),
         );

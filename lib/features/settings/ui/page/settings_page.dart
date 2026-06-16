@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -126,7 +127,11 @@ class _SettingsPageState extends State<SettingsPage> {
               onRefresh: _loadSettings,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 24),
+                padding: AppSystemInsets.pageHorizontal(
+                  context,
+                  top: AppSpacing.lg,
+                  extraBottom: 24,
+                ),
                 children: [
                   Text(
                     '디바이스, 로컬 캘린더, 알림을 관리합니다.',

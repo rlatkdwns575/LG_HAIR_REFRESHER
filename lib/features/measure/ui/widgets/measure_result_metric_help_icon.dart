@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -55,31 +56,34 @@ class MeasureResultMetricHelpIcon extends StatelessWidget {
       barrierColor: Colors.black26,
       builder: (dialogContext) {
         return Center(
-          child: GestureDetector(
-            onTap: () => Navigator.of(dialogContext).pop(),
-            child: Material(
-              type: MaterialType.transparency,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 40),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.gray0,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: AppColors.gray200),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x1A000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
+          child: ConstrainedBox(
+            constraints: AppLayout.popupConstraintsFor(dialogContext),
+            child: GestureDetector(
+              onTap: () => Navigator.of(dialogContext).pop(),
+              child: Material(
+                type: MaterialType.transparency,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.gray0,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.gray200),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 12,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    message,
+                    style: AppTextStyles.bodyXs.copyWith(
+                      color: AppColors.gray800,
+                      fontWeight: FontWeight.w500,
+                      height: 16 / 12,
                     ),
-                  ],
-                ),
-                child: Text(
-                  message,
-                  style: AppTextStyles.bodyXs.copyWith(
-                    color: AppColors.gray800,
-                    fontWeight: FontWeight.w500,
-                    height: 16 / 12,
                   ),
                 ),
               ),
