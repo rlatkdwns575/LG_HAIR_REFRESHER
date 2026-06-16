@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/services/device_consumable_service.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
@@ -13,9 +14,10 @@ import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
-import '../../data/model/refresh_result.dart';
+import '../../data/refresh_mode_availability.dart';
 import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_result_store.dart';
+import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_progress_ring.dart';
 import '../widgets/refresh_progress_step_strip.dart';
 
@@ -31,6 +33,7 @@ class RefreshProgressPage extends StatefulWidget {
 
 class _RefreshProgressPageState extends State<RefreshProgressPage> {
   late final RefreshProgressSession _session;
+  late final RefreshMode _executedMode;
   late int _totalRemainingSeconds;
   late int _stepRemainingSeconds;
   late int _activeStepIndex;
@@ -50,11 +53,27 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   void initState() {
     super.initState();
     final mode = widget.mode ?? _resolveFallbackMode();
+    _executedMode = mode;
     _session = RefreshProgressSession.fromMode(mode);
     _totalRemainingSeconds = _session.totalDurationSeconds;
     _activeStepIndex = 0;
     _stepRemainingSeconds = _session.steps.first.durationSeconds;
     _startTimer();
+    unawaited(_validateScentCartridge(mode));
+  }
+
+  Future<void> _validateScentCartridge(RefreshMode mode) async {
+    if (!mode.scentYn) {
+      return;
+    }
+
+    final cartridge = await const DeviceConsumableService()
+        .fetchScentCartridgeStatus();
+    if (!RefreshModeAvailability.isEnabled(mode, cartridge) && mounted) {
+      _timer?.cancel();
+      showRefreshScentUnavailableSnackBar(context);
+      context.pop();
+    }
   }
 
   RefreshMode _resolveFallbackMode() {
@@ -114,9 +133,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     _navigated = true;
     _timer?.cancel();
 
-    RefreshResultStore.instance.setPending(
-      RefreshResult.fromProgressSession(session: _session, mode: widget.mode),
-    );
+    RefreshResultStore.instance.setPendingMode(_executedMode);
 
     Future<void>.delayed(_completionHold, () {
       if (!mounted) {

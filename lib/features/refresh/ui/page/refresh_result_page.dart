@@ -4,10 +4,14 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../data/api/refresh_api.dart';
 import '../../data/model/refresh_result.dart';
+import '../../data/refresh_mode_availability.dart';
 import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_result_store.dart';
+import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_result_content.dart';
 
 /// Figma 622-13066 — 리프레시 완료 후 최종 결과 화면.
@@ -19,12 +23,28 @@ class RefreshResultPage extends StatefulWidget {
 }
 
 class _RefreshResultPageState extends State<RefreshResultPage> {
+  final _deviceConsumableService = const DeviceConsumableService();
   late final RefreshResult _result;
+  bool _isCartridgeLoading = true;
+  bool _isScentCartridgeAttached = false;
 
   @override
   void initState() {
     super.initState();
     _result = RefreshResultStore.instance.consume();
+    _loadScentCartridgeStatus();
+  }
+
+  Future<void> _loadScentCartridgeStatus() async {
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _isScentCartridgeAttached = cartridge.isAttached;
+      _isCartridgeLoading = false;
+    });
   }
 
   void _goHome() => context.goHome();
@@ -48,6 +68,17 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+      return;
+    }
+
+    if (!RefreshModeAvailability.isEnabled(
+      mode,
+      ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
+    )) {
+      if (!mounted) {
+        return;
+      }
+      showRefreshScentUnavailableSnackBar(context);
       return;
     }
 
@@ -86,6 +117,8 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
               result: _result,
               onDetailTap: _onDetailTap,
               onRecommendTap: _onRecommendTap,
+              isScentRecommendEnabled:
+                  !_isCartridgeLoading && _isScentCartridgeAttached,
             ),
           ],
         ),

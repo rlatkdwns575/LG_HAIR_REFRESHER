@@ -5,11 +5,13 @@ class HomeQuickRefreshMode {
     required this.title,
     required this.durationLabel,
     this.captionItems = const [],
+    this.requiresScentCartridge = false,
   });
 
   final String title;
   final String durationLabel;
   final List<String> captionItems;
+  final bool requiresScentCartridge;
 }
 
 /// 첫 진입 또는 추천 모드를 못 가져올 때 노출하는 기본 리프레시 카드.

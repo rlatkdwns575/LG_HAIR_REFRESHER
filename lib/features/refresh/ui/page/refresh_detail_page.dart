@@ -9,12 +9,16 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../../../core/services/device_consumable_service.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_mode_detail.dart';
+import '../../data/refresh_mode_availability.dart';
+import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_detail_timeline.dart';
 
 /// Figma Design `리프레시 상세` (833:14941 · 823:26534 · 833:15046).
-class RefreshDetailPage extends StatelessWidget {
+class RefreshDetailPage extends StatefulWidget {
   const RefreshDetailPage({required this.mode, super.key});
 
   final RefreshMode mode;
@@ -33,6 +37,47 @@ class RefreshDetailPage extends StatelessWidget {
       stepCount >= 3 ? _headerToTimelineThreeSteps : _headerToTimeline;
 
   @override
+  State<RefreshDetailPage> createState() => _RefreshDetailPageState();
+}
+
+class _RefreshDetailPageState extends State<RefreshDetailPage> {
+  final _deviceConsumableService = const DeviceConsumableService();
+
+  ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
+  bool _isLoading = true;
+
+  RefreshMode get mode => widget.mode;
+
+  bool get _isModeEnabled =>
+      RefreshModeAvailability.isEnabled(mode, _scentCartridge);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartridgeStatus();
+  }
+
+  Future<void> _loadCartridgeStatus() async {
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _scentCartridge = cartridge;
+      _isLoading = false;
+    });
+  }
+
+  void _onStartPressed() {
+    if (!_isModeEnabled) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
+    context.pushRefreshProgress(mode: mode);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final detail = RefreshModeDetail.fromMode(mode);
     final stepCount = detail.steps.length;
@@ -44,71 +89,105 @@ class RefreshDetailPage extends StatelessWidget {
         title: '헤어 리프레시 상세',
         onBack: () => context.pop(),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: _horizontalPadding,
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: _topInsetFor(stepCount)),
-                            _HeaderSection(
-                              modeName: mode.name,
-                              careTags: detail.careTags,
-                            ),
-                            SizedBox(height: _headerToTimelineFor(stepCount)),
-                            RefreshDetailTimeline(
-                              totalDurationLabel: detail.totalDurationLabel,
-                              steps: detail.steps,
-                            ),
-                            const Spacer(),
-                            const SizedBox(height: _timelineToPrecheckMin),
-                            Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 320,
-                                ),
-                                child: _PreCheckSection(
-                                  items: detail.preCheckItems,
-                                ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal:
+                                    RefreshDetailPage._horizontalPadding,
+                              ),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: RefreshDetailPage._topInsetFor(
+                                      stepCount,
+                                    ),
+                                  ),
+                                  _HeaderSection(
+                                    modeName: mode.name,
+                                    careTags: detail.careTags,
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        RefreshDetailPage._headerToTimelineFor(
+                                          stepCount,
+                                        ),
+                                  ),
+                                  RefreshDetailTimeline(
+                                    totalDurationLabel:
+                                        detail.totalDurationLabel,
+                                    steps: detail.steps,
+                                  ),
+                                  const Spacer(),
+                                  const SizedBox(
+                                    height: RefreshDetailPage
+                                        ._timelineToPrecheckMin,
+                                  ),
+                                  Center(
+                                    child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 320,
+                                      ),
+                                      child: _PreCheckSection(
+                                        items: detail.preCheckItems,
+                                      ),
+                                    ),
+                                  ),
+                                  if (!_isModeEnabled) ...[
+                                    const SizedBox(height: AppSpacing.md),
+                                    Text(
+                                      RefreshModeAvailability.unavailableReason,
+                                      textAlign: TextAlign.center,
+                                      style: AppTextStyles.bodyS.copyWith(
+                                        color: AppColors.gray500,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: AppSpacing.lg),
+                                  _SelectOtherModeLink(
+                                    onPressed: () => context.pop(),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xl),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.lg),
-                            _SelectOtherModeLink(
-                              onPressed: () => context.pop(),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                          ],
+                          ),
                         ),
-                      ),
+                      );
+                    },
+                  ),
+                ),
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      15,
+                      AppSpacing.md,
+                      15,
+                      20,
+                    ),
+                    child: AppBoxButton(
+                      label: '시작하기',
+                      variant: _isModeEnabled
+                          ? AppBoxButtonVariant.active
+                          : AppBoxButtonVariant.disabled,
+                      onPressed: _onStartPressed,
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(15, AppSpacing.md, 15, 20),
-              child: AppBoxButton(
-                label: '시작하기',
-                onPressed: () => context.pushRefreshProgress(mode: mode),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/widgets/refresh_mode_card.dart';
 import '../../data/api/measure_result_mapper.dart';
 import '../../data/model/measure_result.dart';
@@ -16,6 +17,7 @@ class MeasureResultContent extends StatelessWidget {
     required this.result,
     required this.onDetailTap,
     required this.onRecommendTap,
+    this.isRecommendEnabled = true,
     super.key,
   });
 
@@ -25,6 +27,7 @@ class MeasureResultContent extends StatelessWidget {
   final MeasureResult result;
   final VoidCallback onDetailTap;
   final VoidCallback onRecommendTap;
+  final bool isRecommendEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +61,10 @@ class MeasureResultContent extends StatelessWidget {
           mode: result.recommendedMode,
           variant: RefreshModeCardVariant.featured,
           badgeLabel: '추천',
+          enabled: isRecommendEnabled,
+          disabledReason: isRecommendEnabled
+              ? null
+              : RefreshModeAvailability.unavailableReason,
           onTap: onRecommendTap,
           onAction: onRecommendTap,
         ),

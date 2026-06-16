@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import '../../../measure/data/model/measure_result_record.dart';
+import '../api/refresh_session_result_generator.dart';
 import '../refresh_mode_catalog.dart';
 import 'refresh_mode.dart';
 import 'refresh_pollution_level.dart';
@@ -18,6 +22,10 @@ class RefreshResult {
     required this.disclaimer,
     required this.dustChange,
     required this.odorChange,
+    this.odorBeforeScore,
+    this.odorAfterScore,
+    this.dustBeforeScore,
+    this.dustAfterScore,
     this.recommendedMode,
     this.detailLinkLabel = '리프레시 결과 자세히 보기',
     this.showChangeChart = true,
@@ -33,6 +41,10 @@ class RefreshResult {
   final String disclaimer;
   final RefreshResultChange dustChange;
   final RefreshResultChange odorChange;
+  final int? odorBeforeScore;
+  final int? odorAfterScore;
+  final int? dustBeforeScore;
+  final int? dustAfterScore;
   final RefreshMode? recommendedMode;
   final String detailLinkLabel;
   final bool showChangeChart;
@@ -50,60 +62,24 @@ class RefreshResult {
     return '${value.toStringAsFixed(1)}%';
   }
 
-  /// 진행 세션 기반 mock 결과. 실제 API 연동 시 이 factory를 교체합니다.
+  /// 진행 세션 완료 시 [RefreshSessionResultGenerator]로 결과를 생성합니다.
   factory RefreshResult.fromProgressSession({
     required RefreshProgressSession session,
     RefreshMode? mode,
+    MeasureResultRecord? baseline,
+    Random? random,
   }) {
-    if (mode != null && mode.isScentOnlyCare) {
-      return RefreshResult(
-        dustRemovalPercent: 0,
-        odorRemovalPercent: 0,
-        overallImprovementPercent: 100,
-        headlineBefore: '은은한 향기 케어가',
-        headlineAfter: '완료되었어요.',
-        disclaimer: '향기는 시간이 지나면 희미해질 수 있어요.',
-        dustChange: const RefreshResultChange(
-          label: '먼지',
-          beforeLevel: RefreshPollutionLevel.good,
-          afterLevel: RefreshPollutionLevel.good,
-        ),
-        odorChange: const RefreshResultChange(
-          label: '냄새',
-          beforeLevel: RefreshPollutionLevel.good,
-          afterLevel: RefreshPollutionLevel.good,
-        ),
-        showChangeChart: false,
-        isScentCareResult: true,
-        showImprovementPercent: false,
-      );
+    if (mode == null) {
+      return RefreshResult.sample;
     }
 
-    return RefreshResult(
-      dustRemovalPercent: 87,
-      odorRemovalPercent: 92,
-      overallImprovementPercent: 40.9,
-      headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-      headlineAfter: '개선되었어요.',
-      disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
-      dustChange: const RefreshResultChange(
-        label: '먼지',
-        beforeLevel: RefreshPollutionLevel.high,
-        afterLevel: RefreshPollutionLevel.good,
-      ),
-      odorChange: const RefreshResultChange(
-        label: '냄새',
-        beforeLevel: RefreshPollutionLevel.veryHigh,
-        afterLevel: RefreshPollutionLevel.normal,
-      ),
-      recommendedMode: _shouldRecommendScentCare(mode)
-          ? resolveScentCareMode()
-          : null,
-    );
+    return RefreshSessionResultGenerator()
+        .generate(mode: mode, baseline: baseline, random: random)
+        .result;
   }
 
   /// 실행 모드에 향기 케어가 이미 포함되면 추천하지 않습니다.
-  static bool _shouldRecommendScentCare(RefreshMode? mode) {
+  static bool shouldRecommendScentCare(RefreshMode? mode) {
     if (mode == null) {
       return true;
     }

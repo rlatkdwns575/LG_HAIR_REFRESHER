@@ -45,12 +45,7 @@ class RefreshResultDetailPage extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          0,
-          AppSpacing.md,
-          0,
-          AppSpacing.xl,
-        ),
+        padding: const EdgeInsets.fromLTRB(0, AppSpacing.md, 0, AppSpacing.xl),
         children: [RefreshResultDetailContent(detail: detail)],
       ),
     );

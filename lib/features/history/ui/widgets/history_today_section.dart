@@ -103,42 +103,34 @@ class _TodayRecordTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Flexible(
-              child: Text(
-                record.modeName,
-                style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              formatKoreanTime(record.dateTime),
-              style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: onDetailTap,
-              behavior: HitTestBehavior.opaque,
+            Expanded(
               child: Row(
                 children: [
-                  Text(
-                    '상세보기',
-                    style: AppTextStyles.labelM.copyWith(
-                      color: AppColors.gray500,
+                  Flexible(
+                    child: Text(
+                      record.modeName,
+                      style: AppTextStyles.bodyM2.copyWith(
+                        color: AppColors.gray900,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right,
-                    size: 14,
-                    color: AppColors.gray400,
+                  const SizedBox(width: 8),
+                  Text(
+                    formatKoreanTime(record.dateTime),
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: AppColors.gray500,
+                    ),
                   ),
                 ],
               ),
             ),
+            HistoryDetailLink(label: '상세보기', onTap: onDetailTap),
           ],
         ),
         const SizedBox(height: AppSpacing.md),

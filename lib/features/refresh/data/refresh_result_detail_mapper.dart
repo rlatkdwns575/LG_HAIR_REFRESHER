@@ -9,10 +9,22 @@ class RefreshResultDetailMapper {
   const RefreshResultDetailMapper._();
 
   static RefreshResultDetail fromRefreshResult(RefreshResult result) {
-    final odorBefore = _percentFromPollution(result.odorChange.beforeLevel);
-    final odorAfter = _percentFromPollution(result.odorChange.afterLevel);
-    final dustBefore = _percentFromPollution(result.dustChange.beforeLevel);
-    final dustAfter = _percentFromPollution(result.dustChange.afterLevel);
+    final odorBefore = _resolveMetricPercent(
+      score: result.odorBeforeScore,
+      level: result.odorChange.beforeLevel,
+    );
+    final odorAfter = _resolveMetricPercent(
+      score: result.odorAfterScore,
+      level: result.odorChange.afterLevel,
+    );
+    final dustBefore = _resolveMetricPercent(
+      score: result.dustBeforeScore,
+      level: result.dustChange.beforeLevel,
+    );
+    final dustAfter = _resolveMetricPercent(
+      score: result.dustAfterScore,
+      level: result.dustChange.afterLevel,
+    );
 
     return RefreshResultDetail(
       modeName: _modeNameFromResult(result),
@@ -40,10 +52,14 @@ class RefreshResultDetailMapper {
       odorSection: _odorSection(
         before: result.odorChange.beforeLevel,
         after: result.odorChange.afterLevel,
+        beforeScore: result.odorBeforeScore,
+        afterScore: result.odorAfterScore,
       ),
       dustSection: _dustSection(
         before: result.dustChange.beforeLevel,
         after: result.dustChange.afterLevel,
+        beforeScore: result.dustBeforeScore,
+        afterScore: result.dustAfterScore,
       ),
       hairSection: RefreshResultDetail.sample.hairSection,
     );
@@ -100,9 +116,11 @@ class RefreshResultDetailMapper {
   static RefreshResultStatusSection _odorSection({
     required RefreshPollutionLevel before,
     required RefreshPollutionLevel after,
+    int? beforeScore,
+    int? afterScore,
   }) {
-    final beforeScore = _scoreFromPollution(before);
-    final afterScore = _scoreFromPollution(after);
+    final resolvedBeforeScore = beforeScore ?? _scoreFromPollution(before);
+    final resolvedAfterScore = afterScore ?? _scoreFromPollution(after);
 
     return RefreshResultStatusSection(
       title: RefreshResultDetail.sample.odorSection.title,
@@ -111,21 +129,21 @@ class RefreshResultDetailMapper {
       changes: [
         _makeScoreChange(
           label: '잔여 냄새 수준',
-          beforeScore: beforeScore,
-          afterScore: afterScore,
+          beforeScore: resolvedBeforeScore,
+          afterScore: resolvedAfterScore,
         ),
         _makeScoreChange(
           label: '인지 가능도',
-          beforeScore: beforeScore,
-          afterScore: afterScore,
+          beforeScore: resolvedBeforeScore,
+          afterScore: resolvedAfterScore,
           usePerceptionScore: true,
           showHelpIcon: true,
           helpTooltipMessage: RefreshResultDetail.odorPerceptionHelpTooltip,
         ),
         _makeScoreChange(
           label: '잔류 가능성',
-          beforeScore: beforeScore,
-          afterScore: afterScore,
+          beforeScore: resolvedBeforeScore,
+          afterScore: resolvedAfterScore,
         ),
       ],
     );
@@ -168,9 +186,11 @@ class RefreshResultDetailMapper {
   static RefreshResultStatusSection _dustSection({
     required RefreshPollutionLevel before,
     required RefreshPollutionLevel after,
+    int? beforeScore,
+    int? afterScore,
   }) {
-    final beforeScore = _scoreFromPollution(before);
-    final afterScore = _scoreFromPollution(after);
+    final resolvedBeforeScore = beforeScore ?? _scoreFromPollution(before);
+    final resolvedAfterScore = afterScore ?? _scoreFromPollution(after);
 
     return RefreshResultStatusSection(
       title: RefreshResultDetail.sample.dustSection.title,
@@ -179,13 +199,13 @@ class RefreshResultDetailMapper {
       changes: [
         _makeScoreChange(
           label: '먼지량',
-          beforeScore: beforeScore,
-          afterScore: afterScore,
+          beforeScore: resolvedBeforeScore,
+          afterScore: resolvedAfterScore,
         ),
         _makeScoreChange(
           label: '분포 범위',
-          beforeScore: beforeScore,
-          afterScore: afterScore,
+          beforeScore: resolvedBeforeScore,
+          afterScore: resolvedAfterScore,
         ),
       ],
     );
@@ -254,6 +274,16 @@ class RefreshResultDetailMapper {
       return '향기 케어';
     }
     return '리프레시 모드';
+  }
+
+  static double _resolveMetricPercent({
+    required int? score,
+    required RefreshPollutionLevel level,
+  }) {
+    if (score != null) {
+      return score.toDouble();
+    }
+    return _percentFromPollution(level);
   }
 
   static int _scoreFromPollution(RefreshPollutionLevel level) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
 import '../../data/model/refresh_result.dart';
+import '../../data/refresh_mode_availability.dart';
 import 'refresh_mode_card.dart';
 import 'refresh_result_change_chart.dart';
 import 'refresh_result_headline.dart';
@@ -14,12 +15,14 @@ class RefreshResultContent extends StatelessWidget {
     required this.result,
     required this.onDetailTap,
     required this.onRecommendTap,
+    this.isScentRecommendEnabled = true,
     super.key,
   });
 
   final RefreshResult result;
   final VoidCallback onDetailTap;
   final VoidCallback onRecommendTap;
+  final bool isScentRecommendEnabled;
 
   /// 헤더(리프레시 결과 / 2시간) 아래 콘텐츠를 내리기 위한 여백.
   static const _headerToHeadlineGap = 64.0;
@@ -55,6 +58,10 @@ class RefreshResultContent extends StatelessWidget {
           RefreshModeCard(
             mode: result.recommendedMode!,
             variant: RefreshModeCardVariant.featured,
+            enabled: isScentRecommendEnabled,
+            disabledReason: isScentRecommendEnabled
+                ? null
+                : RefreshModeAvailability.unavailableReason,
             onTap: onRecommendTap,
             onAction: onRecommendTap,
           ),

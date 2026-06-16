@@ -10,7 +10,8 @@ import '../../features/auth/ui/page/signup_step_two_screen.dart';
 import '../../features/history/ui/page/history_page.dart';
 import '../../features/home/ui/page/home_page.dart';
 import '../../features/home/ui/page/home_refresh_shortcut_add_page.dart';
-import '../../features/measure/ui/page/measure_page.dart';
+import '../../features/measure/ui/page/measure_hair_profile_page.dart';
+import '../../features/measure/ui/page/measure_prepare_page.dart';
 import '../../features/measure/ui/page/measure_analyzing_page.dart';
 import '../../features/measure/data/model/measure_care_level.dart';
 import '../../features/measure/data/model/measure_result.dart';
@@ -26,6 +27,8 @@ import '../../features/refresh/ui/page/refresh_progress_page.dart';
 import '../../features/refresh/ui/page/refresh_result_collecting_page.dart';
 import '../../features/refresh/ui/page/refresh_result_detail_page.dart';
 import '../../features/refresh/ui/page/refresh_result_page.dart';
+import '../../features/settings/ui/page/device_manage_page.dart';
+import '../../features/settings/ui/page/local_calendar_settings_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
 import '../../shared/widgets/shared_widget_gallery_page.dart';
 
@@ -72,8 +75,13 @@ final appRouter = GoRouter(
     GoRoute(
       name: AppRouteNames.measure,
       path: AppRoutePaths.measure,
-      builder: (context, state) => const MeasurePage(),
+      builder: (context, state) => const MeasureHairProfilePage(),
       routes: [
+        GoRoute(
+          name: AppRouteNames.measurePrepare,
+          path: 'prepare',
+          builder: (context, state) => const MeasurePreparePage(),
+        ),
         GoRoute(
           name: AppRouteNames.measureRun,
           path: 'run',
@@ -177,6 +185,16 @@ final appRouter = GoRouter(
       name: AppRouteNames.settings,
       path: AppRoutePaths.settings,
       builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.settingsDevice,
+      path: AppRoutePaths.settingsDevice,
+      builder: (context, state) => const DeviceManagePage(),
+    ),
+    GoRoute(
+      name: AppRouteNames.settingsLocalCalendar,
+      path: AppRoutePaths.settingsLocalCalendar,
+      builder: (context, state) => const LocalCalendarSettingsPage(),
     ),
     GoRoute(
       name: AppRouteNames.widgetGallery,

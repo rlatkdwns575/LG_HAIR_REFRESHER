@@ -17,6 +17,8 @@ class RefreshModeCard extends StatelessWidget {
     required this.mode,
     this.variant = RefreshModeCardVariant.list,
     this.badgeLabel,
+    this.enabled = true,
+    this.disabledReason,
     this.onTap,
     this.onAction,
     this.onDelete,
@@ -26,6 +28,8 @@ class RefreshModeCard extends StatelessWidget {
   final RefreshMode mode;
   final RefreshModeCardVariant variant;
   final String? badgeLabel;
+  final bool enabled;
+  final String? disabledReason;
   final VoidCallback? onTap;
   final VoidCallback? onAction;
   final VoidCallback? onDelete;
@@ -33,6 +37,8 @@ class RefreshModeCard extends StatelessWidget {
   String get _badge => badgeLabel ?? mode.category;
 
   bool get _isUserCustomMode => mode.isCustom || mode.createdByUser;
+
+  double get _contentOpacity => enabled ? 1 : 0.5;
 
   @override
   Widget build(BuildContext context) {
@@ -46,46 +52,63 @@ class RefreshModeCard extends StatelessWidget {
   Widget _buildFeatured() {
     return _CardShell(
       backgroundColor: AppColors.primary100,
-      borderColor: AppColors.primary200,
-      boxShadow: AppShadows.soft,
+      borderColor: enabled ? AppColors.primary200 : AppColors.gray200,
+      boxShadow: enabled ? AppShadows.soft : null,
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  mode.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.titleS.copyWith(
-                    color: AppColors.primary900,
+      child: Opacity(
+        opacity: _contentOpacity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    mode.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.titleS.copyWith(
+                      color: enabled ? AppColors.primary900 : AppColors.gray500,
+                    ),
                   ),
                 ),
-              ),
-              if (_isUserCustomMode) ...[
-                const SizedBox(width: 6),
-                _Badge(label: RefreshModeTabs.customModeTab),
+                if (_isUserCustomMode) ...[
+                  const SizedBox(width: 6),
+                  _Badge(label: RefreshModeTabs.customModeTab),
+                ],
+                const SizedBox(width: AppSpacing.sm),
+                DurationBadge(totalSeconds: mode.durationSeconds),
               ],
-              const SizedBox(width: AppSpacing.sm),
-              DurationBadge(totalSeconds: mode.durationSeconds),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppText(
+              mode.description,
+              style: AppTextStyles.bodyS.copyWith(
+                color: enabled ? AppColors.gray700 : AppColors.gray500,
+              ),
+            ),
+            if (!enabled && disabledReason != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                disabledReason!,
+                style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
+              ),
             ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          AppText(
-            mode.description,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray700),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(child: _MetaRow(mode: mode)),
-              _ArrowButton(onPressed: onAction ?? onTap),
-            ],
-          ),
-        ],
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: _MetaRow(mode: mode, enabled: enabled),
+                ),
+                _ArrowButton(
+                  onPressed: enabled ? (onAction ?? onTap) : onTap,
+                  enabled: enabled,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,38 +143,50 @@ class RefreshModeCard extends StatelessWidget {
   Widget _buildList() {
     return _ListCardShell(
       onTap: onTap,
-      onDelete: onDelete,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DurationBadge(totalSeconds: mode.durationSeconds),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Flexible(
-                child: Text(
-                  mode.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.titleS.copyWith(
-                    color: AppColors.primary900,
+      onDelete: enabled ? onDelete : null,
+      child: Opacity(
+        opacity: _contentOpacity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DurationBadge(totalSeconds: mode.durationSeconds),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    mode.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.titleS.copyWith(
+                      color: enabled ? AppColors.primary900 : AppColors.gray500,
+                    ),
                   ),
                 ),
-              ),
-              if (_isUserCustomMode) ...[
-                const SizedBox(width: 6),
-                _Badge(label: RefreshModeTabs.customModeTab),
+                if (_isUserCustomMode) ...[
+                  const SizedBox(width: 6),
+                  _Badge(label: RefreshModeTabs.customModeTab),
+                ],
               ],
+            ),
+            const SizedBox(height: 6),
+            AppText(
+              mode.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyS.copyWith(
+                color: enabled ? AppColors.gray500 : AppColors.gray400,
+              ),
+            ),
+            if (!enabled && disabledReason != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                disabledReason!,
+                style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
+              ),
             ],
-          ),
-          const SizedBox(height: 6),
-          AppText(
-            mode.description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -310,9 +345,10 @@ class _DurationLabel extends StatelessWidget {
 }
 
 class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.mode});
+  const _MetaRow({required this.mode, this.enabled = true});
 
   final RefreshMode mode;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +356,9 @@ class _MetaRow extends StatelessWidget {
       mode.tags.join('  ・  '),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: AppTextStyles.labelS.copyWith(color: AppColors.gray600),
+      style: AppTextStyles.labelS.copyWith(
+        color: enabled ? AppColors.gray600 : AppColors.gray400,
+      ),
     );
   }
 }
@@ -352,14 +390,15 @@ class _DeleteButton extends StatelessWidget {
 }
 
 class _ArrowButton extends StatelessWidget {
-  const _ArrowButton({this.onPressed});
+  const _ArrowButton({this.onPressed, this.enabled = true});
 
   final VoidCallback? onPressed;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.primary500,
+      color: enabled ? AppColors.primary500 : AppColors.gray300,
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(

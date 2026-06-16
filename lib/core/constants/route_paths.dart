@@ -13,6 +13,7 @@ class AppRoutePaths {
   /// 홈 허브 (하단 탭 없음 — 홈에서 버튼/리스트로 이동)
   static const home = '/';
   static const measure = '/measure';
+  static const measurePrepare = '/measure/prepare';
   static const measureRun = '/measure/run';
   static const measureAnalyzing = '/measure/analyzing';
   static const measureResult = '/measure/result';
@@ -28,6 +29,8 @@ class AppRoutePaths {
   static const refreshShortcutAdd = '/refresh/shortcut/add';
   static const history = '/history';
   static const settings = '/settings';
+  static const settingsDevice = '/settings/device';
+  static const settingsLocalCalendar = '/settings/calendar';
 
   static const widgetGallery = '/dev/widgets';
 }
@@ -41,6 +44,7 @@ class AppRouteNames {
   static const signUpStepTwo = 'signUpStepTwo';
   static const home = 'home';
   static const measure = 'measure';
+  static const measurePrepare = 'measurePrepare';
   static const measureRun = 'measureRun';
   static const measureAnalyzing = 'measureAnalyzing';
   static const measureResult = 'measureResult';
@@ -56,5 +60,7 @@ class AppRouteNames {
   static const refreshShortcutAdd = 'refreshShortcutAdd';
   static const history = 'history';
   static const settings = 'settings';
+  static const settingsDevice = 'settingsDevice';
+  static const settingsLocalCalendar = 'settingsLocalCalendar';
   static const widgetGallery = 'widgetGallery';
 }

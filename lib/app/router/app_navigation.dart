@@ -20,6 +20,8 @@ extension AppNavigation on BuildContext {
 
   void pushMeasure() => push(AppRoutePaths.measure);
 
+  void pushMeasurePrepare() => push(AppRoutePaths.measurePrepare);
+
   void pushMeasureRun() => push(AppRoutePaths.measureRun);
 
   void pushMeasureAnalyzing() => push(AppRoutePaths.measureAnalyzing);
@@ -87,11 +89,18 @@ extension AppNavigation on BuildContext {
 
   void pushSettings() => push(AppRoutePaths.settings);
 
+  void pushDeviceManage() => push(AppRoutePaths.settingsDevice);
+
+  Future<void> pushLocalCalendarSettings() =>
+      push(AppRoutePaths.settingsLocalCalendar);
+
   void pushWidgetGallery() => push(AppRoutePaths.widgetGallery);
 
   void goHomeNamed() => goNamed(AppRouteNames.home);
 
   void pushMeasureNamed() => pushNamed(AppRouteNames.measure);
+
+  void pushMeasurePrepareNamed() => pushNamed(AppRouteNames.measurePrepare);
 
   void pushMeasureRunNamed() => pushNamed(AppRouteNames.measureRun);
 
@@ -118,6 +127,11 @@ extension AppNavigation on BuildContext {
   void pushHistoryNamed() => pushNamed(AppRouteNames.history);
 
   void pushSettingsNamed() => pushNamed(AppRouteNames.settings);
+
+  void pushDeviceManageNamed() => pushNamed(AppRouteNames.settingsDevice);
+
+  void pushLocalCalendarSettingsNamed() =>
+      pushNamed(AppRouteNames.settingsLocalCalendar);
 
   void pushWidgetGalleryNamed() => pushNamed(AppRouteNames.widgetGallery);
 }

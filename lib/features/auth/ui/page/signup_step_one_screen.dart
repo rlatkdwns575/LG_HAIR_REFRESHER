@@ -118,13 +118,7 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '* 비밀번호 조건',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AuthScreenStyles.textMuted,
-                ),
-              ),
+              buildAuthPasswordRulesHint(),
               const Spacer(),
               AuthPrimaryButton(
                 label: '다음',

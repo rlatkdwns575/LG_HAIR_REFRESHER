@@ -293,6 +293,7 @@ class HomeApi {
         title: mode['display_name'] as String? ?? '퀵 리프레시',
         durationLabel: _formatDurationLabel(durationTime),
         captionItems: _buildCaptionItems(mode),
+        requiresScentCartridge: mode['scent_yn'] == true,
       );
     } catch (error, stackTrace) {
       debugPrint('HomeApi frequent mode lookup failed: $error\n$stackTrace');
