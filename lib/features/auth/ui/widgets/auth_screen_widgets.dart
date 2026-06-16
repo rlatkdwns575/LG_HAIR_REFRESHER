@@ -186,3 +186,43 @@ Widget buildPasswordVisibilityIcon({
     ),
   );
 }
+
+Widget buildAuthPasswordRulesHint() {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Text(
+        '* 비밀번호 조건',
+        style: TextStyle(fontSize: 12, color: AuthScreenStyles.textMuted),
+      ),
+      const SizedBox(width: 6),
+      Tooltip(
+        message: AuthCredentialsValidator.passwordRulesDescription,
+        preferBelow: true,
+        waitDuration: const Duration(milliseconds: 150),
+        showDuration: const Duration(seconds: 8),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.help,
+          child: Container(
+            width: 18,
+            height: 18,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AuthScreenStyles.textMuted, width: 1),
+            ),
+            child: const Text(
+              '?',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                height: 1,
+                color: AuthScreenStyles.textMuted,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}

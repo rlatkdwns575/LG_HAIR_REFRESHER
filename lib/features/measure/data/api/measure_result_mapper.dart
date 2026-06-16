@@ -101,8 +101,10 @@ class MeasureResultMapper {
   static (String label, AppBadgeSmallVariant variant) badgeForHairThickness(
     String? raw, {
     String fallbackLabel = '-',
-  }) =>
-      MetricBadgeMapper.badgeForHairThickness(raw, fallbackLabel: fallbackLabel);
+  }) => MetricBadgeMapper.badgeForHairThickness(
+    raw,
+    fallbackLabel: fallbackLabel,
+  );
 
   static (String label, AppBadgeSmallVariant variant) badgeForHairAttribute(
     String? raw, {

@@ -61,4 +61,10 @@ class AuthCredentialsValidator {
     }
     return null;
   }
+
+  /// 회원가입 비밀번호 조건 안내 (툴팁용).
+  static const passwordRulesDescription =
+      '• 한글(자음·모음·완성형)은 사용할 수 없습니다.\n'
+      '• 영문, 숫자, 특수문자를 조합해 입력해 주세요.\n'
+      '• 공백만으로는 설정할 수 없습니다.';
 }

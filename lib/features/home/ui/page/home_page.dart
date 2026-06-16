@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/services/device_consumable_service.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -16,6 +17,7 @@ import '../../../refresh/data/api/refresh_recommend_api.dart';
 import '../../../refresh/data/api/refresh_recommend_fallback.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
+import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
 import '../../data/api/weather_api.dart';
@@ -52,9 +54,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshApi = const RefreshApi();
   final _geminiRecommendApi = const GeminiRecommendApi();
   final _refreshRecommendApi = const RefreshRecommendApi();
+  final _deviceConsumableService = const DeviceConsumableService();
 
   HomeDashboardData _dashboardData = const HomeDashboardData();
   bool _isLoading = true;
+  bool _isScentCartridgeAttached = false;
   String? _recommendMessage;
   HomeQuickRefreshMode? get _favoriteMode =>
       HomeShortcutStore.instance.favoriteQuickMode;
@@ -178,11 +182,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
     }
 
+    final cartridge = await _deviceConsumableService
+        .fetchScentCartridgeStatus();
+
     setState(() {
       _dashboardData = dashboard.copyWith(
         hasRecentDiagnosisResult: hasRecentDiagnosis,
       );
       _recommendMessage = recommendMessage;
+      _isScentCartridgeAttached = cartridge.isAttached;
       _isLoading = false;
     });
 
@@ -310,7 +318,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 children: [
                   HomeDeviceStatusSection(
                     data: _dashboardData,
-                    onDeviceManagePressed: () {},
+                    onDeviceManagePressed: context.pushDeviceManage,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -326,7 +334,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ],
                         HomeQuickRefreshRow(
                           slots: _quickSlots,
+                          isScentCartridgeAttached: _isScentCartridgeAttached,
                           onFavoriteAddPressed: _handleFavoriteAdd,
+                          onScentUnavailable: () =>
+                              showRefreshScentUnavailableSnackBar(context),
                           onModePressed: (mode) =>
                               context.pushRefreshProgress(modeName: mode.title),
                         ),

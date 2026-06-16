@@ -29,6 +29,7 @@ extension RefreshModeHomeShortcut on RefreshMode {
       title: name,
       durationLabel: durationLabel,
       captionItems: tags.isNotEmpty ? tags : [category],
+      requiresScentCartridge: scentYn,
     );
   }
 }

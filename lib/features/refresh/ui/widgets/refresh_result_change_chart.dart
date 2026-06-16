@@ -167,8 +167,8 @@ class _RefreshResultChangeChartPainter extends CustomPainter {
     for (var row = 0; row < changes.length; row++) {
       final change = changes[row];
       final centerY = rowHeight * row + rowHeight / 2;
-      final startX = chartLeft + chartWidth * change.beforeLevel.axisFraction;
-      final endX = chartLeft + chartWidth * change.afterLevel.axisFraction;
+      final startX = chartLeft + chartWidth * change.beforeAxisFraction;
+      final endX = chartLeft + chartWidth * change.afterAxisFraction;
       final left = startX < endX ? startX : endX;
       final right = startX < endX ? endX : startX;
 

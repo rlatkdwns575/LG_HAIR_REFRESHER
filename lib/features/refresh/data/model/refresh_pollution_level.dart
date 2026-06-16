@@ -20,4 +20,11 @@ enum RefreshPollutionLevel {
     final maxIndex = RefreshPollutionLevel.values.length - 1;
     return axisIndex / maxIndex;
   }
+
+  /// 오염 점수(0–100, 높을수록 관리 필요) → 차트 X 위치.
+  /// 왼쪽(0)이 나쁨, 오른쪽(1)이 좋음.
+  static double axisFractionFromScore(int score) {
+    final clamped = score.clamp(0, 100);
+    return 1 - (clamped / 100);
+  }
 }

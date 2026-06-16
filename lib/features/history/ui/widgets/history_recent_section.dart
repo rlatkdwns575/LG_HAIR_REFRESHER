@@ -263,9 +263,10 @@ class _SelectedDayCard extends StatelessWidget {
       backgroundColor: AppColors.gray50,
       borderColor: null,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Text(
@@ -275,25 +276,7 @@ class _SelectedDayCard extends StatelessWidget {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: onDetailTap,
-                behavior: HitTestBehavior.opaque,
-                child: Row(
-                  children: [
-                    Text(
-                      '결과 상세보기',
-                      style: AppTextStyles.labelM.copyWith(
-                        color: AppColors.gray500,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right,
-                      size: 14,
-                      color: AppColors.gray400,
-                    ),
-                  ],
-                ),
-              ),
+              HistoryDetailLink(label: '결과 상세보기', onTap: onDetailTap),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),

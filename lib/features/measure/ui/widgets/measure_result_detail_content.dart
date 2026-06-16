@@ -12,11 +12,13 @@ class MeasureResultDetailContent extends StatelessWidget {
   const MeasureResultDetailContent({
     required this.detail,
     this.onRecommendTap,
+    this.isRecommendEnabled = true,
     super.key,
   });
 
   final MeasureResultDetail detail;
   final VoidCallback? onRecommendTap;
+  final bool isRecommendEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class MeasureResultDetailContent extends StatelessWidget {
               MeasureResultDetailSummary(
                 detail: detail,
                 onRecommendTap: onRecommendTap,
+                isRecommendEnabled: isRecommendEnabled,
               ),
             ],
           ),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/constants/route_paths.dart';
@@ -80,7 +79,6 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
         variant: AppCommonTopHeaderVariant.gnb,
         title: '헤어 상태 진단',
         onBack: () => context.pop(),
-        onSettings: () => context.pushSettings(),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
