@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -79,7 +80,7 @@ Future<DateTime?> showHistoryMonthPicker({
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  AppText(
                     '년월 선택',
                     style: AppTextStyles.titleM.copyWith(
                       color: AppComponentColors.dialogText,
@@ -102,7 +103,7 @@ Future<DateTime?> showHistoryMonthPicker({
                                 for (final year in years)
                                   DropdownMenuItem(
                                     value: year,
-                                    child: Text('$year년'),
+                                    child: AppText('$year년'),
                                   ),
                               ],
                               onChanged: (value) {
@@ -142,7 +143,7 @@ Future<DateTime?> showHistoryMonthPicker({
                                 )
                                   DropdownMenuItem(
                                     value: month,
-                                    child: Text('$month월'),
+                                    child: AppText('$month월'),
                                   ),
                               ],
                               onChanged: (value) {
@@ -200,7 +201,7 @@ class _PickerField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           label,
           style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
         ),

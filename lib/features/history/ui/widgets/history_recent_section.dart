@@ -129,7 +129,7 @@ class _MonthNavRow extends StatelessWidget {
           onTap: onPrevious,
         ),
         const SizedBox(width: 4),
-        Text(
+        AppText(
           _label,
           style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
         ),
@@ -208,18 +208,18 @@ class _MonthlySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '${summary.month.month}월 간 총 ${summary.totalCount}회 리프레시 했어요.',
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(
+              AppText(
                 '지난 $_previousMonthLabel보다 ',
                 style: AppTextStyles.bodyS.copyWith(color: AppColors.gray900),
               ),
-              Text(
+              AppText(
                 '↑${summary.vsLastMonthDelta}회',
                 style: AppTextStyles.bodyS.copyWith(
                   color: AppColors.primary500,
@@ -269,7 +269,7 @@ class _SelectedDayCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
+                child: AppText(
                   formatKoreanDateWithWeekday(group.date),
                   style: AppTextStyles.bodyM2.copyWith(
                     color: AppColors.gray900,
@@ -280,7 +280,7 @@ class _SelectedDayCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             '총 ${group.count}번 리프레시했어요.',
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
@@ -316,13 +316,13 @@ class _DayRecordTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
+          AppText(
             formatKoreanTime(record.dateTime),
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(width: 8),
           Flexible(
-            child: Text(
+            child: AppText(
               record.modeName,
               style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
               overflow: TextOverflow.ellipsis,

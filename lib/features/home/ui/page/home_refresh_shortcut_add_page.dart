@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
@@ -198,7 +199,7 @@ class _HomeRefreshShortcutAddPageState
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 56),
       child: Center(
-        child: Text(
+        child: AppText(
           message,
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),

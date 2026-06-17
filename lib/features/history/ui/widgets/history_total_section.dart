@@ -136,7 +136,7 @@ class _StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           for (var i = 0; i < labelLines.length; i++)
-            Text(
+            AppText(
               labelLines[i],
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyS.copyWith(
@@ -146,7 +146,7 @@ class _StatCard extends StatelessWidget {
             ),
           const SizedBox(height: 10),
           if (valueLeading == null)
-            Text(
+            AppText(
               value,
               textAlign: TextAlign.center,
               style: AppTextStyles.titleS.copyWith(
@@ -160,14 +160,14 @@ class _StatCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(
+                AppText(
                   valueLeading!,
                   style: AppTextStyles.bodyS.copyWith(
                     color: AppColors.gray900,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
+                AppText(
                   value,
                   style: AppTextStyles.titleS.copyWith(
                     color: AppColors.gray900,
@@ -210,7 +210,7 @@ class _InsightCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
+          AppText(
             _title,
             style: AppTextStyles.labelM.copyWith(
               color: titleColor ?? AppColors.gray500,
@@ -250,13 +250,16 @@ class _InsightCard extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(text: text.substring(0, index), style: baseStyle),
           TextSpan(
-            text: phrase,
+            text: text.substring(0, index).softWrapWords(),
+            style: baseStyle,
+          ),
+          TextSpan(
+            text: phrase.softWrapWords(),
             style: baseStyle.copyWith(fontWeight: FontWeight.w700),
           ),
           TextSpan(
-            text: text.substring(index + phrase.length),
+            text: text.substring(index + phrase.length).softWrapWords(),
             style: baseStyle,
           ),
         ],
@@ -351,9 +354,12 @@ class _StackedBar extends StatelessWidget {
         return Text.rich(
           TextSpan(
             children: [
-              TextSpan(text: '${bar.label} ', style: labelStyle),
               TextSpan(
-                text: percentText,
+                text: '${bar.label} '.softWrapWords(),
+                style: labelStyle,
+              ),
+              TextSpan(
+                text: percentText.softWrapWords(),
                 style: labelStyle.copyWith(color: AppColors.primary500),
               ),
             ],
@@ -361,14 +367,14 @@ class _StackedBar extends StatelessWidget {
           textAlign: alignRight ? TextAlign.right : TextAlign.left,
         );
       }
-      return Text(
+      return AppText(
         '${bar.label} $percentText',
         style: labelStyle,
         textAlign: alignRight ? TextAlign.right : TextAlign.left,
       );
     }
 
-    return Text(
+    return AppText(
       '${bar.label} $percentText',
       style: AppTextStyles.labelM.copyWith(color: _labelColor(bar, index)),
       textAlign: alignRight ? TextAlign.right : TextAlign.left,
@@ -460,9 +466,9 @@ class _GradientStackedBar extends StatelessWidget {
       return Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: '${bar.label} ', style: labelStyle),
+            TextSpan(text: '${bar.label} '.softWrapWords(), style: labelStyle),
             TextSpan(
-              text: percentText,
+              text: percentText.softWrapWords(),
               style: labelStyle.copyWith(color: AppColors.primary500),
             ),
           ],
@@ -470,7 +476,7 @@ class _GradientStackedBar extends StatelessWidget {
       );
     }
 
-    return Text(
+    return AppText(
       '${bar.label} $percentText',
       style: labelStyle,
       textAlign: TextAlign.right,
@@ -522,7 +528,7 @@ class _TimeUsageChart extends StatelessWidget {
                   top: 0,
                   left: 0,
                   right: 0,
-                  child: Text(
+                  child: AppText(
                     '24',
                     textAlign: TextAlign.center,
                     style: _hourLabelStyle,
@@ -532,13 +538,13 @@ class _TimeUsageChart extends StatelessWidget {
                   right: 0,
                   top: 0,
                   bottom: 0,
-                  child: Center(child: Text('6', style: _hourLabelStyle)),
+                  child: Center(child: AppText('6', style: _hourLabelStyle)),
                 ),
                 const Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Text(
+                  child: AppText(
                     '12',
                     textAlign: TextAlign.center,
                     style: _hourLabelStyle,
@@ -548,7 +554,7 @@ class _TimeUsageChart extends StatelessWidget {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: Center(child: Text('18', style: _hourLabelStyle)),
+                  child: Center(child: AppText('18', style: _hourLabelStyle)),
                 ),
               ],
             ),
@@ -591,7 +597,7 @@ class _LegendRow extends StatelessWidget {
             child: _CountChip(count: usage.count),
           ),
         ),
-        Text(
+        AppText(
           usage.label,
           style: AppTextStyles.bodyS.copyWith(
             color: highlight ? AppColors.primary500 : AppColors.gray900,
@@ -617,7 +623,7 @@ class _CountChip extends StatelessWidget {
         color: AppColors.primary100,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
+      child: AppText(
         '$count회',
         style: AppTextStyles.labelS.copyWith(
           color: AppColors.primary500,
@@ -717,7 +723,7 @@ class _ModeUsageRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Text(
+          child: AppText(
             usage.modeName,
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyS.copyWith(
@@ -728,7 +734,7 @@ class _ModeUsageRow extends StatelessWidget {
         ),
         SizedBox(
           width: 72,
-          child: Text(
+          child: AppText(
             improvementLabel,
             textAlign: TextAlign.right,
             style: AppTextStyles.labelM.copyWith(

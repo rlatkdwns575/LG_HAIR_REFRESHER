@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/device_consumable_service.dart';
@@ -120,9 +119,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   @override
+  void activate() {
+    super.activate();
+    unawaited(_refreshRecentDiagnosisFlag());
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(_deviceStatusWatcher.refresh());
+      unawaited(_refreshDeviceStatus());
+      unawaited(_refreshRecentDiagnosisFlag());
     }
   }
 
@@ -202,12 +208,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return;
     }
 
-    var hasRecentDiagnosis = false;
-    try {
-      hasRecentDiagnosis = await _measureApi.hasRecentResult();
-    } catch (error, stackTrace) {
-      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
-    }
+    var hasRecentDiagnosis = await _fetchHasRecentDiagnosisResult();
 
     final cartridge = await _deviceConsumableService
         .fetchScentCartridgeStatus();
@@ -257,6 +258,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _refreshDeviceStatus() => _deviceStatusWatcher.refresh();
 
+  Future<bool> _fetchHasRecentDiagnosisResult() async {
+    try {
+      return await _measureApi.hasRecentResult();
+    } catch (error, stackTrace) {
+      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
+      return false;
+    }
+  }
+
+  Future<void> _refreshRecentDiagnosisFlag() async {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted || _dashboardData.hasRecentDiagnosisResult == hasRecent) {
+      return;
+    }
+    setState(() {
+      _dashboardData = _dashboardData.copyWith(
+        hasRecentDiagnosisResult: hasRecent,
+      );
+    });
+  }
+
+  Future<void> _refreshHomeIndicators() async {
+    await Future.wait([_refreshDeviceStatus(), _refreshRecentDiagnosisFlag()]);
+  }
+
   Future<RefreshMode?> _resolveRecommendApiMode(
     EnvironmentSnapshot environment,
   ) async {
@@ -304,7 +330,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _handleDiagnosisTap() async {
-    if (!_dashboardData.hasRecentDiagnosisResult) {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted) {
+      return;
+    }
+
+    if (_dashboardData.hasRecentDiagnosisResult != hasRecent) {
+      setState(() {
+        _dashboardData = _dashboardData.copyWith(
+          hasRecentDiagnosisResult: hasRecent,
+        );
+      });
+    }
+
+    if (!hasRecent) {
       context.pushMeasure();
       return;
     }
@@ -360,7 +399,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _refreshDeviceStatus,
+              onRefresh: _refreshHomeIndicators,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: AppSystemInsets.onlyBottom(
@@ -408,15 +447,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton.small(
-              heroTag: 'widgetGallery',
-              tooltip: 'Shared Widget Gallery',
-              onPressed: context.pushWidgetGallery,
-              child: const Icon(Icons.widgets_outlined, size: 20),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
