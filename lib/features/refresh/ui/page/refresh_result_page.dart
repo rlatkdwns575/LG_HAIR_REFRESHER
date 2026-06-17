@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/navigation/app_system_insets.dart';
@@ -65,7 +66,7 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('향기 케어 모드를 불러오지 못했어요.'),
+            content: AppText('향기 케어 모드를 불러오지 못했어요.'),
             behavior: SnackBarBehavior.floating,
           ),
         );

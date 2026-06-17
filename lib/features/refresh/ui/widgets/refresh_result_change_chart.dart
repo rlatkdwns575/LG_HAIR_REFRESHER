@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -68,7 +69,7 @@ class RefreshResultChangeChart extends StatelessWidget {
                           i++
                         )
                           Expanded(
-                            child: Text(
+                            child: AppText(
                               RefreshPollutionLevel.axisLabels[i],
                               textAlign: i == 0
                                   ? TextAlign.left
@@ -109,7 +110,7 @@ class _RowLabel extends StatelessWidget {
       height: RefreshResultChangeChart._rowHeight,
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(
+        child: AppText(
           label,
           style: AppTextStyles.bodyS.copyWith(
             color: AppColors.gray700,

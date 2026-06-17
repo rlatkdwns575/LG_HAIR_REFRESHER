@@ -19,6 +19,7 @@ import '../../data/refresh_mode_catalog.dart';
 import '../../data/refresh_result_store.dart';
 import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_progress_ring.dart';
+import '../widgets/refresh_progress_status_section.dart';
 import '../widgets/refresh_progress_step_strip.dart';
 
 /// Figma Design `리프레시 > 모드 작동` (793:15950 · 823:25441).
@@ -47,7 +48,6 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   static const double _spacingBelowRing = 36;
   static const double _spacingBelowStepStrip = 36;
   static const double _contentOffsetY = -84;
-  static const double _pauseButtonBottom = 168;
 
   @override
   void initState() {
@@ -177,7 +177,8 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
       return;
     }
 
-    context.pop();
+    _timer?.cancel();
+    context.go(AppRoutePaths.refresh);
   }
 
   void _togglePause() {
@@ -202,91 +203,68 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
           title: '리프레시하기',
           onBack: _confirmStop,
         ),
-        body: Stack(
+        body: Column(
           children: [
-            Align(
-              alignment: const Alignment(0, -0.2),
-              child: Transform.translate(
-                offset: const Offset(0, _contentOffsetY),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _session.modeName,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.headlineL.copyWith(
-                          color: AppColors.primary700,
-                          fontSize: 26,
-                          height: 32 / 26,
+            Expanded(
+              child: Align(
+                alignment: const Alignment(0, -0.2),
+                child: Transform.translate(
+                  offset: const Offset(0, _contentOffsetY),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(
+                      15,
+                      0,
+                      15,
+                      AppSpacing.md,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppText(
+                          _session.modeName,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.headlineL.copyWith(
+                            color: AppColors.primary700,
+                            fontSize: 26,
+                            height: 32 / 26,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: _spacingBelowModeName),
-                      RefreshProgressRing(
-                        progress: _progress,
-                        remainingLabel: _formatClock(_totalRemainingSeconds),
-                        dimmed: _isPaused,
-                      ),
-                      const SizedBox(height: _spacingBelowRing),
-                      RefreshProgressStepStrip(
-                        steps: _session.steps,
-                        activeIndex: _activeStepIndex,
-                        dimmed: _isPaused,
-                      ),
-                      const SizedBox(height: _spacingBelowStepStrip),
-                      SizedBox(
-                        width: 330,
-                        child: _isPaused
-                            ? Column(
-                                children: [
-                                  Text(
-                                    '리프레시가 잠시 멈췄어요.',
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.titleM.copyWith(
-                                      color: AppColors.gray900,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  AppText(
-                                    _pausedHint,
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.bodyM1.copyWith(
-                                      color: AppColors.gray700,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                children: [
-                                  Text(
-                                    step.statusMessage,
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.titleM.copyWith(
-                                      color: AppColors.gray900,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  AppText(
-                                    _session.deviceGuide,
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.bodyM1.copyWith(
-                                      color: AppColors.gray700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ],
+                        const SizedBox(height: _spacingBelowModeName),
+                        RefreshProgressRing(
+                          progress: _progress,
+                          remainingLabel: _formatClock(_totalRemainingSeconds),
+                          dimmed: _isPaused,
+                        ),
+                        const SizedBox(height: _spacingBelowRing),
+                        RefreshProgressStepStrip(
+                          steps: _session.steps,
+                          activeIndex: _activeStepIndex,
+                          dimmed: _isPaused,
+                        ),
+                        const SizedBox(height: _spacingBelowStepStrip),
+                        RefreshProgressStatusSection(
+                          isPaused: _isPaused,
+                          step: step,
+                          deviceGuide: _session.deviceGuide,
+                          pausedHint: _pausedHint,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: _pauseButtonBottom + MediaQuery.paddingOf(context).bottom,
-              child: _buildBottomAction(),
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  15,
+                  AppSpacing.sm,
+                  15,
+                  AppSpacing.sm,
+                ),
+                child: _buildBottomAction(),
+              ),
             ),
           ],
         ),
@@ -295,7 +273,8 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   }
 
   Widget _buildBottomAction() {
-    return Center(
+    return SizedBox(
+      width: double.infinity,
       child: AppBoxButton(
         label: _isPaused ? '진행하기' : '일시 정지',
         onPressed: _togglePause,

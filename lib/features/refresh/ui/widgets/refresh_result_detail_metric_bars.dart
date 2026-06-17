@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -89,7 +90,7 @@ class _MetricGroup extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 7),
-        Text(
+        AppText(
           metric.label,
           textAlign: TextAlign.center,
           maxLines: 1,
@@ -134,7 +135,7 @@ class _BarColumn extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(
+                child: AppText(
                   percentText,
                   maxLines: 1,
                   style: AppTextStyles.labelM.copyWith(

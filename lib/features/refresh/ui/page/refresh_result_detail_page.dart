@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -30,7 +31,7 @@ class RefreshResultDetailPage extends StatelessWidget {
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   const SnackBar(
-                    content: Text('공유 기능은 준비 중이에요.'),
+                    content: AppText('공유 기능은 준비 중이에요.'),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );

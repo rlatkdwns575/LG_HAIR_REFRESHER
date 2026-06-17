@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -32,7 +33,7 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
+          AppText(
             section.title,
             style: AppTextStyles.titleM.copyWith(
               color: AppColors.gray900,
@@ -40,8 +41,9 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          AppText(
             section.description,
+            breakLinesBySentence: true,
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray500,
               height: 1.45,
@@ -117,8 +119,9 @@ class _InsightCard extends StatelessWidget {
             backgroundColor: insight.badgeBackgroundColor,
           ),
           const SizedBox(height: 12),
-          Text(
+          AppText(
             insight.description,
+            breakLinesBySentence: true,
             textAlign: TextAlign.start,
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray900,
@@ -156,7 +159,7 @@ class _OutlineBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.sm),
         border: _showBorder ? Border.all(color: borderColor, width: 1) : null,
       ),
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelS.copyWith(
           color: textColor,
@@ -265,7 +268,7 @@ class _MetricLabel extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
+        AppText(
           label,
           style: AppTextStyles.bodyS.copyWith(
             color: AppColors.gray900,

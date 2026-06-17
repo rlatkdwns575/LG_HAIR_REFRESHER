@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -131,13 +132,13 @@ class _RefreshResultCollectingPageState
             const SizedBox(height: 160),
             const RefreshResultCollectingIllustration(),
             const SizedBox(height: 40),
-            Text(
+            AppText(
               '리프레시 결과를 수집중이에요',
               textAlign: TextAlign.center,
               style: AppTextStyles.titleL.copyWith(color: AppColors.gray900),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
+            AppText(
               '케어 결과를 정리한 뒤 최종 결과를 보여드릴게요.',
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyM1.copyWith(color: AppColors.gray500),

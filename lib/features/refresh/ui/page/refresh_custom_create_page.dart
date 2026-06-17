@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/layout/app_layout.dart';
@@ -201,7 +202,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: AppText(error.message),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -224,21 +225,31 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              padding: AppSystemInsets.pageHorizontal(
-                context,
-                top: AppSpacing.lg,
-                extraBottom: 18,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildPreviewRoadmap(),
-                _buildNameSection(),
-                const SizedBox(height: _sectionGap),
-                _buildCategorySection(),
-                const SizedBox(height: _sectionGap),
-                _buildCareSection(),
-                const SizedBox(height: _sectionGap),
-                _buildDurationSection(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(15, AppSpacing.lg, 15, 0),
+                  child: _buildPreviewRoadmap(),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: AppSystemInsets.pageHorizontal(
+                      context,
+                      top: _selectedCares.isEmpty ? AppSpacing.lg : 0,
+                      extraBottom: 18,
+                    ),
+                    children: [
+                      _buildNameSection(),
+                      const SizedBox(height: _sectionGap),
+                      _buildCategorySection(),
+                      const SizedBox(height: _sectionGap),
+                      _buildCareSection(),
+                      const SizedBox(height: _sectionGap),
+                      _buildDurationSection(),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -394,7 +405,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  AppText(
                     type.label,
                     style: AppTextStyles.bodyL.copyWith(
                       color: isScentUnavailable
@@ -404,7 +415,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
                   ),
                   if (isScentUnavailable) ...[
                     const SizedBox(height: 4),
-                    Text(
+                    AppText(
                       '향 카트리지가 없어 향기 케어를 사용할 수 없어요.',
                       style: AppTextStyles.labelS.copyWith(
                         color: AppColors.gray500,
@@ -439,7 +450,7 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
       children: [
         const _SectionTitle('몇 분동안 케어할까요?'),
         const SizedBox(height: AppSpacing.xs),
-        Text(
+        AppText(
           '복합 케어를 위해서는 7분 이상을 권장해요.',
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
         ),
@@ -473,7 +484,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return AppText(
       text,
       style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
     );
@@ -505,7 +516,7 @@ class _PreviewItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(
+        AppText(
           careLabel,
           style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray800),
         ),
@@ -513,13 +524,13 @@ class _PreviewItem extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            AppText(
               durationLabel,
               style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
             ),
             if (level != null) ...[
               const SizedBox(width: 4),
-              Text(
+              AppText(
                 level!.label,
                 style: AppTextStyles.labelM.copyWith(
                   color: AppColors.primary500,
@@ -621,7 +632,7 @@ class _LevelChip extends StatelessWidget {
         child: SizedBox(
           height: 40,
           child: Center(
-            child: Text(
+            child: AppText(
               label,
               style: AppTextStyles.labelM.copyWith(
                 color: selected ? AppColors.primary500 : AppColors.gray500,
@@ -652,7 +663,7 @@ class _DurationField extends StatelessWidget {
           width: double.infinity,
           height: 48,
           child: Center(
-            child: Text(
+            child: AppText(
               '$value분',
               style: AppTextStyles.titleXs.copyWith(color: AppColors.gray800),
             ),
@@ -723,7 +734,7 @@ class _DurationPickerSheetState extends State<_DurationPickerSheet> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(_selected),
-              child: Text(
+              child: AppText(
                 '저장',
                 style: AppTextStyles.labelL.copyWith(
                   color: AppColors.primary500,
@@ -741,7 +752,7 @@ class _DurationPickerSheetState extends State<_DurationPickerSheet> {
               children: [
                 for (var i = 0; i < count; i++)
                   Center(
-                    child: Text(
+                    child: AppText(
                       '${widget.min + i}분',
                       style: AppTextStyles.titleS.copyWith(
                         color: AppColors.gray800,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -27,7 +28,7 @@ class DurationBadge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
+        child: AppText(
           '$prefix ${CareDurationSplit.formatKoreanTime(totalSeconds)}',
           style: AppTextStyles.labelS.copyWith(color: AppColors.primary700),
         ),
