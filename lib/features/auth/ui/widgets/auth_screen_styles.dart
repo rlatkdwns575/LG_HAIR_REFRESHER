@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/widgets/app_common_top_header.dart';
+
 /// auth 화면 공통 색상·스타일.
 abstract final class AuthScreenStyles {
   static const backgroundMuted = Color(0xFFF3F5F8);
@@ -16,7 +18,7 @@ abstract final class AuthScreenStyles {
   static const genderSelectedBg = Color(0xFFE8EBFF);
   static const genderSelectedBorder = Color(0xFF5B6CFF);
 
-  static const horizontalPadding = 24.0;
+  static const horizontalPadding = AppCommonTopHeader.pageHorizontalInset;
   static const fieldRadius = 8.0;
   static const buttonHeight = 52.0;
   static const buttonRadius = 8.0;

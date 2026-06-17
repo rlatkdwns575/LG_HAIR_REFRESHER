@@ -295,6 +295,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     setState(() {});
   }
 
+  // 즐겨찾기 수정 UI — HomeQuickRefreshRow.onFavoriteEditPressed 연결 시 활성화
+  // ignore: unused_element
+  Future<void> _handleFavoriteEdit() async {
+    final current = HomeShortcutStore.instance.favoriteMode;
+    if (current == null) {
+      return;
+    }
+
+    final selected = await context.pushRefreshShortcutAdd(initialMode: current);
+    if (!mounted || selected == null) {
+      return;
+    }
+
+    HomeShortcutStore.instance.setFavorite(selected);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

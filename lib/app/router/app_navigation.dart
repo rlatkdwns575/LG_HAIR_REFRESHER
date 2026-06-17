@@ -81,9 +81,9 @@ extension AppNavigation on BuildContext {
   Future<bool?> pushRefreshCustomCreate() =>
       push<bool>(AppRoutePaths.refreshCustomCreate);
 
-  /// 홈 즐겨찾기(리프레시 바로가기) 추가 화면으로 이동하고, 선택한 모드를 반환합니다.
-  Future<RefreshMode?> pushRefreshShortcutAdd() =>
-      push<RefreshMode>(AppRoutePaths.refreshShortcutAdd);
+  /// 홈 즐겨찾기(리프레시 바로가기) 추가·수정 화면으로 이동하고, 선택한 모드를 반환합니다.
+  Future<RefreshMode?> pushRefreshShortcutAdd({RefreshMode? initialMode}) =>
+      push<RefreshMode>(AppRoutePaths.refreshShortcutAdd, extra: initialMode);
 
   void pushHistory() => push(AppRoutePaths.history);
 

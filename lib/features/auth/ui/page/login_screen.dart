@@ -3,28 +3,62 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../data/api/auth_api.dart';
+import '../../data/auth_dev_credentials.dart';
 import '../../data/auth_assets.dart';
 import '../widgets/auth_screen_styles.dart';
 
 /// 로그인 방법 선택 화면 (Google / 이메일 / 회원가입).
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   static const _emailButtonTextColor = Color(0xFF6B7280);
   static const _signupTextColor = Color(0xFF9CA3AF);
   static const _buttonHeight = 58.0;
   static const _buttonRadius = 16.0;
   static const _bottomInset = 110.0;
 
-  void _onGoogleLogin(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: AppText('Google 로그인은 준비 중입니다.'),
-          behavior: SnackBarBehavior.floating,
-        ),
+  final _authApi = const AuthApi();
+  bool _isGoogleSubmitting = false;
+
+  Future<void> _onGoogleLogin() async {
+    if (_isGoogleSubmitting) {
+      return;
+    }
+
+    setState(() => _isGoogleSubmitting = true);
+
+    try {
+      await _authApi.signIn(
+        email: AuthDevCredentials.email,
+        password: AuthDevCredentials.password,
       );
+      if (!mounted) {
+        return;
+      }
+      context.go(AppRoutePaths.home);
+    } on AuthApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: AppText(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -46,14 +80,16 @@ class LoginScreen extends StatelessWidget {
                 radius: _buttonRadius,
                 backgroundColor: Colors.white,
                 elevation: 2,
-                onPressed: () => _onGoogleLogin(context),
+                onPressed: _isGoogleSubmitting ? null : _onGoogleLogin,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(AuthAssets.googleIcon, width: 24, height: 24),
                     const SizedBox(width: 10),
                     AppText(
-                      'Google로 로그인하기',
+                      _isGoogleSubmitting
+                          ? 'Google 로그인 중...'
+                          : 'Google로 로그인하기',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -69,7 +105,9 @@ class LoginScreen extends StatelessWidget {
                 radius: _buttonRadius,
                 backgroundColor: Colors.transparent,
                 borderColor: AuthScreenStyles.border,
-                onPressed: () => context.push(AppRoutePaths.emailLogin),
+                onPressed: _isGoogleSubmitting
+                    ? null
+                    : () => context.push(AppRoutePaths.emailLogin),
                 child: AppText(
                   '이메일로 로그인',
                   style: TextStyle(
@@ -81,7 +119,9 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 34),
               TextButton(
-                onPressed: () => context.push(AppRoutePaths.signUp),
+                onPressed: _isGoogleSubmitting
+                    ? null
+                    : () => context.push(AppRoutePaths.signUp),
                 style: TextButton.styleFrom(
                   foregroundColor: _signupTextColor,
                   padding: EdgeInsets.zero,
@@ -157,7 +197,7 @@ class _LoginMethodButton extends StatelessWidget {
   final Color backgroundColor;
   final Color? borderColor;
   final double elevation;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Widget child;
 
   @override
