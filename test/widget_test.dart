@@ -9,10 +9,9 @@ void main() {
     await tester.pumpWidget(const LgHairRefresherApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('서비스 logo'), findsOneWidget);
-    expect(find.text('서비스 설명'), findsOneWidget);
     expect(find.text('Google로 로그인하기'), findsOneWidget);
     expect(find.text('이메일로 로그인'), findsOneWidget);
+    expect(find.byType(Image), findsAtLeastNWidgets(2));
   });
 
   testWidgets('shows home dashboard screen', (tester) async {
