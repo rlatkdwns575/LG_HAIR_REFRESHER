@@ -176,7 +176,13 @@ class _RefreshPageState extends State<RefreshPage> {
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
         title: '헤어 리프레시',
-        onBack: () => context.pop(),
+        onBack: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.goHome();
+          }
+        },
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

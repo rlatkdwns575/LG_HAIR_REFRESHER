@@ -47,7 +47,6 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   static const double _spacingBelowModeName = 40;
   static const double _spacingBelowRing = 36;
   static const double _spacingBelowStepStrip = 36;
-  static const double _contentOffsetY = -84;
 
   @override
   void initState() {
@@ -178,7 +177,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     }
 
     _timer?.cancel();
-    context.go(AppRoutePaths.refresh);
+    context.pop();
   }
 
   void _togglePause() {
@@ -204,53 +203,55 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
           onBack: _confirmStop,
         ),
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                15,
+                AppSpacing.sm,
+                15,
+                0,
+              ),
+              child: AppText(
+                _session.modeName,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.headlineL.copyWith(
+                  color: AppColors.primary700,
+                  fontSize: 26,
+                  height: 32 / 26,
+                ),
+              ),
+            ),
             Expanded(
-              child: Align(
-                alignment: const Alignment(0, -0.2),
-                child: Transform.translate(
-                  offset: const Offset(0, _contentOffsetY),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(
-                      15,
-                      0,
-                      15,
-                      AppSpacing.md,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  15,
+                  _spacingBelowModeName,
+                  15,
+                  AppSpacing.md,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RefreshProgressRing(
+                      progress: _progress,
+                      remainingLabel: _formatClock(_totalRemainingSeconds),
+                      dimmed: _isPaused,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AppText(
-                          _session.modeName,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.headlineL.copyWith(
-                            color: AppColors.primary700,
-                            fontSize: 26,
-                            height: 32 / 26,
-                          ),
-                        ),
-                        const SizedBox(height: _spacingBelowModeName),
-                        RefreshProgressRing(
-                          progress: _progress,
-                          remainingLabel: _formatClock(_totalRemainingSeconds),
-                          dimmed: _isPaused,
-                        ),
-                        const SizedBox(height: _spacingBelowRing),
-                        RefreshProgressStepStrip(
-                          steps: _session.steps,
-                          activeIndex: _activeStepIndex,
-                          dimmed: _isPaused,
-                        ),
-                        const SizedBox(height: _spacingBelowStepStrip),
-                        RefreshProgressStatusSection(
-                          isPaused: _isPaused,
-                          step: step,
-                          deviceGuide: _session.deviceGuide,
-                          pausedHint: _pausedHint,
-                        ),
-                      ],
+                    const SizedBox(height: _spacingBelowRing),
+                    RefreshProgressStepStrip(
+                      steps: _session.steps,
+                      activeIndex: _activeStepIndex,
+                      dimmed: _isPaused,
                     ),
-                  ),
+                    const SizedBox(height: _spacingBelowStepStrip),
+                    RefreshProgressStatusSection(
+                      isPaused: _isPaused,
+                      step: step,
+                      deviceGuide: _session.deviceGuide,
+                      pausedHint: _pausedHint,
+                    ),
+                  ],
                 ),
               ),
             ),
