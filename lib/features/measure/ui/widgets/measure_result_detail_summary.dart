@@ -9,7 +9,7 @@ import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/widgets/refresh_mode_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import 'measure_result_detail_need_bars.dart';
-import 'measure_result_metric_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 import '../../data/api/measure_result_mapper.dart';
 
 /// 리프레시 필요도 요약 블록 (Figma Frame 2085668905~8906).
@@ -169,8 +169,12 @@ class _AnalysisSummary extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              MeasureResultMetricHelpIcon(
-                message: MeasureResultMapper.refreshNeedHelpMessage,
+              const SizedBox(width: 3),
+              AppMetricHelpIcon(
+                tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
+                size: 16,
+                placement: AppMetricHelpTooltipPlacement.belowEnd,
+                tooltipMaxWidth: 240,
               ),
             ],
           ),

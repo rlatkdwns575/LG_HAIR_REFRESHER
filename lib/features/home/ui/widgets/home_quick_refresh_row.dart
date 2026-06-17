@@ -278,11 +278,7 @@ class _FavoriteEditButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.sm),
         child: Padding(
           padding: const EdgeInsets.all(2),
-          child: Icon(
-            Icons.edit_outlined,
-            size: 14,
-            color: AppColors.gray500,
-          ),
+          child: Icon(Icons.edit_outlined, size: 14, color: AppColors.gray500),
         ),
       ),
     );

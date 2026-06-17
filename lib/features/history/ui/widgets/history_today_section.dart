@@ -28,7 +28,15 @@ class HistoryTodaySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (report.hasTodayRecords) _buildSummaryCard() else _buildEmptyCard(),
+        if (report.hasTodayRecords)
+          _TodaySummaryCard(
+            title: report.todaySummaryTitle,
+            subtitle: report.todaySummarySubtitle,
+            records: report.todayRecords,
+            onRecordDetailTap: onRecordDetailTap,
+          )
+        else
+          _buildEmptyCard(),
         if (report.routineSuggestion != null) ...[
           const SizedBox(height: AppSpacing.md),
           _RoutineCard(
@@ -37,38 +45,6 @@ class HistoryTodaySection extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-
-  Widget _buildSummaryCard() {
-    final records = report.todayRecords;
-    return HistoryWhiteCard(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppText(
-            report.todaySummaryTitle,
-            style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
-          ),
-          const SizedBox(height: 4),
-          AppText(
-            report.todaySummarySubtitle,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
-          ),
-          for (var i = 0; i < records.length; i++) ...[
-            const SizedBox(height: AppSpacing.md),
-            const Divider(height: 1, color: AppColors.gray100),
-            const SizedBox(height: AppSpacing.md),
-            _TodayRecordTile(
-              record: records[i],
-              onDetailTap: onRecordDetailTap == null
-                  ? null
-                  : () => onRecordDetailTap!(records[i]),
-            ),
-          ],
-        ],
-      ),
     );
   }
 
@@ -88,6 +64,97 @@ class HistoryTodaySection extends StatelessWidget {
             '리프레시를 통해 외출 후 컨디션을 가볍게 정리해보세요.',
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TodaySummaryCard extends StatefulWidget {
+  const _TodaySummaryCard({
+    required this.title,
+    required this.subtitle,
+    required this.records,
+    this.onRecordDetailTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<RefreshHistoryRecord> records;
+  final ValueChanged<RefreshHistoryRecord>? onRecordDetailTap;
+
+  @override
+  State<_TodaySummaryCard> createState() => _TodaySummaryCardState();
+}
+
+class _TodaySummaryCardState extends State<_TodaySummaryCard> {
+  bool _showAllRecords = false;
+
+  @override
+  void didUpdateWidget(covariant _TodaySummaryCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.records.length != widget.records.length ||
+        !_hasSameRecordOrder(oldWidget.records, widget.records)) {
+      _showAllRecords = false;
+    }
+  }
+
+  bool _hasSameRecordOrder(
+    List<RefreshHistoryRecord> previous,
+    List<RefreshHistoryRecord> current,
+  ) {
+    if (previous.length != current.length) {
+      return false;
+    }
+    for (var i = 0; i < previous.length; i++) {
+      if (previous[i].dateTime != current[i].dateTime ||
+          previous[i].modeName != current[i].modeName) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final records = widget.records;
+    final hasHiddenRecords = records.length > historyMaxVisibleDayRecords;
+    final visibleRecords = _showAllRecords || !hasHiddenRecords
+        ? records
+        : records.take(historyMaxVisibleDayRecords).toList();
+
+    return HistoryWhiteCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText(
+            widget.title,
+            style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
+          ),
+          const SizedBox(height: 4),
+          AppText(
+            widget.subtitle,
+            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
+          ),
+          for (var i = 0; i < visibleRecords.length; i++) ...[
+            const SizedBox(height: AppSpacing.md),
+            const Divider(height: 1, color: AppColors.gray100),
+            const SizedBox(height: AppSpacing.md),
+            _TodayRecordTile(
+              record: visibleRecords[i],
+              onDetailTap: widget.onRecordDetailTap == null
+                  ? null
+                  : () => widget.onRecordDetailTap!(visibleRecords[i]),
+            ),
+          ],
+          if (hasHiddenRecords) ...[
+            const SizedBox(height: AppSpacing.sm),
+            HistoryRecordsExpandToggle(
+              expanded: _showAllRecords,
+              onTap: () => setState(() => _showAllRecords = !_showAllRecords),
+            ),
+          ],
         ],
       ),
     );

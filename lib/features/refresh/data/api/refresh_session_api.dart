@@ -45,12 +45,7 @@ class RefreshSessionApi {
 
     try {
       await _insertPayload(payload);
-      if (kDebugMode) {
-        debugPrint(
-          'RefreshSessionApi.saveCompletedSession saved session_id='
-          '${payload['session_id']}',
-        );
-      }
+      if (kDebugMode) {}
     } on PostgrestException catch (error) {
       throw RefreshSessionApiException(
         '리프레시 기록 저장에 실패했습니다. '
@@ -79,17 +74,9 @@ class RefreshSessionApi {
       );
     } on PostgrestException catch (error) {
       if (!_isMissingEndedAtColumn(error)) {
-        debugPrint(
-          'RefreshSessionApi.hasCompletedRefreshSinceMeasure failed: '
-          '${error.message}',
-        );
         return false;
       }
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshSessionApi.hasCompletedRefreshSinceMeasure failed: '
-        '$error\n$stackTrace',
-      );
+    } catch (_) {
       return false;
     }
 

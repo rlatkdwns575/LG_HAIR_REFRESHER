@@ -27,18 +27,9 @@ class DeviceConsumableService {
 
       final deviceId = userDevice['device_id'] as String;
       final consumable = await _fetchConsumableStatus(deviceId);
-      if (kDebugMode) {
-        debugPrint(
-          'DeviceConsumableService scent status for device_id=$deviceId: '
-          '$consumable',
-        );
-      }
+      if (kDebugMode) {}
       return ScentCartridgeMapper.parseFromConsumable(consumable);
-    } catch (error, stackTrace) {
-      debugPrint(
-        'DeviceConsumableService.fetchScentCartridgeStatus failed: '
-        '$error\n$stackTrace',
-      );
+    } catch (_) {
       return ScentCartridgeStatus.notAttached;
     }
   }
@@ -79,21 +70,10 @@ class DeviceConsumableService {
       }
       return Map<String, dynamic>.from(row);
     } on PostgrestException catch (error) {
-      debugPrint(
-        'DeviceConsumableService: scent column select failed for '
-        'device_id=$deviceId: ${error.message}',
-      );
-
       if (!error.message.contains('scent_cartridge') &&
           !error.message.contains('scent_category')) {
         rethrow;
       }
-
-      debugPrint(
-        'DeviceConsumableService: CONSUMABLE_STATUS에 scent_cartridge_*, '
-        'scent_category 컬럼이 없습니다. '
-        'supabase/dev_consumable_scent_cartridge.sql 을 실행하세요.',
-      );
       return null;
     }
   }

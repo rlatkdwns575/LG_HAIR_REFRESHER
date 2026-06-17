@@ -262,8 +262,6 @@ class _SelectedDayCard extends StatefulWidget {
 }
 
 class _SelectedDayCardState extends State<_SelectedDayCard> {
-  static const _maxCollapsedCount = 3;
-
   bool _showAllRecords = false;
 
   @override
@@ -282,10 +280,10 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
   Widget build(BuildContext context) {
     final group = widget.group;
     final records = group.records;
-    final hasHiddenRecords = records.length > _maxCollapsedCount;
+    final hasHiddenRecords = records.length > historyMaxVisibleDayRecords;
     final visibleRecords = _showAllRecords || !hasHiddenRecords
         ? records
-        : records.take(_maxCollapsedCount).toList();
+        : records.take(historyMaxVisibleDayRecords).toList();
 
     return HistoryWhiteCard(
       backgroundColor: AppColors.gray50,
@@ -324,40 +322,12 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
           ],
           if (hasHiddenRecords) ...[
             const SizedBox(height: AppSpacing.sm),
-            _RecordsExpandToggle(
+            HistoryRecordsExpandToggle(
               expanded: _showAllRecords,
               onTap: () => setState(() => _showAllRecords = !_showAllRecords),
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _RecordsExpandToggle extends StatelessWidget {
-  const _RecordsExpandToggle({
-    required this.expanded,
-    required this.onTap,
-  });
-
-  final bool expanded;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        height: 28,
-        child: Center(
-          child: Icon(
-            expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            size: 22,
-            color: AppColors.gray400,
-          ),
-        ),
       ),
     );
   }

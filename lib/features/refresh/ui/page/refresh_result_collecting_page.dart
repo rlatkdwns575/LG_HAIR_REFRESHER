@@ -54,12 +54,7 @@ class _RefreshResultCollectingPageState
     MeasureResultRecord? baseline;
     try {
       baseline = await _measureApi.fetchLatestResult();
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage baseline fetch failed: '
-        '$error\n$stackTrace',
-      );
-    }
+    } catch (_) {}
 
     try {
       final outcome = _resultGenerator.generate(mode: mode, baseline: baseline);
@@ -71,11 +66,7 @@ class _RefreshResultCollectingPageState
         mode: mode,
       );
       RefreshRecommendService.invalidateCache();
-    } on RefreshSessionApiException catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage persist session failed: '
-        '$error\n$stackTrace',
-      );
+    } on RefreshSessionApiException catch (_) {
       if (RefreshResultStore.instance.peekPendingResult() == null) {
         final outcome = _resultGenerator.generate(
           mode: mode,
@@ -83,12 +74,7 @@ class _RefreshResultCollectingPageState
         );
         RefreshResultStore.instance.setPending(outcome.result, mode: mode);
       }
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage persist session failed: '
-        '$error\n$stackTrace',
-      );
-
+    } catch (_) {
       if (RefreshResultStore.instance.peekPendingResult() == null) {
         final outcome = _resultGenerator.generate(
           mode: mode,

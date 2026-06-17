@@ -73,9 +73,17 @@ void main() {
       final context = RefreshRecommendInput(
         basis: RefreshRecommendBasis.weatherAndSchedule,
         environment: environment,
-        schedule: const RefreshRecommendScheduleSnapshot(
+        schedule: RefreshRecommendScheduleSnapshot(
           todayEventCount: 1,
           nextEventTitle: '회의',
+          todayEvents: [
+            RefreshRecommendScheduleEventSnapshot(
+              title: '회의',
+              eventType: 'importantMeeting',
+              timing: 'before',
+              startsAt: _scheduleStart,
+            ),
+          ],
         ),
       );
 
@@ -86,7 +94,11 @@ void main() {
 
       expect(prompt, contains('오늘 일정 JSON'));
       expect(prompt, contains('today_event_count'));
+      expect(prompt, contains('"events"'));
+      expect(prompt, contains('event_type'));
       expect(prompt, contains('외출 후 케어'));
     });
   });
 }
+
+final _scheduleStart = DateTime(2026, 6, 17, 14);

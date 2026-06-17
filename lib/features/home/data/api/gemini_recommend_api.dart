@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/services/app_env.dart';
@@ -61,26 +60,17 @@ class GeminiRecommendApi {
       if (response.statusCode == 200) {
         try {
           final message = _parseMessage(response.body);
-          debugPrint('GeminiRecommendApi succeeded with model=$model');
           return message;
-        } catch (error) {
-          debugPrint('GeminiRecommendApi model=$model parse failed: $error');
+        } catch (_) {
+          continue;
         }
-        continue;
       }
-
-      debugPrint(
-        'GeminiRecommendApi model=$model failed (${response.statusCode})',
-      );
-
       if (response.statusCode != 429 && response.statusCode != 404) {
         break;
       }
     }
 
     final statusCode = lastResponse?.statusCode ?? 0;
-    final responseBody = lastResponse?.body ?? '';
-    debugPrint('GeminiRecommendApi failed ($statusCode): $responseBody');
     throw GeminiRecommendApiException('Gemini request failed ($statusCode)');
   }
 

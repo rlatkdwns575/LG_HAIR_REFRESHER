@@ -32,11 +32,7 @@ class HomeDeviceStatusWatcher {
     _channel = _api.subscribeDeviceStatus(
       deviceId: deviceId,
       onChanged: (snapshot) {
-        if (kDebugMode) {
-          debugPrint(
-            'HomeDeviceStatusWatcher realtime: battery=${snapshot.batteryPercent}',
-          );
-        }
+        if (kDebugMode) {}
         _onChanged?.call(snapshot);
       },
     );
@@ -56,9 +52,7 @@ class HomeDeviceStatusWatcher {
       if (snapshot != null) {
         onChanged(snapshot);
       }
-    } catch (error, stackTrace) {
-      debugPrint('HomeDeviceStatusWatcher refresh failed: $error\n$stackTrace');
-    }
+    } catch (_) {}
   }
 
   Future<void> stop() async {

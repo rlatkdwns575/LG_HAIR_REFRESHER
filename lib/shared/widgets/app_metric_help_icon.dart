@@ -1,42 +1,42 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/app_text.dart';
 
-import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_component_colors.dart';
-import '../../../../app/theme/app_radius.dart';
-import '../../../../app/theme/app_shadows.dart';
-import '../../../../app/theme/app_text_styles.dart';
+import '../../app/theme/app_colors.dart';
+import '../../app/theme/app_component_colors.dart';
+import '../../app/theme/app_radius.dart';
+import '../../app/theme/app_shadows.dart';
+import '../../app/theme/app_text_styles.dart';
+import 'app_text.dart';
 
-enum RefreshResultHelpTooltipPlacement {
-  /// 아이콘 오른쪽.
+enum AppMetricHelpTooltipPlacement {
+  /// ? 아이콘 오른쪽에 바로 붙여 표시.
   besideIcon,
 
-  /// 아이콘 아래, 오른쪽 정렬.
+  /// ? 아이콘 아래, 오른쪽 정렬.
   belowEnd,
 }
 
-/// 리프레시 결과 상세 — ? 도움말 아이콘 + 호버/탭 툴팁.
-class RefreshResultHelpIcon extends StatefulWidget {
-  const RefreshResultHelpIcon({
+/// 진단·리프레시 결과 상세 — ? 도움말 아이콘 + 호버/탭 툴팁.
+class AppMetricHelpIcon extends StatefulWidget {
+  const AppMetricHelpIcon({
     required this.tooltipMessage,
     this.size = 14,
-    this.placement = RefreshResultHelpTooltipPlacement.besideIcon,
+    this.placement = AppMetricHelpTooltipPlacement.besideIcon,
     this.tooltipMaxWidth = 220,
     super.key,
   });
 
   final String tooltipMessage;
   final double size;
-  final RefreshResultHelpTooltipPlacement placement;
+  final AppMetricHelpTooltipPlacement placement;
   final double tooltipMaxWidth;
 
   @override
-  State<RefreshResultHelpIcon> createState() => _RefreshResultHelpIconState();
+  State<AppMetricHelpIcon> createState() => _AppMetricHelpIconState();
 }
 
-class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
+class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
   OverlayEntry? _overlayEntry;
   Timer? _hideTimer;
   bool _pointerOverIcon = false;
@@ -74,7 +74,8 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
 
     final overlay = Overlay.of(context);
     final iconTopLeft = box.localToGlobal(Offset.zero);
-    const horizontalGap = 8.0;
+    const horizontalGap = 4.0;
+    const verticalGap = 6.0;
     final tooltipMaxWidth = widget.tooltipMaxWidth;
 
     _overlayEntry = OverlayEntry(
@@ -84,7 +85,7 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
         late final double top;
 
         switch (widget.placement) {
-          case RefreshResultHelpTooltipPlacement.besideIcon:
+          case AppMetricHelpTooltipPlacement.besideIcon:
             left = _besideIconLeft(
               iconTopLeft: iconTopLeft,
               iconWidth: box.size.width,
@@ -92,15 +93,15 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
               screenWidth: screenWidth,
               horizontalGap: horizontalGap,
             );
-            top = iconTopLeft.dy - 6;
-          case RefreshResultHelpTooltipPlacement.belowEnd:
+            top = iconTopLeft.dy;
+          case AppMetricHelpTooltipPlacement.belowEnd:
             left = _belowEndLeft(
               iconTopLeft: iconTopLeft,
               iconWidth: box.size.width,
               tooltipMaxWidth: tooltipMaxWidth,
               screenWidth: screenWidth,
             );
-            top = iconTopLeft.dy + box.size.height + 6;
+            top = iconTopLeft.dy + box.size.height + verticalGap;
         }
 
         return Stack(
@@ -199,8 +200,6 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
 
   @override
   Widget build(BuildContext context) {
-    final fontSize = 10.0;
-
     final icon = Container(
       width: widget.size,
       height: widget.size,
@@ -213,7 +212,7 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
         '?',
         style: AppTextStyles.labelXs.copyWith(
           color: AppComponentColors.helpIcon,
-          fontSize: fontSize,
+          fontSize: 10,
           height: 1,
         ),
       ),

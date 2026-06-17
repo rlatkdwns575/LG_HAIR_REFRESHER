@@ -36,6 +36,13 @@ class MeasureResultDetail {
 
   bool get exceedsThreshold => refreshNeedPercent > recommendedThresholdPercent;
 
+  /// 공유하기(클립보드 복사)용 요약 텍스트.
+  String get shareSummaryText => [
+    '내 헤어 상태 진단 결과',
+    '리프레시 필요도 $refreshNeedPercent%',
+    analysisSummary.replaceAll('\n', ' '),
+  ].join('\n');
+
   factory MeasureResultDetail.fromMeasureResult(MeasureResult result) {
     final record = result.sourceRecord;
     if (record == null) {

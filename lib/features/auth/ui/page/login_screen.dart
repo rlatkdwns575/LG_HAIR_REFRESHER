@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/services/local_calendar_login_prompt.dart';
 import '../../data/api/auth_api.dart';
 import '../../data/auth_dev_credentials.dart';
 import '../../data/auth_assets.dart';
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   static const _bottomInset = 110.0;
 
   final _authApi = const AuthApi();
+  final _calendarLoginPrompt = LocalCalendarLoginPrompt();
   bool _isGoogleSubmitting = false;
 
   Future<void> _onGoogleLogin() async {
@@ -38,6 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
         email: AuthDevCredentials.email,
         password: AuthDevCredentials.password,
       );
+      if (!mounted) {
+        return;
+      }
+      await _calendarLoginPrompt.showIfNeeded(context);
       if (!mounted) {
         return;
       }
@@ -87,9 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Image.asset(AuthAssets.googleIcon, width: 24, height: 24),
                     const SizedBox(width: 10),
                     AppText(
-                      _isGoogleSubmitting
-                          ? 'Google 로그인 중...'
-                          : 'Google로 로그인하기',
+                      _isGoogleSubmitting ? 'Google 로그인 중...' : 'Google로 로그인하기',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

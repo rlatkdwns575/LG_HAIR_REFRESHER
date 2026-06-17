@@ -13,14 +13,14 @@ import 'refresh_recommend_result.dart';
 
 /// 통합 Gemini 추천 — 모든 화면의 단일 진입점.
 class RefreshRecommendService {
-  const RefreshRecommendService({
-    this.contextResolver = const RefreshRecommendContextResolver(),
+  RefreshRecommendService({
+    RefreshRecommendContextResolver? contextResolver,
     this.refreshApi = const RefreshApi(),
     this.refreshRecommendApi = const RefreshRecommendApi(),
     this.geminiRecommendApi = const GeminiRecommendApi(),
-  });
+  }) : contextResolver = contextResolver ?? RefreshRecommendContextResolver();
 
-  static const RefreshRecommendService instance = RefreshRecommendService();
+  static final RefreshRecommendService instance = RefreshRecommendService();
 
   final RefreshRecommendContextResolver contextResolver;
   final RefreshApi refreshApi;
@@ -41,7 +41,6 @@ class RefreshRecommendService {
     if (!forceRefresh) {
       final cached = _cache.getIfValidFor(signature);
       if (cached != null) {
-        debugPrint('RefreshRecommendService: using cached result');
         return cached;
       }
     }
@@ -49,7 +48,6 @@ class RefreshRecommendService {
     final presets = await refreshApi.fetchPresetModes();
     RefreshPresetModeStore.instance.setPresets(presets);
     if (presets.isEmpty) {
-      debugPrint('RefreshRecommendService: no preset modes available');
       return null;
     }
 
@@ -59,11 +57,7 @@ class RefreshRecommendService {
         candidates: presets,
         context: context,
       );
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshRecommendService mode Gemini failed: $error\n$stackTrace',
-      );
-    }
+    } catch (_) {}
 
     mode ??= RefreshRecommendFallback.pickMode(
       candidates: presets,
@@ -77,11 +71,7 @@ class RefreshRecommendService {
         context,
         recommendedModeName: mode.name,
       );
-      debugPrint('RefreshRecommendService: Gemini message generated');
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshRecommendService message Gemini failed: $error\n$stackTrace',
-      );
+    } catch (_) {
       message = WeatherRecommendFallback.message(
         context,
         recommendedModeName: mode.name,

@@ -27,7 +27,7 @@ class MeasureAnalyzingPage extends StatefulWidget {
 class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
   static const Duration _analyzingDuration = Duration(seconds: 3);
 
-  final _recommendService = const MeasureRefreshRecommendService();
+  final _recommendService = MeasureRefreshRecommendService();
 
   Timer? _timer;
   bool _navigated = false;
@@ -58,10 +58,8 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
       MeasureResultStore.instance.setPending(result);
     } on MeasureApiException catch (error) {
       MeasureResultStore.instance.setLoadError(error.message);
-      debugPrint('MeasureAnalyzingPage recommend failed: $error');
-    } catch (error, stackTrace) {
+    } catch (_) {
       MeasureResultStore.instance.setLoadError('진단 결과 저장에 실패했습니다.');
-      debugPrint('MeasureAnalyzingPage recommend failed: $error\n$stackTrace');
     }
 
     if (!mounted) {

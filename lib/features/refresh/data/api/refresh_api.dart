@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../../../../core/constants/supabase_tables.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/refresh_mode.dart';
@@ -23,8 +21,7 @@ class RefreshApi {
             ),
           )
           .toList();
-    } catch (error, stackTrace) {
-      debugPrint('RefreshApi.fetchPresetModes failed: $error\n$stackTrace');
+    } catch (_) {
       return const [];
     }
   }
@@ -60,8 +57,7 @@ class RefreshApi {
       }
 
       return modes.isEmpty ? null : modes.first;
-    } catch (error, stackTrace) {
-      debugPrint('RefreshApi.fetchScentCarePreset failed: $error\n$stackTrace');
+    } catch (_) {
       return null;
     }
   }
@@ -81,8 +77,7 @@ class RefreshApi {
       return RefreshModeMapper.fromRefreshModeRow(
         Map<String, dynamic>.from(row),
       );
-    } catch (error, stackTrace) {
-      debugPrint('RefreshApi.fetchModeById failed: $error\n$stackTrace');
+    } catch (_) {
       return null;
     }
   }

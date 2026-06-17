@@ -68,11 +68,7 @@ class SettingsApi {
       final device = await _fetchDevice(deviceId);
       final consumable = await _fetchConsumableStatus(deviceId);
 
-      if (kDebugMode) {
-        debugPrint(
-          'SettingsApi consumable_status for device_id=$deviceId: $consumable',
-        );
-      }
+      if (kDebugMode) {}
 
       final batteryPercent =
           (consumable?['battery_remaining_percent'] as num?)?.round() ?? 60;
@@ -97,8 +93,7 @@ class SettingsApi {
         isConnected: true,
         linkedAtLabel: '연결됨',
       );
-    } catch (error, stackTrace) {
-      debugPrint('SettingsApi.fetchLinkedDevice failed: $error\n$stackTrace');
+    } catch (_) {
       return SettingsDeviceDetail.fallback;
     }
   }
@@ -152,22 +147,10 @@ class SettingsApi {
       }
       return Map<String, dynamic>.from(row);
     } on PostgrestException catch (error) {
-      debugPrint(
-        'SettingsApi: scent column select failed for device_id=$deviceId: '
-        '${error.message}',
-      );
-
       if (!error.message.contains('scent_cartridge') &&
           !error.message.contains('scent_category')) {
         rethrow;
       }
-
-      debugPrint(
-        'SettingsApi: CONSUMABLE_STATUS에 scent_cartridge_*, scent_category '
-        '컬럼이 없습니다. supabase/dev_consumable_scent_cartridge.sql 실행 후 '
-        '다시 UPDATE 하세요.',
-      );
-
       final row = await SupabaseService.client
           .from(SupabaseTables.consumableStatus)
           .select('battery_remaining_percent, filter_remaining_percent')
@@ -200,12 +183,7 @@ class SettingsApi {
         if (row != null) {
           merged.addAll(Map<String, dynamic>.from(row));
         }
-      } on PostgrestException catch (error) {
-        debugPrint(
-          'SettingsApi: partial scent select ($columns) failed: '
-          '${error.message}',
-        );
-      }
+      } on PostgrestException {}
     }
     return merged;
   }

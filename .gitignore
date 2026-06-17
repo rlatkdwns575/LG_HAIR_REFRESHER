@@ -1,3 +1,7 @@
+# Build outputs
+/release/
+*.apk
+
 # Miscellaneous
 .env
 *.class

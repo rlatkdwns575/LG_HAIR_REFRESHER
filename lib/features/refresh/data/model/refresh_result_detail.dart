@@ -149,6 +149,15 @@ class RefreshResultDetail {
     return '${value.toStringAsFixed(1)}%';
   }
 
+  /// 공유하기(클립보드 복사)용 요약 텍스트.
+  String get shareSummaryText => [
+    '리프레시 결과',
+    modeName,
+    '리프레시 필요도 $necessityReductionLabel 낮아짐',
+    '현재 케어 필요도 $currentCareNeedLabel',
+    summaryMessage.replaceAll('\n', ' '),
+  ].join('\n');
+
   /// Figma 기준 mock.
   static const sample = RefreshResultDetail(
     modeName: '외출 후 집중 리프레시 모드',

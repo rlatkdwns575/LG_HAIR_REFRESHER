@@ -122,6 +122,39 @@ class HistoryKeyValueRow extends StatelessWidget {
   }
 }
 
+/// 하루 기록 목록 — 접힘 시 최대 표시 개수.
+const historyMaxVisibleDayRecords = 3;
+
+/// 하루 기록 접기/펼치기 토글.
+class HistoryRecordsExpandToggle extends StatelessWidget {
+  const HistoryRecordsExpandToggle({
+    required this.expanded,
+    required this.onTap,
+    super.key,
+  });
+
+  final bool expanded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        height: 28,
+        child: Center(
+          child: Icon(
+            expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            size: 22,
+            color: AppColors.gray400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// 리포트 카드 우측 상세보기 링크.
 class HistoryDetailLink extends StatelessWidget {
   const HistoryDetailLink({required this.label, this.onTap, super.key});

@@ -9,7 +9,7 @@ import '../../../../shared/widgets/app_section_divider.dart';
 import '../../data/model/refresh_result_detail.dart';
 import 'refresh_result_detail_metric_bars.dart';
 import 'refresh_result_detail_status_section.dart';
-import 'refresh_result_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 
 /// Figma 1170-16711 — 리프레시 결과 상세보기 본문.
 class RefreshResultDetailContent extends StatelessWidget {
@@ -207,10 +207,10 @@ class _NecessityHelpRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 3),
-          RefreshResultHelpIcon(
+          AppMetricHelpIcon(
             tooltipMessage: RefreshResultDetail.necessityHelpTooltip,
             size: 16,
-            placement: RefreshResultHelpTooltipPlacement.belowEnd,
+            placement: AppMetricHelpTooltipPlacement.belowEnd,
             tooltipMaxWidth: 240,
           ),
         ],

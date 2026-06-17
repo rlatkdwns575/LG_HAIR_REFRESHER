@@ -5,6 +5,7 @@ import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/layout/app_layout.dart';
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/services/local_calendar_login_prompt.dart';
 import '../../data/api/auth_api.dart';
 import '../../../../core/constants/hair_profile_options.dart';
 import '../../data/model/sign_up_draft.dart';
@@ -28,6 +29,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final _authApi = const AuthApi();
+  final _calendarLoginPrompt = LocalCalendarLoginPrompt();
 
   int? _selectedAge;
   String? _selectedGender;
@@ -165,6 +167,10 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
+        await _calendarLoginPrompt.showIfNeeded(context);
+        if (!mounted) {
+          return;
+        }
         context.go(AppRoutePaths.home);
         return;
       }
