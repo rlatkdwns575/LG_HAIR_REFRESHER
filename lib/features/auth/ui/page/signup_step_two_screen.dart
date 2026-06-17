@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/layout/app_layout.dart';
 import '../../../../core/constants/route_paths.dart';
@@ -77,7 +78,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      AppText(
                         '나이 선택',
                         style: TextStyle(
                           fontSize: 16,
@@ -90,7 +91,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
                           setState(() => _selectedAge = tempAge);
                           Navigator.pop(sheetContext);
                         },
-                        child: const Text(
+                        child: AppText(
                           '완료',
                           style: TextStyle(
                             fontSize: 14,
@@ -115,7 +116,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
                     children: List.generate(_maxAge - _minAge + 1, (index) {
                       final age = _minAge + index;
                       return Center(
-                        child: Text(
+                        child: AppText(
                           '$age세',
                           style: const TextStyle(
                             fontSize: 20,
@@ -160,7 +161,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
           ..hideCurrentSnackBar()
           ..showSnackBar(
             const SnackBar(
-              content: Text('회원가입이 완료되었습니다.'),
+              content: AppText('회원가입이 완료되었습니다.'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -172,7 +173,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('회원가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.'),
+            content: AppText('회원가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -187,7 +188,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: AppText(error.message),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -213,7 +214,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            AppText(
               hasValue ? '$_selectedAge세' : '나이를 선택해주세요',
               style: TextStyle(
                 fontSize: 14,
@@ -255,7 +256,7 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
           child: SizedBox(
             height: 48,
             child: Center(
-              child: Text(
+              child: AppText(
                 label,
                 style: TextStyle(
                   fontSize: 14,

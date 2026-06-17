@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -84,7 +85,10 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: AppText(message),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 
@@ -146,7 +150,7 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
-                  child: Text(
+                  child: AppText(
                     _status.statusMessage,
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.gray600,
@@ -211,7 +215,7 @@ class _ConnectionHero extends StatelessWidget {
             color: isConnected ? AppColors.primary500 : AppColors.gray300,
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             '기기 로컬 캘린더',
             style: AppTextStyles.titleM.copyWith(color: AppColors.gray900),
           ),
@@ -234,7 +238,7 @@ class _ConnectionHero extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                Text(
+                AppText(
                   label,
                   style: AppTextStyles.labelS.copyWith(
                     color: color,
@@ -245,7 +249,7 @@ class _ConnectionHero extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             '일정 기반 리프레시·측정 추천에 사용됩니다.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),

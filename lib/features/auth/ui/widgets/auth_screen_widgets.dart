@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../data/auth_credentials_validator.dart';
 import 'auth_screen_styles.dart';
@@ -28,7 +29,7 @@ class AuthCloseHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Text(
+          AppText(
             title,
             style: const TextStyle(
               fontSize: 16,
@@ -99,14 +100,14 @@ class AuthPrimaryButton extends StatelessWidget {
           ),
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
-        child: Text(label),
+        child: AppText(label),
       ),
     );
   }
 }
 
 Widget buildAuthFieldLabel(String text, {double fontSize = 14}) {
-  return Text(
+  return AppText(
     text,
     style: TextStyle(
       fontSize: fontSize,
@@ -191,7 +192,7 @@ Widget buildAuthPasswordRulesHint() {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      const Text(
+      AppText(
         '* 비밀번호 조건',
         style: TextStyle(fontSize: 12, color: AuthScreenStyles.textMuted),
       ),
@@ -211,7 +212,7 @@ Widget buildAuthPasswordRulesHint() {
               shape: BoxShape.circle,
               border: Border.all(color: AuthScreenStyles.textMuted, width: 1),
             ),
-            child: const Text(
+            child: AppText(
               '?',
               style: TextStyle(
                 fontSize: 11,

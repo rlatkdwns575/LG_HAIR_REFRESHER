@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -20,7 +21,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '향 카트리지',
             style: AppTextStyles.labelM.copyWith(
               color: AppColors.gray800,
@@ -28,7 +29,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             _currentStatusText(),
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray700,
@@ -36,7 +37,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
+          AppText(
             '향 종류',
             style: AppTextStyles.labelS.copyWith(
               color: AppColors.gray600,
@@ -44,7 +45,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
+          AppText(
             '카트리지마다 아래 향 중 하나가 장착됩니다.',
             style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
           ),
@@ -61,7 +62,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
+          AppText(
             _tipText(),
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray600,
@@ -120,7 +121,7 @@ class _ScentCategoryChip extends StatelessWidget {
           color: isActive ? AppColors.primary500 : AppColors.gray200,
         ),
       ),
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelS.copyWith(
           color: isActive ? AppColors.primary700 : AppColors.gray600,
