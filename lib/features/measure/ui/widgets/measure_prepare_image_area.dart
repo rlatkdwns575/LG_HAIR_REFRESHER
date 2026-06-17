@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/theme/app_colors.dart';
+import '../../data/measure_assets.dart';
+import '../../data/model/measure_prepare_step.dart';
 
 class MeasurePrepareImageArea extends StatelessWidget {
-  const MeasurePrepareImageArea({super.key});
+  const MeasurePrepareImageArea({required this.step, super.key});
+
+  final MeasurePrepareStep step;
 
   static const double height = 360;
   static const double imageRadius = 10;
 
   @override
   Widget build(BuildContext context) {
+    final asset = MeasureAssets.imageForPrepareStep(step);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(imageRadius),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: height,
-        color: AppColors.gray200,
-        child: Icon(Icons.image_outlined, size: 48, color: AppColors.gray400),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Image.asset(
+            asset,
+            key: ValueKey(asset),
+            width: double.infinity,
+            height: height,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+          ),
+        ),
       ),
     );
   }

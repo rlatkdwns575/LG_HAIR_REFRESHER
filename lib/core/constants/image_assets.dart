@@ -14,12 +14,16 @@ class ImageAssets {
   static const googleIcon = '$authDir/Google.png';
   static const checkIcon = '$commonDir/check.png';
   static const homeFilterIcon = '$homeDir/filter.png';
+  static const homeBrandLogo = '$homeDir/LOGO.png';
+  static const homeBrandTagline = '$homeDir/LOGO2.png';
   static const homeDeviceImage = '$homeDir/device_purihair.png';
   static const homeRecommendSparkleIcon = '$homeDir/recommend_sparkle.png';
-  static const measureAnalyzingIllustration = '$measureDir/analyzing.png';
+  static const measureAnalyzingIllustration = '$measureDir/analyzing2.png';
+  static const measurePrepareDevice = '$measureDir/machine.png';
+  static const measurePrepareHair = '$measureDir/hair.png';
   static const refreshTrashIcon = '$refreshDir/trash.png';
   static const refreshShareIcon = '$refreshDir/wifi.png';
-  static const refreshCollectingIllustration = '$refreshDir/refrash.png';
+  static const refreshCollectingIllustration = '$refreshDir/refresh2.png';
   static const historyCalendarIcon = '$historyDir/calendar.png';
 
   static const homeBatteryIconDir = '$homeDir/battery';

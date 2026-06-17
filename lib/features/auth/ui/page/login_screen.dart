@@ -44,6 +44,7 @@ class LoginScreen extends StatelessWidget {
                 height: _buttonHeight,
                 radius: _buttonRadius,
                 backgroundColor: Colors.white,
+                elevation: 2,
                 onPressed: () => _onGoogleLogin(context),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -113,27 +114,26 @@ class LoginScreen extends StatelessWidget {
 class _LogoSection extends StatelessWidget {
   const _LogoSection();
 
+  static const _logoWidth = 228.0;
+  static const _taglineWidth = 204.0;
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          '서비스 logo',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: AuthScreenStyles.logoMuted,
-          ),
+        Image.asset(
+          AuthAssets.brandLogo,
+          width: _logoWidth,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
         ),
-        SizedBox(height: 20),
-        Text(
-          '서비스 설명',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AuthScreenStyles.logoMuted,
-          ),
+        const SizedBox(height: 14),
+        Image.asset(
+          AuthAssets.brandTagline,
+          width: _taglineWidth,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
         ),
       ],
     );
@@ -148,12 +148,14 @@ class _LoginMethodButton extends StatelessWidget {
     required this.child,
     this.backgroundColor = Colors.white,
     this.borderColor,
+    this.elevation = 0,
   });
 
   final double height;
   final double radius;
   final Color backgroundColor;
   final Color? borderColor;
+  final double elevation;
   final VoidCallback onPressed;
   final Widget child;
 
@@ -164,6 +166,8 @@ class _LoginMethodButton extends StatelessWidget {
       height: height,
       child: Material(
         color: backgroundColor,
+        elevation: elevation,
+        shadowColor: Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),
           side: borderColor == null

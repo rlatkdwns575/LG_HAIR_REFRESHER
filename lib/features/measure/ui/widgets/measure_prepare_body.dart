@@ -23,7 +23,7 @@ class MeasurePrepareBody extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: _contentTopGap),
-          const MeasurePrepareImageArea(),
+          MeasurePrepareImageArea(step: step),
           const SizedBox(height: AppSpacing.xl),
           // AnimatedSwitcher를 추가해 문구가 바뀔 때 디졸브 효과를 줌
           AnimatedSwitcher(
