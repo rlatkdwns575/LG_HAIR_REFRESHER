@@ -712,11 +712,7 @@ class _ModeUsageRow extends StatelessWidget {
       color: usage.isMostUsed ? AppColors.primary500 : AppColors.gray700,
       fontWeight: usage.isMostUsed ? FontWeight.w700 : FontWeight.w400,
     );
-    final suffixStyle = AppTextStyles.labelM.copyWith(
-      color: AppColors.gray500,
-      fontWeight: FontWeight.w400,
-    );
-    final percentStyle = AppTextStyles.labelM.copyWith(
+    final improvementStyle = AppTextStyles.labelM.copyWith(
       color: usage.isBestImprovement ? AppColors.primary500 : AppColors.gray500,
       fontWeight: usage.isBestImprovement ? FontWeight.w700 : FontWeight.w400,
     );
@@ -740,13 +736,9 @@ class _ModeUsageRow extends StatelessWidget {
         ),
         SizedBox(
           width: 72,
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(text: improvementPercentText, style: percentStyle),
-                TextSpan(text: ' 개선', style: suffixStyle),
-              ],
-            ),
+          child: Text(
+            '$improvementPercentText 개선',
+            style: improvementStyle,
             textAlign: TextAlign.right,
           ),
         ),

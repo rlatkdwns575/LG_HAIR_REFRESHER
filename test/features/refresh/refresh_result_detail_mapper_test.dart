@@ -26,7 +26,7 @@ void main() {
           odorRemovalPercent: 92,
           overallImprovementPercent: 40.9,
           headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-          headlineAfter: '개선되었어요.',
+          headlineAfter: '줄어들었어요.',
           disclaimer: 'disclaimer',
           dustChange: RefreshResult.sample.dustChange,
           odorChange: RefreshResult.sample.odorChange,

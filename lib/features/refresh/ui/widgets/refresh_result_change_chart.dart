@@ -22,79 +22,154 @@ class RefreshResultChangeChart extends StatelessWidget {
   static const _rowHeight = 48.0;
   static const _chartHorizontalInset = 6.0;
   static const _axisLabelGap = 12.0;
+  static const _legendGap = 30.0;
+  static const _legendItemGap = 24.0;
+
+  static const Color beforeLegendColor = AppColors.gray300;
+  static const Color afterLegendColor = AppColors.primary500;
 
   static double chartHeightForRowCount(int rowCount) => _rowHeight * rowCount;
+
+  /// 차트 [CustomPaint]와 X축 라벨이 동일한 x 좌표를 쓰도록 공유합니다.
+  static double gridLineX(
+    double fraction,
+    double totalWidth, {
+    double horizontalInset = _chartHorizontalInset,
+  }) {
+    final chartWidth = totalWidth - horizontalInset * 2;
+    return horizontalInset + chartWidth * fraction;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: maxChartWidth),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            SizedBox(
-              width: _labelColumnWidth,
-              child: Column(
-                children: [
-                  _RowLabel(label: dustChange.label),
-                  _RowLabel(label: odorChange.label),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: chartHeightForRowCount(2),
-                    child: CustomPaint(
-                      painter: _RefreshResultChangeChartPainter(
-                        changes: [dustChange, odorChange],
-                        rowHeight: _rowHeight,
-                        horizontalInset: _chartHorizontalInset,
-                      ),
-                    ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: _labelColumnWidth,
+                  child: Column(
+                    children: [
+                      _RowLabel(label: dustChange.label),
+                      _RowLabel(label: odorChange.label),
+                    ],
                   ),
-                  const SizedBox(height: _axisLabelGap),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: _chartHorizontalInset,
-                    ),
-                    child: Row(
-                      children: [
-                        for (
-                          var i = 0;
-                          i < RefreshPollutionLevel.axisLabels.length;
-                          i++
-                        )
-                          Expanded(
-                            child: AppText(
-                              RefreshPollutionLevel.axisLabels[i],
-                              textAlign: i == 0
-                                  ? TextAlign.left
-                                  : i ==
-                                        RefreshPollutionLevel
-                                                .axisLabels
-                                                .length -
-                                            1
-                                  ? TextAlign.right
-                                  : TextAlign.center,
-                              style: AppTextStyles.labelS.copyWith(
-                                color: AppColors.gray500,
-                                fontSize: 12,
-                              ),
-                            ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: chartHeightForRowCount(2),
+                        child: CustomPaint(
+                          painter: _RefreshResultChangeChartPainter(
+                            changes: [dustChange, odorChange],
+                            rowHeight: _rowHeight,
+                            horizontalInset: _chartHorizontalInset,
                           ),
-                      ],
-                    ),
+                        ),
+                      ),
+                      const SizedBox(height: _axisLabelGap),
+                      const _ChartAxisLabels(),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
+            const SizedBox(height: _legendGap),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                _ChartLegendItem(color: beforeLegendColor, label: '리프레시 이전'),
+                SizedBox(width: _legendItemGap),
+                _ChartLegendItem(color: afterLegendColor, label: '리프레시 이후'),
+              ],
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ChartAxisLabels extends StatelessWidget {
+  const _ChartAxisLabels();
+
+  static const _rowHeight = 16.0;
+
+  static final TextStyle _labelStyle = AppTextStyles.labelS.copyWith(
+    color: AppColors.gray500,
+    fontSize: 12,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalWidth = constraints.maxWidth;
+        final textDirection = Directionality.of(context);
+        final labels = <Widget>[];
+
+        for (final level in RefreshPollutionLevel.values) {
+          final x = RefreshResultChangeChart.gridLineX(
+            level.axisFraction,
+            totalWidth,
+          );
+          final painter = TextPainter(
+            text: TextSpan(text: level.label, style: _labelStyle),
+            textAlign: TextAlign.center,
+            textDirection: textDirection,
+          )..layout();
+
+          labels.add(
+            Positioned(
+              left: x - painter.width / 2,
+              top: 0,
+              child: AppText(level.label, style: _labelStyle),
+            ),
+          );
+        }
+
+        return SizedBox(
+          height: _rowHeight,
+          child: Stack(clipBehavior: Clip.none, children: labels),
+        );
+      },
+    );
+  }
+}
+
+class _ChartLegendItem extends StatelessWidget {
+  const _ChartLegendItem({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  static const _dotSize = 10.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: _dotSize,
+          height: _dotSize,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        AppText(
+          label,
+          style: AppTextStyles.labelS.copyWith(
+            color: AppColors.gray500,
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -144,18 +219,21 @@ class _RefreshResultChangeChartPainter extends CustomPainter {
   static final Color _barGradientEnd = AppColors.primary500.withValues(
     alpha: 0.4,
   );
-  static const Color _startDotColor = AppColors.gray300;
-  static const Color _endDotColor = AppColors.primary500;
+  static const Color _startDotColor =
+      RefreshResultChangeChart.beforeLegendColor;
+  static const Color _endDotColor = RefreshResultChangeChart.afterLegendColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final chartLeft = horizontalInset;
-    final chartWidth = size.width - horizontalInset * 2;
     final gridBottom = size.height;
 
     for (var i = 0; i <= _gridDivisions; i++) {
       final fraction = i / _gridDivisions;
-      final x = chartLeft + chartWidth * fraction;
+      final x = RefreshResultChangeChart.gridLineX(
+        fraction,
+        size.width,
+        horizontalInset: horizontalInset,
+      );
       final isMajor = i.isEven;
       final gridPaint = Paint()
         ..color = isMajor ? AppColors.gray200 : AppColors.gray100
@@ -168,8 +246,16 @@ class _RefreshResultChangeChartPainter extends CustomPainter {
     for (var row = 0; row < changes.length; row++) {
       final change = changes[row];
       final centerY = rowHeight * row + rowHeight / 2;
-      final startX = chartLeft + chartWidth * change.beforeAxisFraction;
-      final endX = chartLeft + chartWidth * change.afterAxisFraction;
+      final startX = RefreshResultChangeChart.gridLineX(
+        change.beforeAxisFraction,
+        size.width,
+        horizontalInset: horizontalInset,
+      );
+      final endX = RefreshResultChangeChart.gridLineX(
+        change.afterAxisFraction,
+        size.width,
+        horizontalInset: horizontalInset,
+      );
       final left = startX < endX ? startX : endX;
       final right = startX < endX ? endX : startX;
 

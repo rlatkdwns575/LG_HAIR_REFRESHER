@@ -98,7 +98,7 @@ class RefreshSessionResultGenerator {
       odorRemovalPercent: odorRemoval ?? 0,
       overallImprovementPercent: overall,
       headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-      headlineAfter: '개선되었어요.',
+      headlineAfter: '줄어들었어요.',
       disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
       dustChange: RefreshResultChange(
         label: '먼지',
