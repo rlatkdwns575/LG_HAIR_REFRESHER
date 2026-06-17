@@ -251,14 +251,42 @@ class _MonthlySummaryCard extends StatelessWidget {
   }
 }
 
-class _SelectedDayCard extends StatelessWidget {
+class _SelectedDayCard extends StatefulWidget {
   const _SelectedDayCard({required this.group, this.onDetailTap});
 
   final RefreshDayGroup group;
   final VoidCallback? onDetailTap;
 
   @override
+  State<_SelectedDayCard> createState() => _SelectedDayCardState();
+}
+
+class _SelectedDayCardState extends State<_SelectedDayCard> {
+  static const _maxCollapsedCount = 3;
+
+  bool _showAllRecords = false;
+
+  @override
+  void didUpdateWidget(covariant _SelectedDayCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_isSameDay(oldWidget.group.date, widget.group.date)) {
+      _showAllRecords = false;
+    }
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final group = widget.group;
+    final records = group.records;
+    final hasHiddenRecords = records.length > _maxCollapsedCount;
+    final visibleRecords = _showAllRecords || !hasHiddenRecords
+        ? records
+        : records.take(_maxCollapsedCount).toList();
+
     return HistoryWhiteCard(
       backgroundColor: AppColors.gray50,
       borderColor: null,
@@ -276,7 +304,7 @@ class _SelectedDayCard extends StatelessWidget {
                   ),
                 ),
               ),
-              HistoryDetailLink(label: '결과 상세보기', onTap: onDetailTap),
+              HistoryDetailLink(label: '결과 상세보기', onTap: widget.onDetailTap),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -290,11 +318,46 @@ class _SelectedDayCard extends StatelessWidget {
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
           const SizedBox(height: AppSpacing.md),
-          for (var i = 0; i < group.records.length; i++) ...[
+          for (var i = 0; i < visibleRecords.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacing.sm),
-            _DayRecordTile(record: group.records[i]),
+            _DayRecordTile(record: visibleRecords[i]),
+          ],
+          if (hasHiddenRecords) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _RecordsExpandToggle(
+              expanded: _showAllRecords,
+              onTap: () => setState(() => _showAllRecords = !_showAllRecords),
+            ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _RecordsExpandToggle extends StatelessWidget {
+  const _RecordsExpandToggle({
+    required this.expanded,
+    required this.onTap,
+  });
+
+  final bool expanded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        height: 28,
+        child: Center(
+          child: Icon(
+            expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            size: 22,
+            color: AppColors.gray400,
+          ),
+        ),
       ),
     );
   }

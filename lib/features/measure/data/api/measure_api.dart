@@ -6,6 +6,7 @@ import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/measure_result_record.dart';
 import 'measure_diagnosis_generator.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 
 class MeasureApiException implements Exception {
   const MeasureApiException(this.message);
@@ -74,6 +75,8 @@ class MeasureApi {
         'MeasureApi.insertDiagnosisResult failed: $error\n$stackTrace',
       );
       throw MeasureApiException('진단 결과 저장에 실패했습니다.');
+    } finally {
+      RefreshRecommendService.invalidateCache();
     }
   }
 

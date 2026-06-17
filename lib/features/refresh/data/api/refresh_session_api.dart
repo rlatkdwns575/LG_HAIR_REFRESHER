@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../../core/constants/supabase_tables.dart';
 import '../../../../core/services/supabase_service.dart';
+import '../../../../core/utils/session_end_time.dart';
 import '../model/refresh_mode.dart';
 import '../model/refresh_session_outcome.dart';
 import 'refresh_session_result_generator.dart';
@@ -29,9 +30,8 @@ class RefreshSessionApi {
     final durationSeconds = mode.durationSeconds > 0
         ? mode.durationSeconds
         : 180;
-    final startedAt = DateTime.now().toUtc().subtract(
-      Duration(seconds: durationSeconds),
-    );
+    final endedAt = DateTime.now().toUtc();
+    final startedAt = endedAt.subtract(Duration(seconds: durationSeconds));
 
     final payload = _buildPayload(
       sessionId: _generateUuidV4(),
@@ -39,6 +39,7 @@ class RefreshSessionApi {
       mode: mode,
       outcome: outcome,
       startedAt: startedAt,
+      endedAt: endedAt,
       durationSeconds: durationSeconds,
     );
 
@@ -51,21 +52,100 @@ class RefreshSessionApi {
         );
       }
     } on PostgrestException catch (error) {
-      if (_shouldRetryWithoutMeasureId(error, payload)) {
-        payload.remove('measure_id');
-        await _insertPayload(payload);
-        if (kDebugMode) {
-          debugPrint(
-            'RefreshSessionApi: saved without measure_id (${error.message})',
-          );
-        }
-        return;
-      }
       throw RefreshSessionApiException(
         '리프레시 기록 저장에 실패했습니다. '
         '(${RefreshSessionApiException.fromPostgrest(error)})',
       );
     }
+  }
+
+  /// 측정 이후 리프레시를 완료했는지 확인합니다.
+  ///
+  /// `REFRESH_SESSIONS.ended_at >= measureCreatedAt` 기준.
+  /// `ended_at` 컬럼이 없으면 `started_at + duration_time`으로 계산합니다.
+  Future<bool> hasCompletedRefreshSinceMeasure({
+    required DateTime measureCreatedAt,
+    String? userId,
+  }) async {
+    final userDeviceId = await measureApi.fetchUserDeviceId(userId: userId);
+    if (userDeviceId == null || userDeviceId.isEmpty) {
+      return false;
+    }
+
+    try {
+      return await _hasCompletedByEndedAtColumn(
+        userDeviceId: userDeviceId,
+        measureCreatedAt: measureCreatedAt,
+      );
+    } on PostgrestException catch (error) {
+      if (!_isMissingEndedAtColumn(error)) {
+        debugPrint(
+          'RefreshSessionApi.hasCompletedRefreshSinceMeasure failed: '
+          '${error.message}',
+        );
+        return false;
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        'RefreshSessionApi.hasCompletedRefreshSinceMeasure failed: '
+        '$error\n$stackTrace',
+      );
+      return false;
+    }
+
+    return _hasCompletedByComputedEndTime(
+      userDeviceId: userDeviceId,
+      measureCreatedAt: measureCreatedAt,
+    );
+  }
+
+  Future<bool> _hasCompletedByEndedAtColumn({
+    required String userDeviceId,
+    required DateTime measureCreatedAt,
+  }) async {
+    final measureCreatedUtc = measureCreatedAt.toUtc().toIso8601String();
+    final rows = await SupabaseService.client
+        .from(SupabaseTables.refreshSessions)
+        .select('session_id')
+        .eq('user_device_id', userDeviceId)
+        .gte('ended_at', measureCreatedUtc)
+        .limit(1);
+
+    return rows.isNotEmpty;
+  }
+
+  Future<bool> _hasCompletedByComputedEndTime({
+    required String userDeviceId,
+    required DateTime measureCreatedAt,
+  }) async {
+    final rows = await SupabaseService.client
+        .from(SupabaseTables.refreshSessions)
+        .select('ended_at, started_at, duration_time')
+        .eq('user_device_id', userDeviceId)
+        .order('started_at', ascending: false)
+        .limit(50);
+
+    for (final row in rows) {
+      final session = Map<String, dynamic>.from(row);
+      if (SessionEndTime.isEndTimeOnOrAfterMeasure(
+        measureCreatedAt: measureCreatedAt,
+        endedAtRaw: session['ended_at'],
+        startedAtRaw: session['started_at'],
+        durationTimeRaw: session['duration_time'],
+      )) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _isMissingEndedAtColumn(PostgrestException error) {
+    final message = error.message.toLowerCase();
+    return message.contains('ended_at') &&
+        (message.contains('does not exist') ||
+            message.contains('column') ||
+            error.code == '42703');
   }
 
   Future<void> _insertPayload(Map<String, dynamic> payload) async {
@@ -74,29 +154,13 @@ class RefreshSessionApi {
         .insert(payload);
   }
 
-  bool _shouldRetryWithoutMeasureId(
-    PostgrestException error,
-    Map<String, dynamic> payload,
-  ) {
-    if (!payload.containsKey('measure_id')) {
-      return false;
-    }
-
-    if (error.code == '42501' ||
-        error.message.toLowerCase().contains('row-level security')) {
-      return false;
-    }
-
-    final message = error.message.toLowerCase();
-    return message.contains('measure_id') || message.contains('foreign key');
-  }
-
   Map<String, dynamic> _buildPayload({
     required String sessionId,
     required String userDeviceId,
     required RefreshMode mode,
     required RefreshSessionOutcome outcome,
     required DateTime startedAt,
+    required DateTime endedAt,
     required int durationSeconds,
   }) {
     final scores = outcome.scores;
@@ -118,9 +182,8 @@ class RefreshSessionApi {
       'session_id': sessionId,
       'user_device_id': userDeviceId,
       'mode_id': mode.id,
-      if (outcome.measureId != null && outcome.measureId!.isNotEmpty)
-        'measure_id': outcome.measureId,
       'started_at': startedAt.toIso8601String(),
+      'ended_at': endedAt.toIso8601String(),
       'duration_time': durationSeconds,
       'pollution_score_before': pollutionBefore,
       'pollution_score_after': pollutionAfter,

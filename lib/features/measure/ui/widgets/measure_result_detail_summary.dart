@@ -45,6 +45,7 @@ class MeasureResultDetailSummary extends StatelessWidget {
           mode: detail.recommendedMode,
           variant: RefreshModeCardVariant.featured,
           badgeLabel: '추천',
+          descriptionOverride: detail.recommendReason,
           enabled: isRecommendEnabled,
           disabledReason: isRecommendEnabled
               ? null
@@ -73,51 +74,51 @@ class _Headline extends StatelessWidget {
         children: [
           AppText(
             '리프레시 필요도가',
-            style: AppTextStyles.titleS.copyWith(
-              color: AppColors.gray800,
-              height: 1.25,
+            style: AppTextStyles.titleM.copyWith(
+              color: AppColors.gray900,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AppText(
                 '${detail.refreshNeedPercent}%',
                 style: AppTextStyles.headlineL.copyWith(
-                  fontSize: 48,
-                  height: 1.05,
+                  fontSize: 44,
+                  height: 1.1,
                   color: AppColors.gray900,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2, bottom: 2),
                 child: AppText(
                   suffix,
-                  style: AppTextStyles.titleS.copyWith(
-                    color: AppColors.gray800,
-                    height: 1.25,
+                  style: AppTextStyles.titleM.copyWith(
+                    color: AppColors.gray900,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 10),
           Row(
             children: [
               AppText(
                 detail.refreshFocusLabel,
-                style: AppTextStyles.titleS.copyWith(
+                style: AppTextStyles.bodyS.copyWith(
                   color: AppColors.orange700,
-                  height: 1.25,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               AppText(
                 '가 필요해요.',
-                style: AppTextStyles.titleS.copyWith(
-                  color: AppColors.gray800,
-                  height: 1.25,
+                style: AppTextStyles.bodyS.copyWith(
+                  color: AppColors.gray600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -140,7 +141,7 @@ class _AnalysisSummary extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.gray50,
             borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -148,13 +149,14 @@ class _AnalysisSummary extends StatelessWidget {
           child: AppText(
             detail.analysisSummary,
             textAlign: TextAlign.center,
+            breakLinesBySentence: true,
             style: AppTextStyles.bodyXs.copyWith(
-              color: AppColors.gray700,
-              height: 16 / 12,
+              color: AppColors.gray900,
+              height: 1.55,
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: 6),
         Align(
           alignment: Alignment.centerRight,
           child: Row(
@@ -162,7 +164,10 @@ class _AnalysisSummary extends StatelessWidget {
             children: [
               AppText(
                 '리프레시 필요도',
-                style: AppTextStyles.labelS.copyWith(color: AppColors.gray600),
+                style: AppTextStyles.bodyS.copyWith(
+                  color: AppColors.gray600,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               MeasureResultMetricHelpIcon(
                 message: MeasureResultMapper.refreshNeedHelpMessage,

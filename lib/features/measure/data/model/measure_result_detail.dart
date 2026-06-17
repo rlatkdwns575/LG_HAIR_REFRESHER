@@ -15,6 +15,7 @@ class MeasureResultDetail {
     required this.hairImpactPercent,
     required this.analysisSummary,
     required this.recommendedMode,
+    this.recommendReason,
     required this.odorSection,
     required this.dustSection,
     required this.hairSection,
@@ -28,6 +29,7 @@ class MeasureResultDetail {
   final int hairImpactPercent;
   final String analysisSummary;
   final RefreshMode recommendedMode;
+  final String? recommendReason;
   final MeasureResultDetailSection odorSection;
   final MeasureResultDetailSection dustSection;
   final MeasureResultDetailSection hairSection;
@@ -69,6 +71,7 @@ class MeasureResultDetail {
       hairImpactPercent: MeasureResultMapper.hairImpactPercent(record),
       analysisSummary: MeasureResultMapper.analysisSummary(record),
       recommendedMode: result.recommendedMode,
+      recommendReason: result.recommendReason,
       odorSection: MeasureResultDetailSection(
         title: '냄새 상태',
         subtitle: '머리카락에 남은 외부 냄새를 분석했어요.',

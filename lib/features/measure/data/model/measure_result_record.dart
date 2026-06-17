@@ -58,4 +58,17 @@ class MeasureResultRecord {
     final text = value.toString().trim();
     return text.isEmpty ? null : text;
   }
+
+  /// Gemini 추천 프롬프트용 JSON.
+  Map<String, dynamic> toRecommendJson() => {
+    'measure_id': measureId,
+    'created_at': createdAt.toIso8601String(),
+    'hair_dust_score': hairDustScore,
+    'hair_odor_score': hairOdorScore,
+    'total_pollution_score': totalPollutionScore,
+    if (hairDamageScore != null) 'hair_damage_score': hairDamageScore,
+    if (hairThickness != null) 'hair_thickness': hairThickness,
+    if (hairSebum != null) 'hair_sebum': hairSebum,
+    if (smellType != null) 'smell_type': smellType,
+  };
 }

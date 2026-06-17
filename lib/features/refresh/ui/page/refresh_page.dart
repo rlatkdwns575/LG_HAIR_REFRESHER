@@ -13,11 +13,10 @@ import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/device_consumable_service.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
-import '../../../home/data/api/weather_api.dart';
+import '../../../../shared/recommendation/refresh_recommend_basis.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../data/api/custom_mode_api.dart';
 import '../../data/api/refresh_api.dart';
-import '../../data/api/refresh_recommend_api.dart';
-import '../../data/api/refresh_recommend_fallback.dart';
 import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/refresh_mode_availability.dart';
@@ -37,12 +36,13 @@ class RefreshPage extends StatefulWidget {
 class _RefreshPageState extends State<RefreshPage> {
   final _refreshApi = const RefreshApi();
   final _customModeApi = const CustomModeApi();
-  final _weatherApi = const WeatherApi();
-  final _refreshRecommendApi = const RefreshRecommendApi();
+  final _recommendService = RefreshRecommendService.instance;
   final _deviceConsumableService = const DeviceConsumableService();
 
   List<RefreshMode> _presetModes = const [];
   RefreshMode? _recommendedMode;
+  String? _recommendMessage;
+  RefreshRecommendBasis? _recommendBasis;
   ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
   bool _isLoading = true;
   int _selectedChipIndex = 0;
@@ -90,16 +90,15 @@ class _RefreshPageState extends State<RefreshPage> {
     CustomModeCache.instance.setModes(customModes);
 
     RefreshMode? recommended;
+    String? recommendMessage;
+    RefreshRecommendBasis? recommendBasis;
     try {
-      final environment = await _weatherApi.fetchSnapshot();
-      recommended = await _refreshRecommendApi.recommendMode(
-        candidates: presets,
-        environment: environment,
-      );
-      recommended ??= RefreshRecommendFallback.pickMode(
-        candidates: presets,
-        environment: environment,
-      );
+      final recommendation = await _recommendService.resolve();
+      if (recommendation != null) {
+        recommended = recommendation.mode;
+        recommendMessage = recommendation.message;
+        recommendBasis = recommendation.basis;
+      }
     } catch (error, stackTrace) {
       debugPrint('RefreshPage recommend failed: $error\n$stackTrace');
     }
@@ -111,6 +110,8 @@ class _RefreshPageState extends State<RefreshPage> {
     setState(() {
       _presetModes = presets;
       _recommendedMode = recommended;
+      _recommendMessage = recommendMessage;
+      _recommendBasis = recommendBasis;
       _scentCartridge = cartridge;
       _isLoading = false;
     });
@@ -196,13 +197,14 @@ class _RefreshPageState extends State<RefreshPage> {
   }
 
   Widget _buildRecommendedSection(RefreshMode mode) {
+    final subtitle =
+        _recommendBasis?.refreshSectionSubtitle ??
+        RefreshRecommendBasis.weatherOnly.refreshSectionSubtitle;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const RefreshSectionHeader(
-          title: '맞춤 리프레시',
-          subtitle: '측정 결과를 바탕으로 추천한 모드예요',
-        ),
+        RefreshSectionHeader(title: '맞춤 리프레시', subtitle: subtitle),
         const SizedBox(height: AppSpacing.md),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -210,6 +212,7 @@ class _RefreshPageState extends State<RefreshPage> {
             mode: mode,
             variant: RefreshModeCardVariant.featured,
             badgeLabel: 'AI 추천',
+            descriptionOverride: _recommendMessage,
             enabled: _isModeEnabled(mode),
             disabledReason: _isModeEnabled(mode)
                 ? null

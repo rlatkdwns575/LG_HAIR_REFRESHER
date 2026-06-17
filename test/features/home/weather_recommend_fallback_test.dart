@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/home/data/api/weather_recommend_fallback.dart';
 import 'package:lg_hair_refresher/features/home/data/model/environment_snapshot.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
 
 void main() {
   group('WeatherRecommendFallback', () {
@@ -11,9 +13,16 @@ void main() {
       isSnowing: false,
     );
 
-    test('builds mode-aware message when mode name is provided', () {
+    RefreshRecommendInput input(
+      EnvironmentSnapshot env, {
+      RefreshRecommendBasis basis = RefreshRecommendBasis.weatherOnly,
+    }) {
+      return RefreshRecommendInput(basis: basis, environment: env);
+    }
+
+    test('builds weatherOnly message with mode name', () {
       final message = WeatherRecommendFallback.message(
-        environment,
+        input(environment),
         recommendedModeName: '외출 후 케어',
       );
 
@@ -21,11 +30,13 @@ void main() {
       expect(message, contains('외출 후 케어 리프레시 모드를 추천해요'));
     });
 
-    test('builds legacy weather message without mode name', () {
-      final message = WeatherRecommendFallback.message(environment);
+    test('builds measure basis opening', () {
+      final message = WeatherRecommendFallback.message(
+        input(environment, basis: RefreshRecommendBasis.measure),
+        recommendedModeName: '외출 후 케어',
+      );
 
-      expect(message, contains('25°C'));
-      expect(message, contains('42%'));
+      expect(message, contains('측정 결과와 오늘 환경을 보면,'));
     });
 
     test('uses rainy weather clause with mode name', () {
@@ -37,7 +48,7 @@ void main() {
       );
 
       final message = WeatherRecommendFallback.message(
-        rainy,
+        input(rainy),
         recommendedModeName: '날씨 케어',
       );
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/constants/image_assets.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_history_record.dart';
@@ -218,13 +218,11 @@ class _RoutineCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
+                Image.asset(
+                  ImageAssets.homeRecommendSparkleIcon,
                   width: 44,
                   height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.gray200,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                  ),
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(

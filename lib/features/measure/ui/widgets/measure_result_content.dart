@@ -51,6 +51,7 @@ class MeasureResultContent extends StatelessWidget {
           mode: result.recommendedMode,
           variant: RefreshModeCardVariant.featured,
           badgeLabel: '추천',
+          descriptionOverride: result.recommendReason,
           enabled: isRecommendEnabled,
           disabledReason: isRecommendEnabled
               ? null

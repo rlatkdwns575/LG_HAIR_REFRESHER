@@ -23,13 +23,19 @@ class MeasureResultDetailSectionBlock extends StatelessWidget {
       children: [
         AppText(
           section.title,
-          style: AppTextStyles.titleM.copyWith(color: AppColors.gray800),
+          style: AppTextStyles.titleM.copyWith(
+            color: AppColors.gray900,
+            fontWeight: FontWeight.w700,
+          ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: 8),
         AppText(
           section.subtitle,
           breakLinesBySentence: true,
-          style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
+          style: AppTextStyles.bodyS.copyWith(
+            color: AppColors.gray500,
+            height: 1.45,
+          ),
         ),
         const SizedBox(height: AppSpacing.md),
         _AnalysisCard(section: section),
@@ -87,7 +93,7 @@ class _MetricList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < metrics.length; i++) ...[
-          if (i > 0) const SizedBox(height: AppSpacing.md),
+          if (i > 0) const SizedBox(height: 12),
           MeasureResultDetailMetricTile(metric: metrics[i]),
         ],
       ],

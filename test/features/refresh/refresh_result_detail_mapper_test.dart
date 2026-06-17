@@ -88,5 +88,10 @@ void main() {
   test('RefreshResultDetail sample matches figma headline percent', () {
     expect(RefreshResultDetail.sample.necessityReductionLabel, '40.9%');
     expect(RefreshResultDetail.sample.metrics, hasLength(3));
+    expect(RefreshResultDetail.sample.hairSection.hairMetrics, hasLength(4));
+    expect(
+      RefreshResultDetail.sample.hairSection.hairMetrics[2].label,
+      '모발 유분량',
+    );
   });
 }

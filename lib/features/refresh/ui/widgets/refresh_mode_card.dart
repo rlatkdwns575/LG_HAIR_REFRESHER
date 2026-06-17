@@ -17,6 +17,7 @@ class RefreshModeCard extends StatelessWidget {
     required this.mode,
     this.variant = RefreshModeCardVariant.list,
     this.badgeLabel,
+    this.descriptionOverride,
     this.enabled = true,
     this.disabledReason,
     this.onTap,
@@ -28,6 +29,7 @@ class RefreshModeCard extends StatelessWidget {
   final RefreshMode mode;
   final RefreshModeCardVariant variant;
   final String? badgeLabel;
+  final String? descriptionOverride;
   final bool enabled;
   final String? disabledReason;
   final VoidCallback? onTap;
@@ -35,6 +37,10 @@ class RefreshModeCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   String get _badge => badgeLabel ?? mode.category;
+
+  String get _description => descriptionOverride?.trim().isNotEmpty == true
+      ? descriptionOverride!.trim()
+      : mode.description;
 
   bool get _isUserCustomMode => mode.isCustom || mode.createdByUser;
 
@@ -83,7 +89,7 @@ class RefreshModeCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             AppText(
-              mode.description,
+              _description,
               style: AppTextStyles.bodyS.copyWith(
                 color: enabled ? AppColors.gray700 : AppColors.gray500,
               ),
@@ -171,7 +177,7 @@ class RefreshModeCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             AppText(
-              mode.description,
+              _description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodyS.copyWith(

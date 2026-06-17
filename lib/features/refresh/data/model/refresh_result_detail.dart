@@ -272,6 +272,12 @@ class RefreshResultDetail {
           style: AppBadgeStyle.text,
         ),
         RefreshResultHairMetric(
+          label: '모발 유분량',
+          valueLabel: '보통',
+          variant: AppBadgeSmallVariant.medium,
+          style: AppBadgeStyle.text,
+        ),
+        RefreshResultHairMetric(
           label: '모발 굵기',
           valueLabel: '얇음',
           variant: AppBadgeSmallVariant.gray,

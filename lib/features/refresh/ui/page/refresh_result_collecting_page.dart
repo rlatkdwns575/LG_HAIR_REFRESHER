@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/constants/route_paths.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/model/measure_result_record.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
@@ -69,6 +70,7 @@ class _RefreshResultCollectingPageState
         outcome: outcome,
         mode: mode,
       );
+      RefreshRecommendService.invalidateCache();
     } on RefreshSessionApiException catch (error, stackTrace) {
       debugPrint(
         'RefreshResultCollectingPage persist session failed: '

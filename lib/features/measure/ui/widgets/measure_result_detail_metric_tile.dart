@@ -28,8 +28,9 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
                 Flexible(
                   child: AppText(
                     metric.label,
-                    style: AppTextStyles.titleXs.copyWith(
-                      color: AppColors.gray800,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: AppColors.gray900,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
