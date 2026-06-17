@@ -16,7 +16,10 @@ class MeasurePrepareSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const MeasureStepIndicator(currentStep: 0),
+        const MeasureStepIndicator(
+          currentStep: MeasureIntroStepIndicator.prepareStepOffset,
+          totalSteps: MeasureIntroStepIndicator.totalSteps,
+        ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),

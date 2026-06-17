@@ -71,7 +71,7 @@ class _Headline extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '리프레시 필요도가',
             style: AppTextStyles.titleS.copyWith(
               color: AppColors.gray800,
@@ -82,7 +82,7 @@ class _Headline extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
+              AppText(
                 '${detail.refreshNeedPercent}%',
                 style: AppTextStyles.headlineL.copyWith(
                   fontSize: 48,
@@ -93,7 +93,7 @@ class _Headline extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2, bottom: 2),
-                child: Text(
+                child: AppText(
                   suffix,
                   style: AppTextStyles.titleS.copyWith(
                     color: AppColors.gray800,
@@ -106,14 +106,14 @@ class _Headline extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(
+              AppText(
                 detail.refreshFocusLabel,
                 style: AppTextStyles.titleS.copyWith(
                   color: AppColors.orange700,
                   height: 1.25,
                 ),
               ),
-              Text(
+              AppText(
                 '가 필요해요.',
                 style: AppTextStyles.titleS.copyWith(
                   color: AppColors.gray800,
@@ -160,7 +160,7 @@ class _AnalysisSummary extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              AppText(
                 '리프레시 필요도',
                 style: AppTextStyles.labelS.copyWith(color: AppColors.gray600),
               ),

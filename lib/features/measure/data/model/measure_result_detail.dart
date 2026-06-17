@@ -47,7 +47,8 @@ class MeasureResultDetail {
     final odorBadge = MeasureResultMapper.sectionBadge(odorScore);
     final dustBadge = MeasureResultMapper.sectionBadge(dustScore);
     final hairBadge = MeasureResultMapper.hairConditionBadge(record);
-    final sebumBadge = MeasureResultMapper.badgeForHairLevel(record.hairSebum);
+    final retentionBadge = MeasureResultMapper.pollutionRetentionBadge(record);
+    final sebumBadge = MeasureResultMapper.badgeForHairSebum(record.hairSebum);
     final damageBadge = MeasureResultMapper.badgeForHairLevel(
       record.hairDamageScore,
     );
@@ -127,8 +128,8 @@ class MeasureResultDetail {
         metrics: [
           MeasureResultDetailMetric(
             label: '오염 잔류 영향',
-            badgeLabel: sebumBadge.$1,
-            badgeVariant: sebumBadge.$2,
+            badgeLabel: retentionBadge.$1,
+            badgeVariant: retentionBadge.$2,
             showHelpIcon: true,
             helpMessage: MeasureResultMapper.pollutionRetentionHelpMessage,
           ),
@@ -136,6 +137,11 @@ class MeasureResultDetail {
             label: '모발 손상도',
             badgeLabel: damageBadge.$1,
             badgeVariant: damageBadge.$2,
+          ),
+          MeasureResultDetailMetric(
+            label: '모발 유분량',
+            badgeLabel: sebumBadge.$1,
+            badgeVariant: sebumBadge.$2,
           ),
           MeasureResultDetailMetric(
             label: '모발 굵기',

@@ -21,13 +21,14 @@ class MeasureResultDetailSectionBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           section.title,
           style: AppTextStyles.titleM.copyWith(color: AppColors.gray800),
         ),
         const SizedBox(height: AppSpacing.sm),
         AppText(
           section.subtitle,
+          breakLinesBySentence: true,
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -63,6 +64,7 @@ class _AnalysisCard extends StatelessWidget {
           const SizedBox(height: 10),
           AppText(
             section.analysisDescription,
+            breakLinesBySentence: true,
             style: AppTextStyles.bodyM2.copyWith(
               color: AppColors.gray800,
               height: 20 / 14,

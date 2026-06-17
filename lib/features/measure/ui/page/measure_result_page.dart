@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/services/device_consumable_service.dart';
@@ -164,7 +165,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
             ? Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(
+                  child: AppText(
                     _loadError ?? '진단 결과가 없습니다.',
                     textAlign: TextAlign.center,
                     style: Theme.of(
@@ -183,7 +184,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                         15,
                         0,
                       ),
-                      child: Text(
+                      child: AppText(
                         _loadError!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.gray500,

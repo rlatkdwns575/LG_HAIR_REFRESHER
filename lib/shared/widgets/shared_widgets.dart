@@ -27,5 +27,3 @@ export 'app_text_field.dart';
 export 'app_text_link_button.dart';
 export 'app_toggle.dart';
 export 'app_top_header.dart';
-export 'feature_placeholder_page.dart';
-export 'shared_widget_gallery_page.dart';

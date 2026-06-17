@@ -4,11 +4,9 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_text_link_button.dart';
 import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/widgets/refresh_mode_card.dart';
-import '../../data/api/measure_result_mapper.dart';
 import '../../data/model/measure_result.dart';
 import 'measure_result_headline.dart';
 import 'measure_result_header.dart';
-import 'measure_result_smell_type_row.dart';
 import 'measure_result_status_row.dart';
 
 /// 진단 결과 본문 — 안정형/경고형 공통 레이아웃.
@@ -41,14 +39,6 @@ class MeasureResultContent extends StatelessWidget {
         const SizedBox(height: visualAreaHeight),
         const SizedBox(height: 36),
         MeasureResultStatusRow(items: result.statusItems),
-        if (result.sourceRecord != null) ...[
-          const SizedBox(height: AppSpacing.md),
-          MeasureResultSmellTypeRow(
-            types: MeasureResultMapper.parseSmellTypes(
-              result.sourceRecord!.smellType,
-            ),
-          ),
-        ],
         const SizedBox(height: AppSpacing.lg),
         Center(
           child: AppTextLinkButton(

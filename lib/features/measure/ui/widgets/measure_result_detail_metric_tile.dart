@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -25,7 +26,7 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
             child: Row(
               children: [
                 Flexible(
-                  child: Text(
+                  child: AppText(
                     metric.label,
                     style: AppTextStyles.titleXs.copyWith(
                       color: AppColors.gray800,

@@ -98,6 +98,38 @@ class MeasureResultMapper {
     String fallbackLabel = '-',
   }) => MetricBadgeMapper.badgeForHairLevel(raw, fallbackLabel: fallbackLabel);
 
+  static (String label, AppBadgeSmallVariant variant) badgeForHairSebum(
+    String? raw, {
+    String fallbackLabel = '-',
+  }) {
+    if (raw == null || raw.trim().isEmpty) {
+      return (fallbackLabel, AppBadgeSmallVariant.gray);
+    }
+
+    final normalized = raw.trim();
+    final lower = normalized.toLowerCase();
+
+    return switch (lower) {
+      'low' || '낮음' || '적음' => ('낮음', AppBadgeSmallVariant.low),
+      'medium' || '보통' || '중간' => ('보통', AppBadgeSmallVariant.medium),
+      'high' || '높음' || '많음' || '과다' => ('높음', AppBadgeSmallVariant.high),
+      _ => (normalized, AppBadgeSmallVariant.gray),
+    };
+  }
+
+  static (String label, AppBadgeSmallVariant variant) pollutionRetentionBadge(
+    MeasureResultRecord record,
+  ) {
+    final impact = hairImpactPercent(record);
+    if (impact <= 20) {
+      return ('낮음', AppBadgeSmallVariant.low);
+    }
+    if (impact <= 35) {
+      return ('보통', AppBadgeSmallVariant.medium);
+    }
+    return ('높음', AppBadgeSmallVariant.high);
+  }
+
   static (String label, AppBadgeSmallVariant variant) badgeForHairThickness(
     String? raw, {
     String fallbackLabel = '-',

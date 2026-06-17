@@ -14,7 +14,7 @@ class MeasureResultDetailHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           '헤어 상태 진단 결과',
           style: AppTextStyles.titleL.copyWith(color: AppColors.gray800),
         ),

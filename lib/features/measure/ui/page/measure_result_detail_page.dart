@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/services/device_consumable_service.dart';
@@ -100,7 +101,7 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
     }
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('진단 결과 요약이 복사되었어요.'),
+        content: AppText('진단 결과 요약이 복사되었어요.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -125,7 +126,7 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Text(
+                child: AppText(
                   _loadError ?? '진단 상세 결과가 없습니다.',
                   textAlign: TextAlign.center,
                   style: Theme.of(

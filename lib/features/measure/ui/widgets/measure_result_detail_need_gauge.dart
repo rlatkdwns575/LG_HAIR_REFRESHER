@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -33,7 +34,7 @@ class MeasureResultDetailNeedGauge extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: Padding(
             padding: const EdgeInsets.only(bottom: 2),
-            child: Text(
+            child: AppText(
               '$percent%',
               style: AppTextStyles.titleS.copyWith(
                 color: AppColors.gray900,

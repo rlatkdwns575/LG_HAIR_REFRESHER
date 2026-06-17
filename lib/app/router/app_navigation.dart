@@ -94,8 +94,6 @@ extension AppNavigation on BuildContext {
   Future<void> pushLocalCalendarSettings() =>
       push(AppRoutePaths.settingsLocalCalendar);
 
-  void pushWidgetGallery() => push(AppRoutePaths.widgetGallery);
-
   void goHomeNamed() => goNamed(AppRouteNames.home);
 
   void pushMeasureNamed() => pushNamed(AppRouteNames.measure);
@@ -132,6 +130,4 @@ extension AppNavigation on BuildContext {
 
   void pushLocalCalendarSettingsNamed() =>
       pushNamed(AppRouteNames.settingsLocalCalendar);
-
-  void pushWidgetGalleryNamed() => pushNamed(AppRouteNames.widgetGallery);
 }
