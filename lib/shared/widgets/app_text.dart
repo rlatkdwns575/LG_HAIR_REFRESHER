@@ -28,7 +28,7 @@ class AppText extends StatelessWidget {
   /// false이면 [data]를 그대로 표시합니다.
   final bool enableKoreanLineBreak;
 
-    /// true이면 문장 종결·쉼표(`,`)마다 줄바꿈 후 구간 내부에 [softWrapWords]를 적용합니다.
+  /// true이면 문장 종결·쉼표(`,`)마다 줄바꿈 후 구간 내부에 [softWrapWords]를 적용합니다.
   final bool breakLinesBySentence;
 
   @override
