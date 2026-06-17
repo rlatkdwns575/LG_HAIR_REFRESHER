@@ -279,6 +279,11 @@ GitHub Flow + Issue 단위 Feature Branch + Pull Request
 - 리뷰 없는 merge
 - `git push --force`
 
+Pull Request:
+
+- PR 제목·본문(Summary, 테스트 계획 등)은 **한글**로 작성합니다.
+- 상세 규칙: `.cursor/rules/pull-request-korean.mdc`
+
 ## 16. 커밋 메시지
 
 Conventional Commits를 사용합니다.

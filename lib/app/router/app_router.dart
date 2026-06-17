@@ -183,7 +183,9 @@ final appRouter = GoRouter(
         GoRoute(
           name: AppRouteNames.refreshShortcutAdd,
           path: AppRoutePaths.refreshShortcutAdd,
-          builder: (context, state) => const HomeRefreshShortcutAddPage(),
+          builder: (context, state) => HomeRefreshShortcutAddPage(
+            initialMode: resolveRefreshMode(state.extra),
+          ),
         ),
         GoRoute(
           name: AppRouteNames.history,

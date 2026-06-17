@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../data/auth_credentials_validator.dart';
@@ -14,21 +15,36 @@ class AuthCloseHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const closeIconSize = 20.0;
+
     return SizedBox(
       height: 48,
       child: Row(
         children: [
-          IconButton(
-            onPressed: onClose ?? () => context.pop(),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            icon: const Icon(
-              Icons.close,
-              size: 20,
-              color: AuthScreenStyles.textDark,
+          SizedBox(
+            width: AppCommonTopHeader.backIconSlotWidth,
+            height: closeIconSize,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: onClose ?? () => context.pop(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: closeIconSize,
+                  minHeight: closeIconSize,
+                ),
+                style: IconButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(
+                  Icons.close,
+                  size: closeIconSize,
+                  color: AuthScreenStyles.textDark,
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppCommonTopHeader.backToTitleGap),
           AppText(
             title,
             style: const TextStyle(
