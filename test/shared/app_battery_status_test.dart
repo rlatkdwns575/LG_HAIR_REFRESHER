@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/shared/widgets/app_battery_status.dart';
 
+import '../test_helpers.dart';
+
 void main() {
   group('AppBatteryStatus.resolveIconState', () {
     test('maps to nearest Figma icon_battery_24 variant', () {
@@ -30,8 +32,8 @@ void main() {
       const MaterialApp(home: Scaffold(body: AppBatteryStatus(percent: 60))),
     );
 
-    expect(find.text('배터리'), findsOneWidget);
-    expect(find.text('60%'), findsOneWidget);
+    expect(findDisplayText('배터리'), findsOneWidget);
+    expect(findDisplayText('60%'), findsOneWidget);
     expect(find.byType(Image), findsOneWidget);
   });
 
@@ -40,7 +42,7 @@ void main() {
       const MaterialApp(home: Scaffold(body: AppBatteryStatus(percent: 150))),
     );
 
-    expect(find.text('100%'), findsOneWidget);
+    expect(findDisplayText('100%'), findsOneWidget);
   });
 
   testWidgets('hides title when showTitle is false', (tester) async {
@@ -50,7 +52,7 @@ void main() {
       ),
     );
 
-    expect(find.text('배터리'), findsNothing);
-    expect(find.text('42%'), findsOneWidget);
+    expect(findDisplayText('배터리'), findsNothing);
+    expect(findDisplayText('42%'), findsOneWidget);
   });
 }
