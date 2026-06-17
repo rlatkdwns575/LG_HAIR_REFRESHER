@@ -1,30 +1,34 @@
-import 'package:flutter/foundation.dart';
-
+import '../../core/services/calendar_events_api.dart';
 import '../../core/services/local_calendar_service.dart';
 import '../../features/home/data/api/weather_api.dart';
 import '../../features/home/data/model/environment_snapshot.dart';
 import '../../features/measure/data/api/measure_api.dart';
 import '../../features/measure/data/model/measure_result_record.dart';
 import '../../features/refresh/data/api/refresh_session_api.dart';
+import '../../shared/models/calendar_event.dart';
 import 'refresh_recommend_basis.dart';
 import 'refresh_recommend_input.dart';
 import 'refresh_recommend_schedule_snapshot.dart';
 
 /// 날씨·측정·일정을 조합해 추천 입력 컨텍스트를 결정합니다.
 class RefreshRecommendContextResolver {
-  const RefreshRecommendContextResolver({
+  RefreshRecommendContextResolver({
     this.weatherApi = const WeatherApi(),
     this.measureApi = const MeasureApi(),
     this.refreshSessionApi = const RefreshSessionApi(),
-    this.calendarService = const LocalCalendarService(),
+    LocalCalendarService? calendarService,
+    this.calendarEventsApi = const CalendarEventsApi(),
     this.measureWindow = const Duration(hours: 2),
-  });
+    this.calendarStaleAfter = const Duration(minutes: 30),
+  }) : calendarService = calendarService ?? LocalCalendarService();
 
   final WeatherApi weatherApi;
   final MeasureApi measureApi;
   final RefreshSessionApi refreshSessionApi;
   final LocalCalendarService calendarService;
+  final CalendarEventsApi calendarEventsApi;
   final Duration measureWindow;
+  final Duration calendarStaleAfter;
 
   static const EnvironmentSnapshot neutralEnvironment = EnvironmentSnapshot(
     temperatureCelsius: 22,
@@ -36,8 +40,9 @@ class RefreshRecommendContextResolver {
   Future<RefreshRecommendInput> resolve({DateTime? now, String? userId}) async {
     final resolvedNow = now ?? DateTime.now();
     final environment = await _loadEnvironment();
-    final schedule = RefreshRecommendScheduleSnapshot.fromCalendarStatus(
-      await calendarService.fetchStatus(),
+    final schedule = await _loadSchedule(
+      resolvedNow: resolvedNow,
+      userId: userId,
     );
 
     final latestMeasure = await measureApi.fetchLatestResult(userId: userId);
@@ -56,14 +61,47 @@ class RefreshRecommendContextResolver {
       now: resolvedNow,
       measureWindow: measureWindow,
     );
-
-    debugPrint('RefreshRecommendContextResolver: basis=${basis.name}');
-
     return buildInput(
       basis: basis,
       environment: environment,
       latestMeasure: latestMeasure,
       schedule: schedule,
+    );
+  }
+
+  Future<RefreshRecommendScheduleSnapshot> _loadSchedule({
+    required DateTime resolvedNow,
+    String? userId,
+  }) async {
+    final calendarStatus = await calendarService.fetchStatus();
+    if (!calendarStatus.isConnected) {
+      return const RefreshRecommendScheduleSnapshot(todayEventCount: 0);
+    }
+
+    final lastCheckedAt = calendarStatus.lastCheckedAt;
+    final isStale =
+        lastCheckedAt == null ||
+        resolvedNow.difference(lastCheckedAt) > calendarStaleAfter;
+    if (isStale && calendarStatus.permissionGranted) {
+      try {
+        await calendarService.refreshConnection(
+          userId: userId,
+          now: resolvedNow,
+        );
+      } catch (_) {}
+    }
+
+    List<CalendarEvent> events = const [];
+    try {
+      events = await calendarEventsApi.fetchTodayEvents(
+        userId: userId,
+        now: resolvedNow,
+      );
+    } catch (_) {}
+
+    return RefreshRecommendScheduleSnapshot.fromCalendarEvents(
+      events,
+      resolvedNow,
     );
   }
 
@@ -117,10 +155,7 @@ class RefreshRecommendContextResolver {
   Future<EnvironmentSnapshot> _loadEnvironment() async {
     try {
       return await weatherApi.fetchSnapshot();
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshRecommendContextResolver weather failed: $error\n$stackTrace',
-      );
+    } catch (_) {
       return neutralEnvironment;
     }
   }

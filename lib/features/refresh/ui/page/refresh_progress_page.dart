@@ -206,12 +206,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                15,
-                AppSpacing.sm,
-                15,
-                0,
-              ),
+              padding: const EdgeInsets.fromLTRB(15, AppSpacing.sm, 15, 0),
               child: AppText(
                 _session.modeName,
                 textAlign: TextAlign.center,

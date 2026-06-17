@@ -102,11 +102,9 @@ class HistoryTotalSection extends StatelessWidget {
                 if (i > 0) const SizedBox(height: 12),
                 _ModeUsageRow(
                   usage: summary.modeUsages[i],
-                  highlight:
-                      bestMode != null &&
-                      identical(summary.modeUsages[i], bestMode),
-                  improvementLabel:
-                      '${_formatPercent(summary.modeUsages[i].improvementPercent)} 개선',
+                  improvementPercentText: _formatPercent(
+                    summary.modeUsages[i].improvementPercent,
+                  ),
                 ),
               ],
             ],
@@ -702,16 +700,27 @@ class _ClockDonutPainter extends CustomPainter {
 class _ModeUsageRow extends StatelessWidget {
   const _ModeUsageRow({
     required this.usage,
-    required this.highlight,
-    required this.improvementLabel,
+    required this.improvementPercentText,
   });
 
   final ModeUsage usage;
-  final bool highlight;
-  final String improvementLabel;
+  final String improvementPercentText;
 
   @override
   Widget build(BuildContext context) {
+    final nameStyle = AppTextStyles.bodyS.copyWith(
+      color: usage.isMostUsed ? AppColors.primary500 : AppColors.gray700,
+      fontWeight: usage.isMostUsed ? FontWeight.w700 : FontWeight.w400,
+    );
+    final suffixStyle = AppTextStyles.labelM.copyWith(
+      color: AppColors.gray500,
+      fontWeight: FontWeight.w400,
+    );
+    final percentStyle = AppTextStyles.labelM.copyWith(
+      color: usage.isBestImprovement ? AppColors.primary500 : AppColors.gray500,
+      fontWeight: usage.isBestImprovement ? FontWeight.w700 : FontWeight.w400,
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -726,21 +735,19 @@ class _ModeUsageRow extends StatelessWidget {
           child: AppText(
             usage.modeName,
             textAlign: TextAlign.center,
-            style: AppTextStyles.bodyS.copyWith(
-              color: highlight ? AppColors.primary500 : AppColors.gray700,
-              fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
-            ),
+            style: nameStyle,
           ),
         ),
         SizedBox(
           width: 72,
-          child: AppText(
-            improvementLabel,
-            textAlign: TextAlign.right,
-            style: AppTextStyles.labelM.copyWith(
-              color: highlight ? AppColors.primary500 : AppColors.gray500,
-              fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(text: improvementPercentText, style: percentStyle),
+                TextSpan(text: ' 개선', style: suffixStyle),
+              ],
             ),
+            textAlign: TextAlign.right,
           ),
         ),
       ],

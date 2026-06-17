@@ -29,12 +29,18 @@ class HistoryReportBuilder {
         .where((record) => !record.isDiagnosis)
         .toList();
 
-    final todayRecords = refreshRecords
-        .where((record) => _isSameDay(record.dateTime, asOf))
-        .toList();
+    final todayRecords =
+        refreshRecords
+            .where((record) => _isSameDay(record.dateTime, asOf))
+            .toList()
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
     final monthHistory = _buildMonthHistory(sortedRecords, asOf);
-    final totalSummary = _buildTotalSummary(refreshRecords, userName);
+    final totalSummary = _buildTotalSummary(
+      refreshRecords,
+      userName,
+      asOf: asOf,
+    );
 
     return RefreshHistoryReport(
       asOfDate: asOf,
@@ -76,19 +82,15 @@ class HistoryReportBuilder {
       return null;
     }
 
-    final bucketCounts = <String, int>{};
     final weekdayCounts = List<int>.filled(7, 0);
     for (final record in records) {
-      final bucket = _bucketForHour(record.dateTime.hour);
-      if (bucket != null) {
-        bucketCounts[bucket.label] = (bucketCounts[bucket.label] ?? 0) + 1;
-      }
       weekdayCounts[record.dateTime.weekday - 1]++;
     }
 
-    final topBucket = _topEntry(bucketCounts);
-    final topWeekdays = _topWeekdayLabels(weekdayCounts);
-    if (topBucket == null) {
+    final topMode = _mostUsedMode(records);
+    final topWeekday = _topWeekdayLabel(weekdayCounts);
+    final topHour = _topHour(records);
+    if (topHour == null) {
       return null;
     }
 
@@ -101,12 +103,12 @@ class HistoryReportBuilder {
         .length;
     final durationLabel = durationCount == 0
         ? null
-        : '${(avgDuration / durationCount).round()}분 소요';
+        : '평균 시간 ${(avgDuration / durationCount).round()}분 소요';
 
     final tags = <String>[
-      '퇴근 후 리프레시 케어',
-      if (topWeekdays.isNotEmpty) topWeekdays,
-      topBucket.key,
+      if (topMode != '-') topMode,
+      if (topWeekday.isNotEmpty) topWeekday,
+      _hourLabel(topHour),
       ?durationLabel,
     ];
 
@@ -271,8 +273,9 @@ class HistoryReportBuilder {
 
   static RefreshTotalSummary _buildTotalSummary(
     List<RefreshHistoryRecord> records,
-    String userName,
-  ) {
+    String userName, {
+    required DateTime asOf,
+  }) {
     final totalCount = records.length;
     final improvements = records
         .map((record) => record.necessityReductionPercent)
@@ -309,7 +312,7 @@ class HistoryReportBuilder {
               100;
     final dustCarePercent = careTotal == 0 ? 0.0 : 100 - odorCarePercent;
 
-    final modeUsages = _modeUsages(records);
+    final modeUsages = _modeUsages(records, asOf: asOf);
     final topMode = modeUsages.isEmpty ? null : modeUsages.first;
 
     return RefreshTotalSummary(
@@ -434,9 +437,18 @@ class HistoryReportBuilder {
     ];
   }
 
-  static List<ModeUsage> _modeUsages(List<RefreshHistoryRecord> records) {
+  static const _recentModeUsageLimit = 5;
+
+  static List<ModeUsage> _modeUsages(
+    List<RefreshHistoryRecord> records, {
+    required DateTime asOf,
+  }) {
+    final recentRecords = records
+        .where((record) => _isWithinLastMonth(record.dateTime, asOf))
+        .toList();
+
     final grouped = <String, List<RefreshHistoryRecord>>{};
-    for (final record in records) {
+    for (final record in recentRecords) {
       grouped.putIfAbsent(record.modeName, () => []).add(record);
     }
 
@@ -455,7 +467,32 @@ class HistoryReportBuilder {
       );
     }).toList()..sort((a, b) => b.count.compareTo(a.count));
 
-    return usages;
+    final topUsages = usages.take(_recentModeUsageLimit).toList();
+    if (topUsages.isEmpty) {
+      return topUsages;
+    }
+
+    final bestImprovement = topUsages.reduce(
+      (a, b) => a.improvementPercent >= b.improvementPercent ? a : b,
+    );
+
+    return [
+      for (var i = 0; i < topUsages.length; i++)
+        ModeUsage(
+          count: topUsages[i].count,
+          modeName: topUsages[i].modeName,
+          improvementPercent: topUsages[i].improvementPercent,
+          isMostUsed: i == 0,
+          isBestImprovement: topUsages[i].modeName == bestImprovement.modeName,
+        ),
+    ];
+  }
+
+  static bool _isWithinLastMonth(DateTime recordDate, DateTime asOf) {
+    final recordDay = _dateOnly(recordDate);
+    final asOfDay = _dateOnly(asOf);
+    final cutoff = DateTime(asOfDay.year, asOfDay.month - 1, asOfDay.day);
+    return !recordDay.isBefore(cutoff);
   }
 
   static String _mostUsedMode(List<RefreshHistoryRecord> records) {
@@ -481,7 +518,7 @@ class HistoryReportBuilder {
     return counts.entries.reduce((a, b) => a.value >= b.value ? a : b);
   }
 
-  static String _topWeekdayLabels(List<int> weekdayCounts) {
+  static String _topWeekdayLabel(List<int> weekdayCounts) {
     final entries = <MapEntry<int, int>>[];
     for (var i = 0; i < weekdayCounts.length; i++) {
       if (weekdayCounts[i] > 0) {
@@ -493,7 +530,38 @@ class HistoryReportBuilder {
     }
     entries.sort((a, b) => b.value.compareTo(a.value));
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
-    return entries.take(2).map((entry) => '${labels[entry.key]}요일').join('·');
+    return '${labels[entries.first.key]}요일';
+  }
+
+  static int? _topHour(List<RefreshHistoryRecord> records) {
+    final hourCounts = List<int>.filled(24, 0);
+    for (final record in records) {
+      hourCounts[record.dateTime.hour]++;
+    }
+
+    var topHour = -1;
+    var topCount = 0;
+    for (var hour = 0; hour < hourCounts.length; hour++) {
+      if (hourCounts[hour] > topCount) {
+        topCount = hourCounts[hour];
+        topHour = hour;
+      }
+    }
+
+    return topCount == 0 ? null : topHour;
+  }
+
+  static String _hourLabel(int hour) {
+    if (hour == 0) {
+      return '밤 12시';
+    }
+    if (hour < 12) {
+      return '오전 $hour시';
+    }
+    if (hour == 12) {
+      return '낮 12시';
+    }
+    return '오후 ${hour - 12}시';
   }
 
   static _TimeBucket? _bucketForHour(int hour) {

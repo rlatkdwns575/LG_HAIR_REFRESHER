@@ -7,7 +7,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/refresh_result_detail.dart';
-import 'refresh_result_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 
 /// Figma 1182-20490 — 냄새 / 먼지 / 모발 상태 섹션.
 class RefreshResultDetailStatusSection extends StatelessWidget {
@@ -279,7 +279,10 @@ class _MetricLabel extends StatelessWidget {
             helpTooltipMessage != null &&
             helpTooltipMessage!.isNotEmpty) ...[
           const SizedBox(width: 2),
-          RefreshResultHelpIcon(tooltipMessage: helpTooltipMessage!),
+          AppMetricHelpIcon(
+            tooltipMessage: helpTooltipMessage!,
+            placement: AppMetricHelpTooltipPlacement.besideIcon,
+          ),
         ],
       ],
     );

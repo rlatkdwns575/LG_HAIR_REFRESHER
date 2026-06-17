@@ -30,7 +30,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _authApi = const AuthApi();
   final _settingsApi = const SettingsApi();
-  final _localCalendarService = const LocalCalendarService();
+  final _localCalendarService = LocalCalendarService();
 
   SettingsUserSummary _user = SettingsUserSummary.guest;
   SettingsDeviceDetail _device = SettingsDeviceDetail.fallback;

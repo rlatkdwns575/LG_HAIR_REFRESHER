@@ -15,6 +15,8 @@ void main() {
       expect(detail.necessityReductionPercent, 40.9);
       expect(detail.metrics, hasLength(3));
       expect(detail.odorSection.changes, hasLength(3));
+      expect(detail.shareSummaryText, contains('리프레시 결과'));
+      expect(detail.shareSummaryText, contains(detail.summaryMessage));
     });
 
     test('uses fallback mode name when recommendedMode is null', () {

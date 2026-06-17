@@ -24,7 +24,7 @@ class MeasureResultPage extends StatefulWidget {
 }
 
 class _MeasureResultPageState extends State<MeasureResultPage> {
-  final _recommendService = const MeasureRefreshRecommendService();
+  final _recommendService = MeasureRefreshRecommendService();
   final _deviceConsumableService = const DeviceConsumableService();
 
   MeasureResult? _result;
@@ -83,7 +83,6 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         _isLoading = false;
       });
     } on MeasureApiException catch (error) {
-      debugPrint('MeasureResultPage load failed: $error');
       if (!mounted) {
         return;
       }
@@ -91,8 +90,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         _loadError = error.message;
         _isLoading = false;
       });
-    } catch (error, stackTrace) {
-      debugPrint('MeasureResultPage load failed: $error\n$stackTrace');
+    } catch (_) {
       if (!mounted) {
         return;
       }

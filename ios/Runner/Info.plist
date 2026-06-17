@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCalendarsUsageDescription</key>
+	<string>오늘 일정을 확인해 리프레시 모드 추천에 활용합니다.</string>
 </dict>
 </plist>

@@ -62,8 +62,7 @@ class _HistoryPageState extends State<HistoryPage> {
         _selectedDate = report.monthDataFor(_visibleMonth).latestRecordedDate;
         _isLoading = false;
       });
-    } catch (error, stackTrace) {
-      debugPrint('History report load failed: $error\n$stackTrace');
+    } catch (error, _) {
       if (!mounted) {
         return;
       }

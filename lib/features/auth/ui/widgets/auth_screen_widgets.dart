@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text.dart';
 
@@ -212,33 +213,12 @@ Widget buildAuthPasswordRulesHint() {
         '* 비밀번호 조건',
         style: TextStyle(fontSize: 12, color: AuthScreenStyles.textMuted),
       ),
-      const SizedBox(width: 6),
-      Tooltip(
-        message: AuthCredentialsValidator.passwordRulesDescription,
-        preferBelow: true,
-        waitDuration: const Duration(milliseconds: 150),
-        showDuration: const Duration(seconds: 8),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.help,
-          child: Container(
-            width: 18,
-            height: 18,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AuthScreenStyles.textMuted, width: 1),
-            ),
-            child: AppText(
-              '?',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                height: 1,
-                color: AuthScreenStyles.textMuted,
-              ),
-            ),
-          ),
-        ),
+      const SizedBox(width: 3),
+      AppMetricHelpIcon(
+        tooltipMessage: AuthCredentialsValidator.passwordRulesDescription,
+        size: 16,
+        placement: AppMetricHelpTooltipPlacement.besideIcon,
+        tooltipMaxWidth: 240,
       ),
     ],
   );

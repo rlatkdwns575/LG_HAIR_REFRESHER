@@ -73,4 +73,13 @@ enum ScheduleCategory {
   final int dustImpact;
   final int socialImportance;
   final String careHint;
+
+  static ScheduleCategory? tryParseEventType(String value) {
+    for (final category in ScheduleCategory.values) {
+      if (category.name == value) {
+        return category;
+      }
+    }
+    return null;
+  }
 }

@@ -61,19 +61,14 @@ class MeasureApi {
           .select(resultColumns)
           .single();
 
-      if (kDebugMode) {
-        debugPrint('MeasureApi.insertDiagnosisResult saved: $row');
-      }
+      if (kDebugMode) {}
 
       return MeasureResultRecord.fromJson(Map<String, dynamic>.from(row));
     } on PostgrestException catch (error) {
       throw MeasureApiException(
         '진단 결과 저장에 실패했습니다. (${MeasureApiException.fromPostgrest(error)})',
       );
-    } catch (error, stackTrace) {
-      debugPrint(
-        'MeasureApi.insertDiagnosisResult failed: $error\n$stackTrace',
-      );
+    } catch (_) {
       throw MeasureApiException('진단 결과 저장에 실패했습니다.');
     } finally {
       RefreshRecommendService.invalidateCache();
@@ -87,11 +82,7 @@ class MeasureApi {
     );
 
     if (userDevice == null) {
-      if (kDebugMode) {
-        debugPrint(
-          'MeasureApi: no USER_DEVICES link for latest measure result.',
-        );
-      }
+      if (kDebugMode) {}
       return null;
     }
 
@@ -115,8 +106,7 @@ class MeasureApi {
       throw MeasureApiException(
         '진단 결과 조회에 실패했습니다. (${MeasureApiException.fromPostgrest(error)})',
       );
-    } catch (error, stackTrace) {
-      debugPrint('MeasureApi.fetchLatestResult failed: $error\n$stackTrace');
+    } catch (_) {
       return null;
     }
   }

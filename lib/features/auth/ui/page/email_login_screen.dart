@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/services/local_calendar_login_prompt.dart';
 import '../../data/api/auth_api.dart';
 import '../../data/auth_credentials_validator.dart';
 import '../widgets/auth_screen_styles.dart';
@@ -18,6 +19,7 @@ class EmailLoginScreen extends StatefulWidget {
 
 class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final _authApi = const AuthApi();
+  final _calendarLoginPrompt = LocalCalendarLoginPrompt();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -82,6 +84,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
     try {
       await _authApi.signIn(email: email, password: password);
+      if (!mounted) {
+        return;
+      }
+      await _calendarLoginPrompt.showIfNeeded(context);
       if (!mounted) {
         return;
       }

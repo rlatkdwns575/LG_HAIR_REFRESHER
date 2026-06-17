@@ -1,7 +1,6 @@
+import '../../shared/models/calendar_event.dart';
+
 /// 로컬 캘린더 연동 세션 저장소.
-///
-/// MVP 단계에서는 기기 캘린더 API 연동 전, 사용자 동의·상태 확인 흐름을
-/// 앱 세션 안에서 유지합니다.
 class LocalCalendarConnectionStore {
   LocalCalendarConnectionStore._();
 
@@ -14,22 +13,43 @@ class LocalCalendarConnectionStore {
   int todayEventCount = 0;
   String? nextEventTitle;
   DateTime? nextEventStartAt;
+  int deviceCalendarCount = 0;
+  int deviceRawEventCount = 0;
+  String? lastFetchNote;
 
   void grantPermission() {
     permissionGranted = true;
   }
 
-  void applyPreview({
-    required int todayEventCount,
-    required String nextEventTitle,
-    required DateTime nextEventStartAt,
+  void applyFetchDiagnostics({
+    required int calendarCount,
+    required int rawEventCount,
+    String? note,
+  }) {
+    deviceCalendarCount = calendarCount;
+    deviceRawEventCount = rawEventCount;
+    lastFetchNote = note;
+  }
+
+  void applySyncedEvents(
+    List<CalendarEvent> events, {
     required DateTime checkedAt,
   }) {
-    this.todayEventCount = todayEventCount;
-    this.nextEventTitle = nextEventTitle;
-    this.nextEventStartAt = nextEventStartAt;
+    todayEventCount = events.length;
     lastCheckedAt = checkedAt;
     isConnected = true;
+
+    CalendarEvent? next;
+    for (final event in events) {
+      if (!event.startsAt.isBefore(checkedAt)) {
+        if (next == null || event.startsAt.isBefore(next.startsAt)) {
+          next = event;
+        }
+      }
+    }
+
+    nextEventTitle = next?.title;
+    nextEventStartAt = next?.startsAt;
   }
 
   void clear() {
@@ -39,5 +59,8 @@ class LocalCalendarConnectionStore {
     todayEventCount = 0;
     nextEventTitle = null;
     nextEventStartAt = null;
+    deviceCalendarCount = 0;
+    deviceRawEventCount = 0;
+    lastFetchNote = null;
   }
 }

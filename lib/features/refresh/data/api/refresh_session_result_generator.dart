@@ -173,7 +173,7 @@ class RefreshSessionResultGenerator {
 
   /// `MEASURE_RESULTS.total_pollution_score`와 동일하게 활성 축 중 최대값.
   static int computePollutionScore({int? odor, int? dust, int? fallback}) {
-    final values = <int>[if (odor != null) odor, if (dust != null) dust];
+    final values = <int>[?odor, ?dust];
     if (values.isNotEmpty) {
       return values.reduce(max);
     }

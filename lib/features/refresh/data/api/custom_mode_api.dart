@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/supabase_tables.dart';
@@ -27,8 +26,7 @@ class CustomModeApi {
             ),
           )
           .toList();
-    } catch (error, stackTrace) {
-      debugPrint('CustomModeApi.fetchForUser failed: $error\n$stackTrace');
+    } catch (_) {
       return const [];
     }
   }
@@ -96,8 +94,7 @@ class CustomModeApi {
           .eq('mode_id', modeId)
           .eq('custom_yn', true);
       return true;
-    } catch (error, stackTrace) {
-      debugPrint('CustomModeApi.delete failed: $error\n$stackTrace');
+    } catch (_) {
       return false;
     }
   }

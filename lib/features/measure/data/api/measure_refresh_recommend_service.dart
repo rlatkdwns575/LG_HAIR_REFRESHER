@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../../../app/theme/app_colors.dart';
 import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
@@ -15,11 +13,11 @@ import '../model/measure_care_level.dart';
 
 /// 진단 결과와 통합 Gemini 추천을 조합해 [MeasureResult]를 생성합니다.
 class MeasureRefreshRecommendService {
-  const MeasureRefreshRecommendService({
+  MeasureRefreshRecommendService({
     this.measureApi = const MeasureApi(),
     this.refreshApi = const RefreshApi(),
-    this.recommendService = RefreshRecommendService.instance,
-  });
+    RefreshRecommendService? recommendService,
+  }) : recommendService = recommendService ?? RefreshRecommendService.instance;
 
   final MeasureApi measureApi;
   final RefreshApi refreshApi;
@@ -58,13 +56,6 @@ class MeasureRefreshRecommendService {
     final recommendReason =
         recommendation?.message ??
         '현재 헤어 상태와 환경을 고려해 ${recommendedMode.name}을 추천해요.';
-
-    debugPrint(
-      'MeasureRefreshRecommendService: using MEASURE_RESULTS '
-      '${record.measureId} (odor=${record.hairOdorScore}, '
-      'dust=${record.hairDustScore}, total=${record.totalPollutionScore}).',
-    );
-
     return MeasureResult(
       odorLevel: resolvedOdor,
       dustLevel: resolvedDust,

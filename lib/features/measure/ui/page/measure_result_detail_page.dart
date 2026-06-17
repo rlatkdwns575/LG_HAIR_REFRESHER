@@ -28,7 +28,7 @@ class MeasureResultDetailPage extends StatefulWidget {
 }
 
 class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
-  final _recommendService = const MeasureRefreshRecommendService();
+  final _recommendService = MeasureRefreshRecommendService();
   final _deviceConsumableService = const DeviceConsumableService();
 
   MeasureResult? _result;
@@ -76,8 +76,7 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
         _loadError = error.message;
         _isLoading = false;
       });
-    } catch (error, stackTrace) {
-      debugPrint('MeasureResultDetailPage load failed: $error\n$stackTrace');
+    } catch (_) {
       if (!mounted) {
         return;
       }
@@ -89,22 +88,18 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
   }
 
   void _onShare(MeasureResultDetail detail) {
-    final text = [
-      '내 헤어 상태 진단 결과',
-      '리프레시 필요도 ${detail.refreshNeedPercent}%',
-      detail.analysisSummary.replaceAll('\n', ' '),
-    ].join('\n');
-
-    Clipboard.setData(ClipboardData(text: text));
+    Clipboard.setData(ClipboardData(text: detail.shareSummaryText));
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: AppText('진단 결과 요약이 복사되었어요.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: AppText('진단 결과 요약이 복사되었습니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   @override

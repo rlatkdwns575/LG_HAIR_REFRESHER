@@ -18,10 +18,6 @@ class HistoryApi {
     var userDevice = await _fetchUserDeviceLink(resolvedUserId);
 
     if (userDevice == null && kDebugMode) {
-      debugPrint(
-        'HistoryApi: no USER_DEVICES for user_id=$resolvedUserId. '
-        'Trying first linked device (debug fallback).',
-      );
       userDevice = await _fetchUserDeviceLink(null);
     }
 
@@ -33,11 +29,7 @@ class HistoryApi {
     }
 
     final userDeviceId = userDevice['user_device_id'] as String;
-    if (kDebugMode) {
-      debugPrint(
-        'HistoryApi: loading history for user_device_id=$userDeviceId',
-      );
-    }
+    if (kDebugMode) {}
 
     final userName = await _fetchUserName(resolvedUserId);
     final measures = await _fetchMeasureResults(userDeviceId);
@@ -80,12 +72,7 @@ class HistoryApi {
 
     final records = [...sessionRecords, ...diagnosisRecords];
 
-    if (kDebugMode) {
-      debugPrint(
-        'HistoryApi: loaded ${sessionRecords.length} refresh sessions, '
-        '${diagnosisRecords.length} measure results.',
-      );
-    }
+    if (kDebugMode) {}
 
     return HistoryReportBuilder.build(records: records, userName: userName);
   }
@@ -99,20 +86,13 @@ class HistoryApi {
       return rows;
     } on PostgrestException catch (error) {
       if (!error.message.contains('measure_id')) {
-        debugPrint('HistoryApi.fetchSessions failed: ${error.message}');
         rethrow;
       }
-
-      debugPrint(
-        'HistoryApi: REFRESH_SESSIONS.measure_id column missing, retrying '
-        'without measure_id.',
-      );
       return _selectSessions(
         userDeviceId,
         HistorySessionMapper.sessionColumnsWithoutMeasureId,
       );
-    } catch (error, stackTrace) {
-      debugPrint('HistoryApi.fetchSessions failed: $error\n$stackTrace');
+    } catch (_) {
       rethrow;
     }
   }
@@ -141,8 +121,7 @@ class HistoryApi {
           .order('created_at', ascending: false);
 
       return [for (final row in rows) Map<String, dynamic>.from(row)];
-    } catch (error, stackTrace) {
-      debugPrint('HistoryApi.fetchMeasureResults failed: $error\n$stackTrace');
+    } catch (_) {
       return const [];
     }
   }
@@ -164,8 +143,7 @@ class HistoryApi {
         for (final row in rows)
           row['mode_id'] as String: Map<String, dynamic>.from(row),
       };
-    } catch (error, stackTrace) {
-      debugPrint('HistoryApi.fetchModes failed: $error\n$stackTrace');
+    } catch (_) {
       return const {};
     }
   }
@@ -182,9 +160,7 @@ class HistoryApi {
       if (nickname != null && nickname.trim().isNotEmpty) {
         return nickname.trim();
       }
-    } catch (error, stackTrace) {
-      debugPrint('HistoryApi.fetchUserName failed: $error\n$stackTrace');
-    }
+    } catch (_) {}
     return '고객';
   }
 

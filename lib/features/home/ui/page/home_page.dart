@@ -10,10 +10,13 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/api/measure_refresh_recommend_service.dart';
 import '../../../measure/data/measure_result_store.dart';
+import '../../../refresh/data/model/refresh_mode.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/refresh_scent_unavailable.dart';
 import '../../data/api/home_api.dart';
 import '../../data/home_device_status_watcher.dart';
@@ -41,7 +44,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _homeApi = const HomeApi();
   final _deviceStatusWatcher = HomeDeviceStatusWatcher();
   final _measureApi = const MeasureApi();
-  final _measureRecommendService = const MeasureRefreshRecommendService();
+  final _measureRecommendService = MeasureRefreshRecommendService();
   final _recommendService = RefreshRecommendService.instance;
   final _deviceConsumableService = const DeviceConsumableService();
 
@@ -49,6 +52,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoading = true;
   bool _isScentCartridgeAttached = false;
   String? _recommendMessage;
+  RefreshMode? _recommendedRefreshMode;
   HomeQuickRefreshMode? _recommendedQuickMode;
   bool _useRecommendForQuickSlot = false;
   HomeQuickRefreshMode? get _favoriteMode =>
@@ -126,20 +130,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     try {
       dashboard = await _homeApi.fetchDashboard();
-    } catch (error, stackTrace) {
-      debugPrint('Home dashboard load failed: $error\n$stackTrace');
+    } catch (error, _) {
       dashboard = fallback.copyWith(
-        modelName: 'Supabase 연동 필요 · RLS/USER_DEVICES 확인',
+        modelName: error is HomeApiException
+            ? error.message
+            : 'Supabase 연동 필요 · RLS/USER_DEVICES 확인',
       );
-      if (error is HomeApiException) {
-        debugPrint(
-          'HomeApi hint: Supabase SQL Editor에서 supabase/dev_read_policies.sql '
-          '실행 후 USER_DEVICES 연결을 확인하세요.',
-        );
-      }
     }
 
     String? recommendMessage;
+    RefreshMode? recommendedRefreshMode;
     HomeQuickRefreshMode? recommendedQuickMode;
     var useRecommendForQuickSlot = false;
 
@@ -147,16 +147,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       final recommendation = await _recommendService.resolve();
       if (recommendation != null) {
         recommendMessage = recommendation.message;
+        recommendedRefreshMode = recommendation.mode;
         recommendedQuickMode = recommendation.mode.toHomeQuickRefreshMode();
         useRecommendForQuickSlot = true;
-        debugPrint(
-          'Home using unified recommend: ${recommendation.mode.name} '
-          '(basis=${recommendation.basis.name})',
-        );
       }
-    } catch (error, stackTrace) {
-      debugPrint('Home recommend load failed: $error\n$stackTrace');
-    }
+    } catch (_) {}
 
     if (!mounted) {
       return;
@@ -172,6 +167,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         hasRecentDiagnosisResult: hasRecentDiagnosis,
       );
       _recommendMessage = recommendMessage;
+      _recommendedRefreshMode = recommendedRefreshMode;
       _recommendedQuickMode = recommendedQuickMode;
       _useRecommendForQuickSlot = useRecommendForQuickSlot;
       _isScentCartridgeAttached = cartridge.isAttached;
@@ -215,8 +211,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<bool> _fetchHasRecentDiagnosisResult() async {
     try {
       return await _measureApi.hasRecentResult();
-    } catch (error, stackTrace) {
-      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
+    } catch (_) {
       return false;
     }
   }
@@ -275,9 +270,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final measureResult = await _measureRecommendService
             .buildMeasureResult();
         MeasureResultStore.instance.setPending(measureResult);
-      } catch (error, stackTrace) {
-        debugPrint('Home measure result preload failed: $error\n$stackTrace');
-      }
+      } catch (_) {}
       if (!mounted) {
         return;
       }
@@ -293,6 +286,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     HomeShortcutStore.instance.setFavorite(selected);
     setState(() {});
+  }
+
+  void _handleRecommendBannerTap() {
+    final mode = _recommendedRefreshMode;
+    if (mode == null) {
+      return;
+    }
+
+    if (!RefreshModeAvailability.isEnabled(
+      mode,
+      ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
+    )) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
+
+    context.pushRefreshDetail(mode: mode);
   }
 
   // 즐겨찾기 수정 UI — HomeQuickRefreshRow.onFavoriteEditPressed 연결 시 활성화
@@ -347,7 +357,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         children: [
                           const SizedBox(height: _sectionGap),
                           if (_recommendMessage != null) ...[
-                            HomeRecommendBanner(message: _recommendMessage!),
+                            HomeRecommendBanner(
+                              message: _recommendMessage!,
+                              onTap: _recommendedRefreshMode == null
+                                  ? null
+                                  : _handleRecommendBannerTap,
+                            ),
                             const SizedBox(height: _sectionGap),
                           ],
                           HomeQuickRefreshRow(

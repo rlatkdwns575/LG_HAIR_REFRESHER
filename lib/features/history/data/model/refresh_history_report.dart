@@ -72,11 +72,15 @@ class ModeUsage {
     required this.count,
     required this.modeName,
     required this.improvementPercent,
+    this.isMostUsed = false,
+    this.isBestImprovement = false,
   });
 
   final int count;
   final String modeName;
   final double improvementPercent;
+  final bool isMostUsed;
+  final bool isBestImprovement;
 }
 
 /// 인사이트 카드 (제목 + 설명들 + 막대).
@@ -194,10 +198,15 @@ class RefreshTotalSummary {
   final String modeUsageDescription;
   final List<ModeUsage> modeUsages;
 
-  /// 가장 개선도가 높은 모드 (해당 항목 강조용).
+  /// 가장 개선도가 높은 모드 (상위 5개 중, 해당 % 강조용).
   ModeUsage? get bestImprovementMode {
     if (modeUsages.isEmpty) {
       return null;
+    }
+    for (final usage in modeUsages) {
+      if (usage.isBestImprovement) {
+        return usage;
+      }
     }
     return modeUsages.reduce(
       (a, b) => a.improvementPercent >= b.improvementPercent ? a : b,
@@ -301,7 +310,7 @@ class RefreshHistoryReport {
     routineSuggestion: const RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
       subtitle: '새로운 루틴으로 등록할까요?',
-      tags: ['퇴근 후 리프레시 케어', '수요일·금요일', '오후 7시', '5분 소요'],
+      tags: ['외부 냄새 리프레시', '금요일', '오후 7시', '평균 시간 5분 소요'],
     ),
     monthHistory: [
       RefreshHistoryMonthData(
@@ -612,8 +621,18 @@ class RefreshHistoryReport {
       ),
       modeUsageDescription: '00000모드를 가장 많이 사용했어요',
       modeUsages: [
-        ModeUsage(count: 56, modeName: '00000모드', improvementPercent: 70),
-        ModeUsage(count: 12, modeName: '00000모드', improvementPercent: 86),
+        ModeUsage(
+          count: 56,
+          modeName: '00000모드',
+          improvementPercent: 70,
+          isMostUsed: true,
+        ),
+        ModeUsage(
+          count: 12,
+          modeName: '00000모드',
+          improvementPercent: 86,
+          isBestImprovement: true,
+        ),
         ModeUsage(count: 3, modeName: '00000모드', improvementPercent: 50),
       ],
     ),

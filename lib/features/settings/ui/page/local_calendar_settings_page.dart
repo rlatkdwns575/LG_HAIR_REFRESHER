@@ -6,6 +6,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/services/calendar_events_api.dart';
+import '../../../../core/services/local_calendar_connect_result.dart';
 import '../../../../core/services/local_calendar_service.dart';
 import '../../../../shared/models/local_calendar_status.dart';
 import '../../../../shared/widgets/app_box_button.dart';
@@ -22,7 +24,7 @@ class LocalCalendarSettingsPage extends StatefulWidget {
 }
 
 class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
-  final _localCalendarService = const LocalCalendarService();
+  final _localCalendarService = LocalCalendarService();
 
   LocalCalendarStatus _status = LocalCalendarStatus.disconnected;
   bool _isRefreshing = false;
@@ -38,20 +40,73 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
     if (!mounted) {
       return;
     }
+
+    if (status.permissionGranted) {
+      try {
+        final refreshed = await _localCalendarService.refreshConnection();
+        if (!mounted) {
+          return;
+        }
+        setState(() => _status = refreshed);
+        return;
+      } on CalendarEventsApiException catch (error) {
+        if (!mounted) {
+          return;
+        }
+        final fallbackStatus = await _localCalendarService.fetchStatus();
+        if (!mounted) {
+          return;
+        }
+        setState(() => _status = fallbackStatus);
+        if (_status.todayEventCount > 0) {
+          return;
+        }
+        _showMessage(error.message);
+        return;
+      }
+    }
+
     setState(() => _status = status);
   }
 
   Future<void> _requestAccess() async {
     setState(() => _isRefreshing = true);
-    final status = await _localCalendarService.requestAccess();
-    if (!mounted) {
-      return;
+    try {
+      final result = await _localCalendarService.connect();
+      if (!mounted) {
+        return;
+      }
+      final resolvedStatus =
+          result.status ?? await _localCalendarService.fetchStatus();
+      if (!mounted) {
+        return;
+      }
+      setState(() => _status = resolvedStatus);
+
+      switch (result.outcome) {
+        case LocalCalendarConnectOutcome.connected:
+          _showMessage(_status.statusMessage);
+        case LocalCalendarConnectOutcome.permissionDenied:
+          _showMessage(
+            result.errorMessage ?? '캘린더 접근 권한이 필요합니다. 기기 설정에서 허용해 주세요.',
+          );
+        case LocalCalendarConnectOutcome.syncFailed:
+          _showMessage(
+            result.errorMessage ?? '일정 동기화에 실패했습니다. 네트워크와 권한을 확인해 주세요.',
+          );
+        case LocalCalendarConnectOutcome.skipped:
+        case LocalCalendarConnectOutcome.cancelled:
+          _showMessage('이 기기에서는 로컬 캘린더 연동을 지원하지 않습니다.');
+      }
+    } catch (error) {
+      if (mounted) {
+        _showMessage('캘린더 연동에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
     }
-    setState(() {
-      _status = status;
-      _isRefreshing = false;
-    });
-    _showMessage('로컬 캘린더 연동을 확인했습니다.');
   }
 
   Future<void> _refreshConnection() async {
@@ -61,24 +116,59 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
     }
 
     setState(() => _isRefreshing = true);
-    final status = await _localCalendarService.refreshConnection();
-    if (!mounted) {
-      return;
+    try {
+      final status = await _localCalendarService.refreshConnection();
+      if (!mounted) {
+        return;
+      }
+      setState(() => _status = status);
+      _showMessage(_status.statusMessage);
+    } on CalendarEventsApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      final status = await _localCalendarService.fetchStatus();
+      setState(() => _status = status);
+      if (status.todayEventCount > 0) {
+        _showMessage(
+          '기기에서 ${status.todayEventCount}건을 확인했습니다. 서버 저장 오류: ${error.message}',
+        );
+      } else {
+        _showMessage(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showMessage('일정 동기화에 실패했습니다. 네트워크와 권한을 확인해 주세요.');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
     }
-    setState(() {
-      _status = status;
-      _isRefreshing = false;
-    });
-    _showMessage(_status.statusMessage);
   }
 
   Future<void> _disconnect() async {
-    final status = await _localCalendarService.disconnect();
-    if (!mounted) {
-      return;
+    setState(() => _isRefreshing = true);
+    try {
+      final status = await _localCalendarService.disconnect();
+      if (!mounted) {
+        return;
+      }
+      setState(() => _status = status);
+      _showMessage('로컬 캘린더 연동을 해제했습니다.');
+    } on CalendarEventsApiException catch (error) {
+      if (mounted) {
+        _showMessage(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showMessage('연동 해제 중 오류가 발생했습니다.');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
     }
-    setState(() => _status = status);
-    _showMessage('로컬 캘린더 연동을 해제했습니다.');
   }
 
   void _showMessage(String message) {
@@ -129,6 +219,11 @@ class _LocalCalendarSettingsPageState extends State<LocalCalendarSettingsPage> {
                 DeviceManageInfoRow(
                   label: '마지막 확인',
                   value: _status.lastCheckedLabel,
+                ),
+                const SettingsDivider(),
+                DeviceManageInfoRow(
+                  label: '기기 읽기',
+                  value: _status.deviceFetchLabel,
                 ),
                 const SettingsDivider(),
                 DeviceManageInfoRow(

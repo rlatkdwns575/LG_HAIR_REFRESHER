@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../core/constants/image_assets.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../data/model/refresh_result_detail.dart';
 import '../widgets/refresh_result_detail_content.dart';
@@ -16,6 +16,18 @@ class RefreshResultDetailPage extends StatelessWidget {
 
   final RefreshResultDetail detail;
 
+  void _onShare(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: detail.shareSummaryText));
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: AppText('리프레시 결과 요약이 복사되었습니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,27 +36,7 @@ class RefreshResultDetailPage extends StatelessWidget {
         variant: AppCommonTopHeaderVariant.gnb,
         title: '리프레시 결과보기',
         onBack: () => context.pop(),
-        actions: [
-          IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(
-                    content: AppText('공유 기능은 준비 중이에요.'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-            },
-            icon: Image.asset(
-              ImageAssets.refreshShareIcon,
-              width: 20,
-              height: 20,
-            ),
-            padding: const EdgeInsets.all(4),
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-          ),
-        ],
+        onShare: () => _onShare(context),
       ),
       body: ListView(
         padding: EdgeInsets.only(

@@ -99,9 +99,7 @@ class _RefreshPageState extends State<RefreshPage> {
         recommendMessage = recommendation.message;
         recommendBasis = recommendation.basis;
       }
-    } catch (error, stackTrace) {
-      debugPrint('RefreshPage recommend failed: $error\n$stackTrace');
-    }
+    } catch (_) {}
 
     if (!mounted) {
       return;

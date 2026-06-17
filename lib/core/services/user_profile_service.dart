@@ -104,11 +104,7 @@ class UserProfileService {
       );
     }
 
-    if (kDebugMode) {
-      debugPrint(
-        'UserProfileService: updated hair_type=$hairType for user_id=$userId',
-      );
-    }
+    if (kDebugMode) {}
   }
 
   Future<void> _insertProfileWithHairType({
@@ -136,11 +132,7 @@ class UserProfileService {
       'hair_type': hairType,
     });
 
-    if (kDebugMode) {
-      debugPrint(
-        'UserProfileService: created AUTH_USERS profile for user_id=$userId',
-      );
-    }
+    if (kDebugMode) {}
   }
 
   static String _missingProfileMessage(String userId) {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/services/app_env.dart';
@@ -53,42 +52,27 @@ class RefreshRecommendApi {
       'generationConfig': {'temperature': 0.3, 'maxOutputTokens': 256},
     });
 
-    http.Response? lastResponse;
     for (final model in _models) {
       final response = await _postGenerateContent(
         apiKey: apiKey,
         model: model,
         body: body,
       );
-      lastResponse = response;
-
       if (response.statusCode == 200) {
         final modeId = _parseModeId(response.body);
         if (modeId != null) {
           for (final mode in candidates) {
             if (mode.id == modeId) {
-              debugPrint('RefreshRecommendApi succeeded with model=$model');
               return mode;
             }
           }
         }
-        debugPrint('RefreshRecommendApi model=$model parse failed, retrying');
         continue;
       }
-
-      debugPrint(
-        'RefreshRecommendApi model=$model failed (${response.statusCode})',
-      );
-
       if (response.statusCode != 429 && response.statusCode != 404) {
         break;
       }
     }
-
-    debugPrint(
-      'RefreshRecommendApi failed (${lastResponse?.statusCode}): '
-      '${lastResponse?.body}',
-    );
     return null;
   }
 

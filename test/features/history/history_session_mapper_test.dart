@@ -84,5 +84,82 @@ void main() {
         2,
       );
     });
+
+    test('builds routine suggestion with single mode, weekday, and hour', () {
+      final report = HistoryReportBuilder.build(
+        userName: '제이',
+        asOfDate: DateTime(2026, 6, 13),
+        records: [
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 6, 6, 19, 0),
+            modeName: '외부 냄새 리프레시',
+            careType: CareType.odor,
+            duration: const Duration(minutes: 4),
+          ),
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 6, 7, 19, 30),
+            modeName: '외부 냄새 리프레시',
+            careType: CareType.odor,
+            duration: const Duration(minutes: 6),
+          ),
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 6, 13, 20, 0),
+            modeName: '먼지 케어 리프레시',
+            careType: CareType.dust,
+            duration: const Duration(minutes: 8),
+          ),
+        ],
+      );
+
+      final suggestion = report.routineSuggestion;
+      expect(suggestion, isNotNull);
+      expect(suggestion!.tags, ['외부 냄새 리프레시', '토요일', '오후 7시', '평균 시간 6분 소요']);
+    });
+    test('limits recent mode usages to top 5 within last month', () {
+      final report = HistoryReportBuilder.build(
+        userName: '제이',
+        asOfDate: DateTime(2026, 6, 15),
+        records: [
+          for (var i = 0; i < 6; i++)
+            RefreshHistoryRecord(
+              dateTime: DateTime(2026, 6, 10, 10 + i),
+              modeName: '모드 A',
+              careType: CareType.odor,
+              necessityReductionPercent: 60,
+            ),
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 6, 12, 18),
+            modeName: '모드 B',
+            careType: CareType.dust,
+            necessityReductionPercent: 90,
+          ),
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 6, 13, 19),
+            modeName: '모드 C',
+            careType: CareType.both,
+            necessityReductionPercent: 70,
+          ),
+          RefreshHistoryRecord(
+            dateTime: DateTime(2026, 4, 1, 12),
+            modeName: '오래된 모드',
+            careType: CareType.odor,
+            necessityReductionPercent: 99,
+          ),
+        ],
+      );
+
+      final usages = report.totalSummary.modeUsages;
+      expect(usages, hasLength(3));
+      expect(usages.first.modeName, '모드 A');
+      expect(usages.first.isMostUsed, isTrue);
+      expect(usages.first.isBestImprovement, isFalse);
+      expect(
+        usages
+            .firstWhere((usage) => usage.modeName == '모드 B')
+            .isBestImprovement,
+        isTrue,
+      );
+      expect(usages.any((usage) => usage.modeName == '오래된 모드'), isFalse);
+    });
   });
 }
