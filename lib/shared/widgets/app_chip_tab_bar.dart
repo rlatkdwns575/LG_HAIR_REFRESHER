@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_component_colors.dart';
@@ -124,7 +125,7 @@ class _AppChipTabBarState extends State<AppChipTabBar> {
                   borderRadius: BorderRadius.circular(AppRadius.chip),
                 ),
                 alignment: Alignment.center,
-                child: Text(
+                child: AppText(
                   widget.tabs[index],
                   style: AppTextStyles.labelM.copyWith(
                     color: selected

@@ -105,7 +105,7 @@ class AppResultCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        AppText(
           tag.label,
           style: AppTextStyles.bodyS.copyWith(
             color: AppComponentColors.resultCardTagText,

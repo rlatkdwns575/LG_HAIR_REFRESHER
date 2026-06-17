@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -110,7 +111,7 @@ class AppListItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
+              AppText(
                 title,
                 style: AppTextStyles.bodyM1.copyWith(
                   color: AppComponentColors.listTitle,
@@ -131,7 +132,7 @@ class AppListItem extends StatelessWidget {
           ),
           if (caption != null) ...[
             const SizedBox(height: 6),
-            Text(
+            AppText(
               caption!,
               style: AppTextStyles.labelM.copyWith(
                 color: AppComponentColors.listCaption,
@@ -146,14 +147,14 @@ class AppListItem extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             title,
             style: AppTextStyles.bodyM1.copyWith(
               color: AppComponentColors.listTitle,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
+          AppText(
             caption!,
             style: AppTextStyles.labelM.copyWith(
               color: AppComponentColors.listCaption,
@@ -167,7 +168,7 @@ class AppListItem extends StatelessWidget {
       return Row(
         children: [
           Flexible(
-            child: Text(
+            child: AppText(
               title,
               style: AppTextStyles.bodyM1.copyWith(
                 color: AppComponentColors.listTitle,
@@ -175,7 +176,7 @@ class AppListItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Text(
+          AppText(
             rightLabel!,
             style: AppTextStyles.bodyM1.copyWith(
               color: AppComponentColors.listSubText,
@@ -185,7 +186,7 @@ class AppListItem extends StatelessWidget {
       );
     }
 
-    return Text(
+    return AppText(
       title,
       style: AppTextStyles.bodyM1.copyWith(color: AppComponentColors.listTitle),
     );
@@ -195,7 +196,7 @@ class AppListItem extends StatelessWidget {
     return switch (variant) {
       AppListItemVariant.chevronWithRightLabel => [
         if (rightLabel != null)
-          Text(
+          AppText(
             rightLabel!,
             style: AppTextStyles.bodyM1.copyWith(
               color: AppComponentColors.listRightLabel,

@@ -15,7 +15,7 @@ class AppSectionTitle extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           title,
           style: AppTextStyles.titleL.copyWith(
             color: AppComponentColors.sectionTitle,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
@@ -42,7 +43,7 @@ class AppSegmentedTabBar extends StatelessWidget {
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppRadius.chip),
                   ),
-                  child: Text(
+                  child: AppText(
                     tabs[index],
                     style: AppTextStyles.labelM.copyWith(
                       color: selectedIndex == index

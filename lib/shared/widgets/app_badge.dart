@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
@@ -69,7 +70,7 @@ class AppBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(compact ? 4 : AppRadius.sm),
       ),
       alignment: Alignment.center,
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelXs.copyWith(
           fontSize: fontSize,
@@ -91,7 +92,7 @@ class AppBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       alignment: Alignment.center,
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelM.copyWith(color: colors.$2),
       ),

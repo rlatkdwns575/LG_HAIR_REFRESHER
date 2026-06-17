@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_text_styles.dart';
+import '../../core/extensions/string_extension.dart';
 
 enum AppTextFieldState { empty, typing, completed }
 
@@ -41,7 +42,7 @@ class AppTextField extends StatelessWidget {
               : AppComponentColors.fieldText,
         ),
         decoration: InputDecoration(
-          hintText: hintText ?? 'text',
+          hintText: (hintText ?? 'text').softWrapWords(),
           hintStyle: AppTextStyles.bodyM1.copyWith(
             color: AppComponentColors.fieldPlaceholder,
           ),
