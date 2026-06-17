@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/constants/image_assets.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_history_record.dart';
@@ -47,7 +47,7 @@ class HistoryTodaySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             report.todaySummaryTitle,
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
@@ -79,7 +79,7 @@ class HistoryTodaySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '오늘의 리프레시 내역이 없어요.',
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
@@ -112,7 +112,7 @@ class _TodayRecordTile extends StatelessWidget {
               child: Row(
                 children: [
                   Flexible(
-                    child: Text(
+                    child: AppText(
                       record.modeName,
                       style: AppTextStyles.bodyM2.copyWith(
                         color: AppColors.gray900,
@@ -121,7 +121,7 @@ class _TodayRecordTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  AppText(
                     formatKoreanTime(record.dateTime),
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.gray500,
@@ -134,64 +134,65 @@ class _TodayRecordTile extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        Center(
-          child: IntrinsicHeight(
-            child: Row(
+        _buildMetricsRow(),
+      ],
+    );
+  }
+
+  Widget _buildMetricsRow() {
+    final careItems = <HistoryCareStatusItem>[
+      if (record.odorBeforeStatus != null)
+        HistoryCareStatusItem(
+          label: '냄새 관리',
+          before: record.odorBeforeStatus!,
+          after: record.odorAfterStatus,
+        ),
+      if (record.dustBeforeStatus != null)
+        HistoryCareStatusItem(
+          label: '먼지 관리',
+          before: record.dustBeforeStatus!,
+          after: record.dustAfterStatus,
+        ),
+    ];
+    final hasCareItems = careItems.isNotEmpty;
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (record.hasNecessityReduction)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppText(
+                  '리프레시 필요성',
+                  style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
+                ),
+                const SizedBox(height: 2),
+                AppText(
+                  record.necessityReductionLabel!,
+                  style: AppTextStyles.titleM.copyWith(
+                    color: AppColors.gray900,
+                  ),
+                ),
+              ],
+            ),
+          const Spacer(),
+          if (hasCareItems)
+            Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (record.hasNecessityReduction) ...[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '리프레시 필요성',
-                        style: AppTextStyles.bodyS.copyWith(
-                          color: AppColors.gray500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        record.necessityReductionLabel!,
-                        style: AppTextStyles.titleS.copyWith(
-                          color: AppColors.gray900,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: AppSpacing.md),
                   Container(width: 1, color: AppColors.gray100),
                   const SizedBox(width: AppSpacing.md),
                 ],
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HistoryCareStatusGroup(
-                      labelWidth: 58,
-                      items: [
-                        if (record.odorBeforeStatus != null)
-                          HistoryCareStatusItem(
-                            label: '냄새 관리',
-                            before: record.odorBeforeStatus!,
-                            after: record.odorAfterStatus,
-                          ),
-                        if (record.dustBeforeStatus != null)
-                          HistoryCareStatusItem(
-                            label: '먼지 관리',
-                            before: record.dustBeforeStatus!,
-                            after: record.dustAfterStatus,
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
+                HistoryCareStatusGroup(labelWidth: 58, items: careItems),
               ],
             ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -217,13 +218,11 @@ class _RoutineCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
+                Image.asset(
+                  ImageAssets.homeRecommendSparkleIcon,
                   width: 44,
                   height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.gray200,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                  ),
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -231,7 +230,7 @@ class _RoutineCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      AppText(
                         suggestion.title,
                         style: AppTextStyles.bodyM2.copyWith(
                           color: AppColors.gray900,
@@ -255,7 +254,7 @@ class _RoutineCard extends StatelessWidget {
               runSpacing: 6,
               children: [
                 for (final tag in suggestion.tags)
-                  Text(
+                  AppText(
                     tag,
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.primary500,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -104,7 +105,7 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
                       color: AppColors.gray100,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text(
+                    child: AppText(
                       '권장기준',
                       style: AppTextStyles.labelS.copyWith(
                         color: AppColors.gray600,
@@ -140,7 +141,7 @@ class _NeedBarRow extends StatelessWidget {
         children: [
           SizedBox(
             width: MeasureResultDetailNeedBars._labelWidth,
-            child: Text(
+            child: AppText(
               item.label,
               textAlign: TextAlign.left,
               style: AppTextStyles.labelS.copyWith(
@@ -187,7 +188,7 @@ class _NeedBarRow extends StatelessWidget {
             width: MeasureResultDetailNeedBars._percentWidth,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: AppText(
                 '${item.percent}%',
                 style: AppTextStyles.labelS.copyWith(
                   color: item.emphasized

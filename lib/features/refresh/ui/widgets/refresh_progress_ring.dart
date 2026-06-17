@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -59,7 +60,7 @@ class RefreshProgressRing extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  AppText(
                     '$displayPercent%',
                     style: AppTextStyles.headlineL.copyWith(
                       color: dimmed ? AppColors.gray500 : AppColors.primary400,
@@ -69,7 +70,7 @@ class RefreshProgressRing extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
+                  AppText(
                     remainingLabel,
                     style: AppTextStyles.bodyM1.copyWith(
                       color: AppColors.gray700,

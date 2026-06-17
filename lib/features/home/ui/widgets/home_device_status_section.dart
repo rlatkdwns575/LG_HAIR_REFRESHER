@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -228,14 +229,14 @@ class _FilterStatus extends StatelessWidget {
               height: HomeDeviceStatusSection.statusIconSize,
             ),
             const SizedBox(width: AppSpacing.xs),
-            Text(
+            AppText(
               '필터 상태',
               style: AppTextStyles.bodyS.copyWith(
                 color: HomeDeviceStatusSection.statusLabelColor,
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
-            Text(
+            AppText(
               status.label,
               style: AppTextStyles.bodyS.copyWith(
                 color: _statusColor(status.tier),

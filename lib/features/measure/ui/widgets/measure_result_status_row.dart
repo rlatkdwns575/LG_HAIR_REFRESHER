@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -42,7 +43,7 @@ class _StatusItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
-        Text(
+        AppText(
           item.categoryLabel,
           style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray800),
         ),
@@ -54,7 +55,7 @@ class _StatusItem extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text(
+            child: AppText(
               item.badgeLabel,
               style: AppTextStyles.labelS.copyWith(color: item.badgeTextColor),
             ),

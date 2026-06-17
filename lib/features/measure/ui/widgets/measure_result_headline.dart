@@ -31,12 +31,12 @@ class MeasureResultHeadline extends StatelessWidget {
       TextSpan(
         style: _baseStyle,
         children: [
-          TextSpan(text: '$before\n'),
+          TextSpan(text: '$before\n'.softWrapWords()),
           TextSpan(
-            text: headline.highlight,
+            text: headline.highlight!.softWrapWords(),
             style: TextStyle(color: headline.highlightColor),
           ),
-          TextSpan(text: headline.after),
+          TextSpan(text: headline.after!.softWrapWords()),
         ],
       ),
       textAlign: TextAlign.center,

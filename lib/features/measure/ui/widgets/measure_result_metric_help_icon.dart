@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/layout/app_layout.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -77,7 +78,7 @@ class MeasureResultMetricHelpIcon extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Text(
+                  child: AppText(
                     message,
                     style: AppTextStyles.bodyXs.copyWith(
                       color: AppColors.gray800,

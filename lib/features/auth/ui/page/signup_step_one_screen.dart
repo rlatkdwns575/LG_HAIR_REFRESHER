@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
 import '../../data/auth_credentials_validator.dart';
@@ -50,7 +51,10 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: AppText(message),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 

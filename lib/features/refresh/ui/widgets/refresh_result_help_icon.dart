@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
@@ -130,7 +131,7 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         boxShadow: AppShadows.soft,
                       ),
-                      child: Text(
+                      child: AppText(
                         widget.tooltipMessage,
                         style: AppTextStyles.bodyXs.copyWith(
                           color: AppColors.gray700,
@@ -208,7 +209,7 @@ class _RefreshResultHelpIconState extends State<RefreshResultHelpIcon> {
         border: Border.all(color: AppComponentColors.helpIcon),
       ),
       alignment: Alignment.center,
-      child: Text(
+      child: AppText(
         '?',
         style: AppTextStyles.labelXs.copyWith(
           color: AppComponentColors.helpIcon,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -34,7 +35,7 @@ class AppCalendarWeekStrip extends StatelessWidget {
               if (i > 0) const SizedBox(width: 16),
               GestureDetector(
                 onTap: onWeekSelected == null ? null : () => onWeekSelected!(i),
-                child: Text(
+                child: AppText(
                   weeks[i].label,
                   style: AppTextStyles.titleS.copyWith(
                     color: weeks[i].isSelected

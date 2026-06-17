@@ -17,6 +17,7 @@ class RefreshModeCard extends StatelessWidget {
     required this.mode,
     this.variant = RefreshModeCardVariant.list,
     this.badgeLabel,
+    this.descriptionOverride,
     this.enabled = true,
     this.disabledReason,
     this.onTap,
@@ -28,6 +29,7 @@ class RefreshModeCard extends StatelessWidget {
   final RefreshMode mode;
   final RefreshModeCardVariant variant;
   final String? badgeLabel;
+  final String? descriptionOverride;
   final bool enabled;
   final String? disabledReason;
   final VoidCallback? onTap;
@@ -35,6 +37,10 @@ class RefreshModeCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   String get _badge => badgeLabel ?? mode.category;
+
+  String get _description => descriptionOverride?.trim().isNotEmpty == true
+      ? descriptionOverride!.trim()
+      : mode.description;
 
   bool get _isUserCustomMode => mode.isCustom || mode.createdByUser;
 
@@ -64,7 +70,7 @@ class RefreshModeCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
+                  child: AppText(
                     mode.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -83,14 +89,14 @@ class RefreshModeCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             AppText(
-              mode.description,
+              _description,
               style: AppTextStyles.bodyS.copyWith(
                 color: enabled ? AppColors.gray700 : AppColors.gray500,
               ),
             ),
             if (!enabled && disabledReason != null) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text(
+              AppText(
                 disabledReason!,
                 style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
               ),
@@ -127,7 +133,7 @@ class RefreshModeCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             mode.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -154,7 +160,7 @@ class RefreshModeCard extends StatelessWidget {
             Row(
               children: [
                 Flexible(
-                  child: Text(
+                  child: AppText(
                     mode.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -171,7 +177,7 @@ class RefreshModeCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             AppText(
-              mode.description,
+              _description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodyS.copyWith(
@@ -180,7 +186,7 @@ class RefreshModeCard extends StatelessWidget {
             ),
             if (!enabled && disabledReason != null) ...[
               const SizedBox(height: 6),
-              Text(
+              AppText(
                 disabledReason!,
                 style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
               ),
@@ -314,7 +320,7 @@ class _Badge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-        child: Text(
+        child: AppText(
           label,
           style: AppTextStyles.labelXs.copyWith(color: AppColors.primary700),
         ),
@@ -335,7 +341,7 @@ class _DurationLabel extends StatelessWidget {
       children: [
         const Icon(Icons.schedule_outlined, size: 14, color: AppColors.gray500),
         const SizedBox(width: 2),
-        Text(
+        AppText(
           label,
           style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
         ),
@@ -352,7 +358,7 @@ class _MetaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return AppText(
       mode.tags.join('  ・  '),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

@@ -39,10 +39,10 @@ class RefreshResultHeadline extends StatelessWidget {
               style: _messageStyle,
               children: [
                 TextSpan(
-                  text: result.overallImprovementLabel,
+                  text: result.overallImprovementLabel.softWrapWords(),
                   style: _percentStyle,
                 ),
-                TextSpan(text: ' ${result.headlineAfter}'),
+                TextSpan(text: ' ${result.headlineAfter}'.softWrapWords()),
               ],
             ),
             textAlign: TextAlign.center,

@@ -1,43 +1,29 @@
 import 'package:flutter/material.dart';
 
-import '../../../home/data/api/weather_api.dart';
-import '../../../home/data/model/environment_snapshot.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
-import '../../../../app/theme/app_colors.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
-import '../measure_refresh_recommend_engine.dart';
-import '../model/measure_care_level.dart';
-import '../model/measure_pollution_snapshot.dart';
-import '../model/measure_refresh_recommend_input.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
+import 'measure_diagnosis_generator.dart';
 import '../model/measure_result.dart';
 import '../model/measure_result_headline.dart';
 import '../model/measure_result_record.dart';
 import 'measure_api.dart';
-import 'measure_diagnosis_generator.dart';
 import 'measure_result_mapper.dart';
-import 'measure_schedule_classifier_api.dart';
+import '../model/measure_care_level.dart';
 
-/// 진단 결과와 리프레시 모드 추천을 조합해 [MeasureResult]를 생성합니다.
+/// 진단 결과와 통합 Gemini 추천을 조합해 [MeasureResult]를 생성합니다.
 class MeasureRefreshRecommendService {
   const MeasureRefreshRecommendService({
     this.measureApi = const MeasureApi(),
     this.refreshApi = const RefreshApi(),
-    this.weatherApi = const WeatherApi(),
-    this.scheduleClassifierApi = const MeasureScheduleClassifierApi(),
+    this.recommendService = RefreshRecommendService.instance,
   });
 
   final MeasureApi measureApi;
   final RefreshApi refreshApi;
-  final WeatherApi weatherApi;
-  final MeasureScheduleClassifierApi scheduleClassifierApi;
-
-  static const EnvironmentSnapshot _neutralEnvironment = EnvironmentSnapshot(
-    temperatureCelsius: 22,
-    humidityPercent: 50,
-    isRaining: false,
-    isSnowing: false,
-  );
+  final RefreshRecommendService recommendService;
 
   /// 진단 분석 단계: 고오염 점수를 생성해 DB에 저장한 뒤 결과를 조합합니다.
   Future<MeasureResult> runDiagnosis({DateTime? now}) async {
@@ -59,42 +45,19 @@ class MeasureRefreshRecommendService {
 
     final resolvedOdor = odorLevel ?? MeasureResultMapper.odorLevel(record);
     final resolvedDust = dustLevel ?? MeasureResultMapper.dustLevel(record);
-    final resolvedNow = now ?? DateTime.now();
 
     final presets = await refreshApi.fetchPresetModes();
     RefreshPresetModeStore.instance.setPresets(presets);
 
-    final environment = await _loadEnvironment();
-    final scheduleCategory = await scheduleClassifierApi.classify();
-    final scheduleTiming = await scheduleClassifierApi.resolveTiming(
-      now: resolvedNow,
+    final recommendation = await recommendService.resolve(
+      forceRefresh: sourceRecord != null,
+      now: now,
     );
 
-    final pollution = MeasurePollutionSnapshot(
-      odor: record.hairOdorScore.toDouble(),
-      dust: record.hairDustScore.toDouble(),
-      total: record.totalPollutionScore.toDouble(),
-    );
-
-    final recommendation = MeasureRefreshRecommendEngine.recommend(
-      MeasureRefreshRecommendInput(
-        odorPollution: pollution.odor,
-        dustPollution: pollution.dust,
-        totalPollution: pollution.total,
-        temperatureCelsius: environment.temperatureCelsius,
-        humidityPercent: environment.humidityPercent,
-        isPrecipitating: environment.isRaining || environment.isSnowing,
-        scheduleCategory: scheduleCategory,
-        scheduleTiming: scheduleTiming,
-        now: resolvedNow,
-        candidates: presets,
-      ),
-    );
-
-    final recommendedMode = await _resolveRecommendedMode(
-      recommendationMode: recommendation?.recommendedMode,
-      presets: presets,
-    );
+    final recommendedMode = recommendation?.mode ?? _fallbackMode(presets);
+    final recommendReason =
+        recommendation?.message ??
+        '현재 헤어 상태와 환경을 고려해 ${recommendedMode.name}을 추천해요.';
 
     debugPrint(
       'MeasureRefreshRecommendService: using MEASURE_RESULTS '
@@ -107,33 +70,9 @@ class MeasureRefreshRecommendService {
       dustLevel: resolvedDust,
       headline: _headlineFor(resolvedOdor, resolvedDust),
       recommendedMode: recommendedMode,
-      recommendReason:
-          recommendation?.reason ??
-          '현재 헤어 상태와 환경을 고려해 ${recommendedMode.name}을 추천해요.',
+      recommendReason: recommendReason,
       sourceRecord: record,
     );
-  }
-
-  Future<RefreshMode> _resolveRecommendedMode({
-    required RefreshMode? recommendationMode,
-    required List<RefreshMode> presets,
-  }) async {
-    if (recommendationMode != null) {
-      return recommendationMode;
-    }
-
-    return _fallbackMode(presets);
-  }
-
-  Future<EnvironmentSnapshot> _loadEnvironment() async {
-    try {
-      return await weatherApi.fetchSnapshot();
-    } catch (error, stackTrace) {
-      debugPrint(
-        'MeasureRefreshRecommendService weather failed: $error\n$stackTrace',
-      );
-      return _neutralEnvironment;
-    }
   }
 
   static MeasureResultHeadline _headlineFor(
@@ -154,16 +93,7 @@ class MeasureRefreshRecommendService {
 
   static RefreshMode _fallbackMode(List<RefreshMode> presets) {
     if (presets.isEmpty) {
-      return const RefreshMode(
-        id: 'fallback-refresh',
-        name: '리프레시',
-        description: '모드를 불러오지 못했습니다.',
-        category: RefreshModeTabs.afterOuting,
-        durationSeconds: 300,
-        icon: Icons.bolt_outlined,
-        odorYn: true,
-        dustYn: true,
-      );
+      return RefreshRecommendService.fallbackMode();
     }
 
     for (final mode in presets) {

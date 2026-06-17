@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
@@ -95,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: AppText(error.message),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -133,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   extraBottom: 24,
                 ),
                 children: [
-                  Text(
+                  AppText(
                     '디바이스, 로컬 캘린더, 알림을 관리합니다.',
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.gray600,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -36,7 +37,7 @@ class MeasureHairProfileRadioTile extends StatelessWidget {
         child: SizedBox(
           height: tileHeight,
           child: Center(
-            child: Text(
+            child: AppText(
               label,
               style: AppTextStyles.bodyM1.copyWith(
                 color: selected ? AppColors.primary500 : AppColors.gray800,

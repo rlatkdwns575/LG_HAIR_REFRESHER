@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -19,7 +20,8 @@ class RefreshProgressStepStrip extends StatelessWidget {
   final bool dimmed;
 
   static const double _dotSize = 8;
-  static const double _columnWidth = 92;
+  static const double _baseColumnWidth = 92;
+  static const double _maxColumnWidth = 132;
   static const double _columnGap = 24;
   static const double _dotRowHeight = _dotSize;
   static const double _lineHorizontalExtension = 40;
@@ -30,10 +32,15 @@ class RefreshProgressStepStrip extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final columnWidth = (_baseColumnWidth * textScale).clamp(
+      _baseColumnWidth,
+      _maxColumnWidth,
+    );
     final stripWidth =
-        steps.length * _columnWidth + (steps.length - 1) * _columnGap;
+        steps.length * columnWidth + (steps.length - 1) * _columnGap;
 
-    return Opacity(
+    final strip = Opacity(
       opacity: dimmed ? 0.45 : 1,
       child: SizedBox(
         width: stripWidth,
@@ -42,8 +49,8 @@ class RefreshProgressStepStrip extends StatelessWidget {
           children: [
             if (steps.length > 1)
               Positioned(
-                left: _columnWidth / 2 - _lineHorizontalExtension,
-                right: _columnWidth / 2 - _lineHorizontalExtension,
+                left: columnWidth / 2 - _lineHorizontalExtension,
+                right: columnWidth / 2 - _lineHorizontalExtension,
                 top: (_dotRowHeight - 1) / 2,
                 child: Container(height: 1, color: AppColors.gray200),
               ),
@@ -54,13 +61,27 @@ class RefreshProgressStepStrip extends StatelessWidget {
                   _StepColumn(
                     step: steps[i],
                     isActive: i == activeIndex,
-                    width: _columnWidth,
+                    width: columnWidth,
                   ),
               ],
             ),
           ],
         ),
       ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (stripWidth <= constraints.maxWidth) {
+          return Center(child: strip);
+        }
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          child: strip,
+        );
+      },
     );
   }
 }
@@ -84,6 +105,7 @@ class _StepColumn extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
             height: RefreshProgressStepStrip._dotRowHeight,
@@ -99,18 +121,20 @@ class _StepColumn extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
+          AppText(
             step.stepTitle,
             textAlign: TextAlign.center,
+            softWrap: true,
             style: AppTextStyles.bodyL.copyWith(
               color: isActive ? AppColors.gray800 : AppColors.gray500,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
+          AppText(
             step.durationLabel,
             textAlign: TextAlign.center,
+            softWrap: true,
             style: AppTextStyles.bodyM1.copyWith(
               color: isActive ? intensityColor : AppColors.gray500,
               fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,

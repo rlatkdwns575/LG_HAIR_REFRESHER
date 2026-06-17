@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
@@ -39,7 +40,7 @@ class AppBoxMiniButton extends StatelessWidget {
                 : BorderSide.none,
           ),
         ),
-        child: Text(label, style: AppTextStyles.labelM),
+        child: AppText(label, style: AppTextStyles.labelM),
       ),
     );
   }

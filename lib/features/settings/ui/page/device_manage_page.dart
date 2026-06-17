@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -49,7 +50,7 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('$feature 기능은 준비 중입니다.'),
+          content: AppText('$feature 기능은 준비 중입니다.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -146,7 +147,7 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
                       const SettingsDivider(),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
-                        child: Text(
+                        child: AppText(
                           _consumableTip(_device),
                           style: AppTextStyles.bodyS.copyWith(
                             color: AppColors.gray600,

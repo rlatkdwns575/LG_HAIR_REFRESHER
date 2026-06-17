@@ -172,7 +172,7 @@ class RefreshResultDetail {
         highlightAfter: false,
       ),
     ],
-    summaryMessage: '진단 시 권장 기준을 넘었던 냄새와 먼지 지표가\n리프레시 후 기준 아래로 내려갔어요.',
+    summaryMessage: '진단 시 권장 기준을 넘었던 냄새와 먼지 지표가 리프레시 후 기준 아래로 내려갔어요.',
     odorSection: RefreshResultStatusSection(
       title: '냄새 상태',
       description: '냄새 제거 단계 후 머리카락에 남은 냄새 반응을 확인했어요.',
@@ -183,7 +183,7 @@ class RefreshResultDetail {
         badgeBorderColor: AppColors.primary300,
         description:
             '모발 사이에 머물던 냄새를 공기 흐름으로 덜어냈어요. '
-            '리프레시 후 잔여 냄새 반응이 낮아져, 가까운 거리에서\n'
+            '리프레시 후 잔여 냄새 반응이 낮아져, 가까운 거리에서 '
             '인지될 가능성도 줄었어요.',
       ),
       changes: [
@@ -219,7 +219,7 @@ class RefreshResultDetail {
         badgeLabel: '일부 잔여',
         description:
             '리프레시 중 모발 표면에 붙은 외부 먼지를 공기 흐름으로 분리하고, '
-            '전체 모발을 가볍게 정리했어요.\n'
+            '전체 모발을 가볍게 정리했어요. '
             '그 결과 넓게 퍼져 있던 미세 입자 흔적이 줄어, '
             '외출 후 남은 먼지 부담이 완화됐어요.',
         badgeTextColor: AppColors.green700,
@@ -251,7 +251,7 @@ class RefreshResultDetail {
         badgeTextColor: AppColors.primary500,
         badgeBorderColor: AppColors.primary300,
         description:
-            '모발 컨디션 영향이 낮아, 리프레시 강도를 과하게 높이지 않았어요.\n'
+            '모발 컨디션 영향이 낮아, 리프레시 강도를 과하게 높이지 않았어요. '
             '냄새와 먼지 제거는 집중적으로 진행했어요.',
       ),
       hairMetrics: [
@@ -269,6 +269,12 @@ class RefreshResultDetail {
           label: '모발 손상도',
           valueLabel: '낮음',
           variant: AppBadgeSmallVariant.low,
+          style: AppBadgeStyle.text,
+        ),
+        RefreshResultHairMetric(
+          label: '모발 유분량',
+          valueLabel: '보통',
+          variant: AppBadgeSmallVariant.medium,
           style: AppBadgeStyle.text,
         ),
         RefreshResultHairMetric(

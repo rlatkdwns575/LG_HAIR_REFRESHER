@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -27,7 +28,7 @@ class MeasureResultDetailSectionBadge extends StatelessWidget {
         border: Border.all(color: colors.$1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelXs.copyWith(
           fontSize: 11,

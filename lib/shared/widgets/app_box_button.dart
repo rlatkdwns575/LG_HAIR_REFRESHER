@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
@@ -39,7 +40,7 @@ class AppBoxButton extends StatelessWidget {
       child: TextButton(
         onPressed: _isDisabled ? null : onPressed,
         style: _styleFor(resolvedVariant),
-        child: Text(
+        child: AppText(
           label,
           style: AppTextStyles.labelL.copyWith(
             color: _textColorFor(resolvedVariant),

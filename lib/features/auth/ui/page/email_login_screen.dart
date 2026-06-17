@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
 import '../../data/api/auth_api.dart';
@@ -52,7 +53,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: AppText(message),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 
@@ -90,7 +94,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: AppText(error.message),
             behavior: SnackBarBehavior.floating,
           ),
         );

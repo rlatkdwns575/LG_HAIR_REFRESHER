@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/services/app_env.dart';
-import '../model/environment_snapshot.dart';
-import 'home_recommend_craft_prompt.dart';
+import '../../../../shared/recommendation/refresh_recommend_input.dart';
+import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
 
 class GeminiRecommendApi {
   const GeminiRecommendApi();
@@ -20,22 +20,26 @@ class GeminiRecommendApi {
   static const _minMessageLength = 25;
 
   Future<String> generateMessage(
-    EnvironmentSnapshot environment, {
-    String? recommendedModeName,
+    RefreshRecommendInput context, {
+    required String recommendedModeName,
   }) async {
     final apiKey = AppEnv.geminiApiKey;
     final body = jsonEncode({
       'system_instruction': {
         'parts': [
-          {'text': HomeRecommendCraftPrompt.systemInstruction.trim()},
+          {
+            'text': RefreshRecommendPrompt.messageSystemInstruction(
+              context.basis,
+            ).trim(),
+          },
         ],
       },
       'contents': [
         {
           'parts': [
             {
-              'text': HomeRecommendCraftPrompt.userPrompt(
-                environment,
+              'text': RefreshRecommendPrompt.messageUserPrompt(
+                context: context,
                 recommendedModeName: recommendedModeName,
               ),
             },

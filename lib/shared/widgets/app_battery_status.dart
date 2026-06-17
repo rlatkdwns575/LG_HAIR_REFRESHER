@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../core/constants/image_assets.dart';
 import '../../app/theme/app_colors.dart';
@@ -56,13 +57,13 @@ class AppBatteryStatus extends StatelessWidget {
             ),
             if (showTitle) ...[
               const SizedBox(width: AppSpacing.xs),
-              Text(
+              AppText(
                 '배터리',
                 style: AppTextStyles.bodyS.copyWith(color: _labelColor),
               ),
             ],
             const SizedBox(width: AppSpacing.xs),
-            Text(
+            AppText(
               '$clamped%',
               style: AppTextStyles.bodyS.copyWith(color: _labelColor),
             ),

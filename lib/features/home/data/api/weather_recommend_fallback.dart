@@ -1,3 +1,5 @@
+import '../../../../shared/recommendation/refresh_recommend_basis.dart';
+import '../../../../shared/recommendation/refresh_recommend_input.dart';
 import '../model/environment_snapshot.dart';
 
 /// Gemini 실패 시 Weather + 추천 모드 기반 규칙 안내 문구.
@@ -5,16 +7,22 @@ class WeatherRecommendFallback {
   const WeatherRecommendFallback._();
 
   static String message(
-    EnvironmentSnapshot environment, {
-    String? recommendedModeName,
+    RefreshRecommendInput context, {
+    required String recommendedModeName,
   }) {
-    final modeName = recommendedModeName?.trim();
-    if (modeName != null && modeName.isNotEmpty) {
-      return '오늘 날씨가 ${_weatherClause(environment)} 날이니,\n'
-          '$modeName 리프레시 모드를 추천해요.';
+    final modeName = recommendedModeName.trim();
+    if (modeName.isEmpty) {
+      return _legacyMessage(context.environment);
     }
 
-    return _legacyMessage(environment);
+    final opening = switch (context.basis) {
+      RefreshRecommendBasis.measure => '측정 결과와 오늘 환경을 보면,',
+      RefreshRecommendBasis.weatherAndSchedule => '오늘 일정과 날씨를 보면,',
+      RefreshRecommendBasis.weatherOnly =>
+        '오늘 날씨가 ${_weatherClause(context.environment)} 날이니,',
+    };
+
+    return '$opening\n$modeName 리프레시 모드를 추천해요.';
   }
 
   static String _weatherClause(EnvironmentSnapshot environment) {

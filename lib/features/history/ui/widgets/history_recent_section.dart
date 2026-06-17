@@ -129,7 +129,7 @@ class _MonthNavRow extends StatelessWidget {
           onTap: onPrevious,
         ),
         const SizedBox(width: 4),
-        Text(
+        AppText(
           _label,
           style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
         ),
@@ -208,18 +208,18 @@ class _MonthlySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '${summary.month.month}월 간 총 ${summary.totalCount}회 리프레시 했어요.',
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(
+              AppText(
                 '지난 $_previousMonthLabel보다 ',
                 style: AppTextStyles.bodyS.copyWith(color: AppColors.gray900),
               ),
-              Text(
+              AppText(
                 '↑${summary.vsLastMonthDelta}회',
                 style: AppTextStyles.bodyS.copyWith(
                   color: AppColors.primary500,
@@ -251,14 +251,42 @@ class _MonthlySummaryCard extends StatelessWidget {
   }
 }
 
-class _SelectedDayCard extends StatelessWidget {
+class _SelectedDayCard extends StatefulWidget {
   const _SelectedDayCard({required this.group, this.onDetailTap});
 
   final RefreshDayGroup group;
   final VoidCallback? onDetailTap;
 
   @override
+  State<_SelectedDayCard> createState() => _SelectedDayCardState();
+}
+
+class _SelectedDayCardState extends State<_SelectedDayCard> {
+  static const _maxCollapsedCount = 3;
+
+  bool _showAllRecords = false;
+
+  @override
+  void didUpdateWidget(covariant _SelectedDayCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_isSameDay(oldWidget.group.date, widget.group.date)) {
+      _showAllRecords = false;
+    }
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final group = widget.group;
+    final records = group.records;
+    final hasHiddenRecords = records.length > _maxCollapsedCount;
+    final visibleRecords = _showAllRecords || !hasHiddenRecords
+        ? records
+        : records.take(_maxCollapsedCount).toList();
+
     return HistoryWhiteCard(
       backgroundColor: AppColors.gray50,
       borderColor: null,
@@ -269,18 +297,18 @@ class _SelectedDayCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
+                child: AppText(
                   formatKoreanDateWithWeekday(group.date),
                   style: AppTextStyles.bodyM2.copyWith(
                     color: AppColors.gray900,
                   ),
                 ),
               ),
-              HistoryDetailLink(label: '결과 상세보기', onTap: onDetailTap),
+              HistoryDetailLink(label: '결과 상세보기', onTap: widget.onDetailTap),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             '총 ${group.count}번 리프레시했어요.',
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
@@ -290,11 +318,46 @@ class _SelectedDayCard extends StatelessWidget {
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
           const SizedBox(height: AppSpacing.md),
-          for (var i = 0; i < group.records.length; i++) ...[
+          for (var i = 0; i < visibleRecords.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacing.sm),
-            _DayRecordTile(record: group.records[i]),
+            _DayRecordTile(record: visibleRecords[i]),
+          ],
+          if (hasHiddenRecords) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _RecordsExpandToggle(
+              expanded: _showAllRecords,
+              onTap: () => setState(() => _showAllRecords = !_showAllRecords),
+            ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _RecordsExpandToggle extends StatelessWidget {
+  const _RecordsExpandToggle({
+    required this.expanded,
+    required this.onTap,
+  });
+
+  final bool expanded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        height: 28,
+        child: Center(
+          child: Icon(
+            expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            size: 22,
+            color: AppColors.gray400,
+          ),
+        ),
       ),
     );
   }
@@ -316,13 +379,13 @@ class _DayRecordTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
+          AppText(
             formatKoreanTime(record.dateTime),
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(width: 8),
           Flexible(
-            child: Text(
+            child: AppText(
               record.modeName,
               style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
               overflow: TextOverflow.ellipsis,

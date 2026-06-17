@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/device_consumable_service.dart';
@@ -11,23 +10,14 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/api/measure_refresh_recommend_service.dart';
 import '../../../measure/data/measure_result_store.dart';
-import '../../../refresh/data/api/refresh_api.dart';
-import '../../../refresh/data/api/refresh_recommend_api.dart';
-import '../../../refresh/data/api/refresh_recommend_fallback.dart';
-import '../../../refresh/data/model/refresh_mode.dart';
-import '../../../refresh/data/refresh_mode_catalog.dart';
 import '../../../refresh/ui/refresh_scent_unavailable.dart';
-import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
-import '../../data/api/weather_api.dart';
-import '../../data/api/weather_recommend_fallback.dart';
 import '../../data/home_device_status_watcher.dart';
-import '../../data/home_recommend_cache.dart';
 import '../../data/home_shortcut_store.dart';
-import '../../data/model/environment_snapshot.dart';
 import '../../data/model/home_dashboard_data.dart';
 import '../../data/model/home_device_status_snapshot.dart';
 import '../widgets/home_device_status_section.dart';
@@ -50,12 +40,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const _sectionGap = 6.0;
   final _homeApi = const HomeApi();
   final _deviceStatusWatcher = HomeDeviceStatusWatcher();
-  final _weatherApi = const WeatherApi();
   final _measureApi = const MeasureApi();
   final _measureRecommendService = const MeasureRefreshRecommendService();
-  final _refreshApi = const RefreshApi();
-  final _geminiRecommendApi = const GeminiRecommendApi();
-  final _refreshRecommendApi = const RefreshRecommendApi();
+  final _recommendService = RefreshRecommendService.instance;
   final _deviceConsumableService = const DeviceConsumableService();
 
   HomeDashboardData _dashboardData = const HomeDashboardData();
@@ -120,9 +107,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   @override
+  void activate() {
+    super.activate();
+    unawaited(_refreshRecentDiagnosisFlag());
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(_deviceStatusWatcher.refresh());
+      unawaited(_refreshDeviceStatus());
+      unawaited(_refreshRecentDiagnosisFlag());
     }
   }
 
@@ -145,69 +139,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     }
 
-    String? recommendMessage = HomeRecommendCache.instance.message;
+    String? recommendMessage;
     HomeQuickRefreshMode? recommendedQuickMode;
     var useRecommendForQuickSlot = false;
-    EnvironmentSnapshot? environment;
 
     try {
-      environment = await _weatherApi.fetchSnapshot();
-      debugPrint(
-        'Home weather loaded: '
-        '${environment.temperatureCelsius}°C, '
-        'humidity ${environment.humidityPercent}%, '
-        'rain=${environment.isRaining}, snow=${environment.isSnowing}',
-      );
-
-      final apiRecommendedMode = await _resolveRecommendApiMode(environment);
-      if (apiRecommendedMode != null) {
-        recommendedQuickMode = apiRecommendedMode.toHomeQuickRefreshMode();
+      final recommendation = await _recommendService.resolve();
+      if (recommendation != null) {
+        recommendMessage = recommendation.message;
+        recommendedQuickMode = recommendation.mode.toHomeQuickRefreshMode();
         useRecommendForQuickSlot = true;
         debugPrint(
-          'Home quick slot using RECOMMEND API mode: ${apiRecommendedMode.name}',
+          'Home using unified recommend: ${recommendation.mode.name} '
+          '(basis=${recommendation.basis.name})',
         );
-      } else {
-        debugPrint('Home quick slot falling back to frequent mode.');
-      }
-
-      if (recommendMessage == null) {
-        final recommendedMode =
-            apiRecommendedMode ?? await _resolveRecommendedMode(environment);
-        final recommendedModeName = recommendedMode?.name;
-
-        try {
-          recommendMessage = await _geminiRecommendApi.generateMessage(
-            environment,
-            recommendedModeName: recommendedModeName,
-          );
-          debugPrint('Home Gemini banner message generated.');
-        } catch (error, stackTrace) {
-          debugPrint('Home Gemini failed: $error\n$stackTrace');
-          recommendMessage = WeatherRecommendFallback.message(
-            environment,
-            recommendedModeName: recommendedModeName,
-          );
-          debugPrint('Home banner using weather fallback message.');
-        }
-
-        HomeRecommendCache.instance.save(recommendMessage);
-      } else {
-        debugPrint('Home banner using cached recommend message.');
       }
     } catch (error, stackTrace) {
-      debugPrint('Home weather/recommend load failed: $error\n$stackTrace');
+      debugPrint('Home recommend load failed: $error\n$stackTrace');
     }
 
     if (!mounted) {
       return;
     }
 
-    var hasRecentDiagnosis = false;
-    try {
-      hasRecentDiagnosis = await _measureApi.hasRecentResult();
-    } catch (error, stackTrace) {
-      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
-    }
+    var hasRecentDiagnosis = await _fetchHasRecentDiagnosisResult();
 
     final cartridge = await _deviceConsumableService
         .fetchScentCartridgeStatus();
@@ -257,54 +212,46 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _refreshDeviceStatus() => _deviceStatusWatcher.refresh();
 
-  Future<RefreshMode?> _resolveRecommendApiMode(
-    EnvironmentSnapshot environment,
-  ) async {
+  Future<bool> _fetchHasRecentDiagnosisResult() async {
     try {
-      final presets = await _refreshApi.fetchPresetModes();
-      RefreshPresetModeStore.instance.setPresets(presets);
-      if (presets.isEmpty) {
-        return null;
-      }
-
-      return await _refreshRecommendApi.recommendMode(
-        candidates: presets,
-        environment: environment,
-      );
+      return await _measureApi.hasRecentResult();
     } catch (error, stackTrace) {
-      debugPrint('Home RECOMMEND API failed: $error\n$stackTrace');
-      return null;
+      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
+      return false;
     }
   }
 
-  Future<RefreshMode?> _resolveRecommendedMode(
-    EnvironmentSnapshot environment,
-  ) async {
-    try {
-      final presets = await _refreshApi.fetchPresetModes();
-      RefreshPresetModeStore.instance.setPresets(presets);
-      if (presets.isEmpty) {
-        return null;
-      }
-
-      final recommended = await _refreshRecommendApi.recommendMode(
-        candidates: presets,
-        environment: environment,
-      );
-
-      return recommended ??
-          RefreshRecommendFallback.pickMode(
-            candidates: presets,
-            environment: environment,
-          );
-    } catch (error, stackTrace) {
-      debugPrint('Home recommend mode resolve failed: $error\n$stackTrace');
-      return null;
+  Future<void> _refreshRecentDiagnosisFlag() async {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted || _dashboardData.hasRecentDiagnosisResult == hasRecent) {
+      return;
     }
+    setState(() {
+      _dashboardData = _dashboardData.copyWith(
+        hasRecentDiagnosisResult: hasRecent,
+      );
+    });
+  }
+
+  Future<void> _refreshHomeIndicators() async {
+    await Future.wait([_refreshDeviceStatus(), _refreshRecentDiagnosisFlag()]);
   }
 
   Future<void> _handleDiagnosisTap() async {
-    if (!_dashboardData.hasRecentDiagnosisResult) {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted) {
+      return;
+    }
+
+    if (_dashboardData.hasRecentDiagnosisResult != hasRecent) {
+      setState(() {
+        _dashboardData = _dashboardData.copyWith(
+          hasRecentDiagnosisResult: hasRecent,
+        );
+      });
+    }
+
+    if (!hasRecent) {
       context.pushMeasure();
       return;
     }
@@ -360,7 +307,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _refreshDeviceStatus,
+              onRefresh: _refreshHomeIndicators,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: AppSystemInsets.onlyBottom(
@@ -408,15 +355,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton.small(
-              heroTag: 'widgetGallery',
-              tooltip: 'Shared Widget Gallery',
-              onPressed: context.pushWidgetGallery,
-              child: const Icon(Icons.widgets_outlined, size: 20),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

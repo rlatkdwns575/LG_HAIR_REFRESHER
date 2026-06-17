@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/services/app_env.dart';
-import '../../../home/data/model/environment_snapshot.dart';
+import '../../../../shared/recommendation/refresh_recommend_input.dart';
+import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
 import '../model/refresh_mode.dart';
-import 'refresh_mode_recommend_knowledge.dart';
 
 class RefreshRecommendApi {
   const RefreshRecommendApi();
@@ -21,7 +21,7 @@ class RefreshRecommendApi {
 
   Future<RefreshMode?> recommendMode({
     required List<RefreshMode> candidates,
-    required EnvironmentSnapshot environment,
+    required RefreshRecommendInput context,
   }) async {
     if (candidates.isEmpty) {
       return null;
@@ -31,16 +31,20 @@ class RefreshRecommendApi {
     final body = jsonEncode({
       'system_instruction': {
         'parts': [
-          {'text': RefreshModeRecommendKnowledge.systemInstruction.trim()},
+          {
+            'text': RefreshRecommendPrompt.modeSystemInstruction(
+              context.basis,
+            ).trim(),
+          },
         ],
       },
       'contents': [
         {
           'parts': [
             {
-              'text': RefreshModeRecommendKnowledge.userPrompt(
+              'text': RefreshRecommendPrompt.modeUserPrompt(
                 candidates: candidates,
-                environment: environment,
+                context: context,
               ),
             },
           ],

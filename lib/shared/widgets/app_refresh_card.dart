@@ -110,7 +110,7 @@ class AppRefreshCard extends StatelessWidget {
             style: AppBadgeStyle.text,
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
+          AppText(
             title,
             style: AppTextStyles.titleXs.copyWith(
               color: AppComponentColors.refreshCardTitle,
@@ -124,7 +124,7 @@ class AppRefreshCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Text(
+          child: AppText(
             title,
             style: (isDefault ? AppTextStyles.titleS : AppTextStyles.titleXs)
                 .copyWith(color: AppComponentColors.refreshCardTitle),
@@ -150,13 +150,13 @@ class AppRefreshCard extends StatelessWidget {
       children: [
         for (var i = 0; i < captionItems.length; i++) ...[
           if (i > 0)
-            Text(
+            AppText(
               '・',
               style: AppTextStyles.labelS.copyWith(
                 color: AppComponentColors.refreshCardCaption,
               ),
             ),
-          Text(
+          AppText(
             captionItems[i],
             style: AppTextStyles.labelS.copyWith(
               color: AppComponentColors.refreshCardCaption,

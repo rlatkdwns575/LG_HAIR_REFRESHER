@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_text_styles.dart';
+import '../../core/extensions/string_extension.dart';
 
 /// Figma Text Field_Search (Variants > Common > Top_Header_Common Type=Search).
 class AppSearchTextField extends StatelessWidget {
@@ -31,7 +32,7 @@ class AppSearchTextField extends StatelessWidget {
           color: AppComponentColors.fieldText,
         ),
         decoration: InputDecoration(
-          hintText: hintText,
+          hintText: hintText.softWrapWords(),
           hintStyle: AppTextStyles.bodyM1.copyWith(
             color: AppComponentColors.fieldPlaceholder,
           ),

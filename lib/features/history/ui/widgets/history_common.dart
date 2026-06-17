@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -88,7 +89,7 @@ class HistoryKeyValueRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Text(
+          child: AppText(
             label,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
           ),
@@ -98,12 +99,12 @@ class HistoryKeyValueRow extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              AppText(
                 value,
                 style: AppTextStyles.bodyM2.copyWith(color: valueColor),
               ),
               const SizedBox(width: 2),
-              Text(
+              AppText(
                 trailingDelta!,
                 style: AppTextStyles.labelM.copyWith(
                   color: AppColors.primary500,
@@ -112,7 +113,10 @@ class HistoryKeyValueRow extends StatelessWidget {
             ],
           )
         else
-          Text(value, style: AppTextStyles.bodyM2.copyWith(color: valueColor)),
+          AppText(
+            value,
+            style: AppTextStyles.bodyM2.copyWith(color: valueColor),
+          ),
       ],
     );
   }
@@ -133,7 +137,7 @@ class HistoryDetailLink extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          AppText(
             label,
             style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -20,7 +21,7 @@ class MeasureResultSmellTypeRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
+        AppText(
           '냄새 유형',
           style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray800),
         ),

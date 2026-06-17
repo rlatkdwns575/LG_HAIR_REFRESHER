@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
 import '../../data/auth_assets.dart';
@@ -20,7 +21,7 @@ class LoginScreen extends StatelessWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(
-          content: Text('Google 로그인은 준비 중입니다.'),
+          content: AppText('Google 로그인은 준비 중입니다.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -51,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     Image.asset(AuthAssets.googleIcon, width: 24, height: 24),
                     const SizedBox(width: 10),
-                    const Text(
+                    AppText(
                       'Google로 로그인하기',
                       style: TextStyle(
                         fontSize: 16,
@@ -69,7 +70,7 @@ class LoginScreen extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 borderColor: AuthScreenStyles.border,
                 onPressed: () => context.push(AppRoutePaths.emailLogin),
-                child: const Text(
+                child: AppText(
                   '이메일로 로그인',
                   style: TextStyle(
                     fontSize: 16,
@@ -90,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    AppText(
                       '회원가입',
                       style: TextStyle(
                         fontSize: 15,

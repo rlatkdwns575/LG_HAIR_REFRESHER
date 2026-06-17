@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/layout/app_layout.dart';
 import '../../app/theme/app_component_colors.dart';
@@ -63,7 +64,7 @@ class AppConfirmDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            AppText(
               title,
               textAlign: TextAlign.center,
               style: AppTextStyles.titleM.copyWith(
@@ -71,7 +72,7 @@ class AppConfirmDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            AppText(
               message,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyM1.copyWith(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_component_colors.dart';
@@ -111,7 +112,7 @@ class _RefreshModeAddCard extends StatelessWidget {
               children: [
                 Align(
                   alignment: Alignment.topLeft,
-                  child: Text(
+                  child: AppText(
                     '자주 쓰는 리프레시를\n홈에 등록해보세요.',
                     style: AppTextStyles.titleXs.copyWith(
                       color: AppComponentColors.refreshCardAddTitle,
@@ -184,7 +185,7 @@ class _RefreshModeQuickCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Expanded(
-                        child: Text(
+                        child: AppText(
                           mode.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -198,7 +199,7 @@ class _RefreshModeQuickCard extends StatelessWidget {
                         ),
                       ),
                       if (!enabled) ...[
-                        Text(
+                        AppText(
                           '카트리지 없음',
                           style: AppTextStyles.labelXs.copyWith(
                             color: AppColors.gray500,
@@ -265,7 +266,7 @@ class _FilledBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       alignment: Alignment.center,
-      child: Text(
+      child: AppText(
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -299,7 +300,7 @@ class _DurationBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
         child: Center(
-          child: Text(
+          child: AppText(
             '소요시간 $durationLabel',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

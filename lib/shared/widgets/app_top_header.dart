@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -28,7 +29,7 @@ class AppTopHeader extends StatelessWidget implements PreferredSizeWidget {
           height: 44,
           child: NavigationToolbar(
             leading: leading,
-            middle: Text(
+            middle: AppText(
               title,
               style: AppTextStyles.headlineM.copyWith(
                 color: AppComponentColors.headerTitle,
