@@ -35,7 +35,10 @@ class SettingsSectionCard extends StatelessWidget {
             color: AppColors.gray0,
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          child: Column(children: children),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
         ),
       ],
     );

@@ -29,7 +29,15 @@ class RefreshDayGroup {
   final List<RefreshHistoryRecord> records;
   final String summaryMessage;
 
+  /// 진단 포함 전체 기록 수.
   int get count => records.length;
+
+  /// 리프레시(진단 제외) 기록 수.
+  int get refreshCount => records.where((record) => !record.isDiagnosis).length;
+
+  /// 헤어 상태 진단 기록 수.
+  int get diagnosisCount =>
+      records.where((record) => record.isDiagnosis).length;
 }
 
 /// 가로 막대 통계 한 줄.
@@ -151,7 +159,10 @@ class RefreshHistoryMonthData {
   }
 
   Map<DateTime, int> get countByDate {
-    return {for (final group in dayGroups) group.date: group.count};
+    return {
+      for (final group in dayGroups)
+        if (group.refreshCount > 0) group.date: group.refreshCount,
+    };
   }
 
   RefreshDayGroup? groupForDate(DateTime date) {

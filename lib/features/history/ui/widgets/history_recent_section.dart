@@ -27,7 +27,6 @@ class HistoryRecentSection extends StatelessWidget {
     required this.onCalendarIconTap,
     required this.onDateSelected,
     required this.onToggleExpanded,
-    this.onDayResultDetailTap,
     super.key,
   });
 
@@ -43,7 +42,6 @@ class HistoryRecentSection extends StatelessWidget {
   final VoidCallback onCalendarIconTap;
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback onToggleExpanded;
-  final VoidCallback? onDayResultDetailTap;
 
   @override
   Widget build(BuildContext context) {
@@ -87,10 +85,7 @@ class HistoryRecentSection extends StatelessWidget {
         ),
         if (selectedGroup != null) ...[
           const SizedBox(height: AppSpacing.md),
-          _SelectedDayCard(
-            group: selectedGroup,
-            onDetailTap: onDayResultDetailTap,
-          ),
+          _SelectedDayCard(group: selectedGroup),
         ],
       ],
     );
@@ -209,7 +204,7 @@ class _MonthlySummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppText(
-            '${summary.month.month}월 간 총 ${summary.totalCount}회 리프레시 했어요.',
+            '${summary.month.month}월 총 리프레시 횟수 : ${summary.totalCount}회',
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 4),
@@ -252,10 +247,9 @@ class _MonthlySummaryCard extends StatelessWidget {
 }
 
 class _SelectedDayCard extends StatefulWidget {
-  const _SelectedDayCard({required this.group, this.onDetailTap});
+  const _SelectedDayCard({required this.group});
 
   final RefreshDayGroup group;
-  final VoidCallback? onDetailTap;
 
   @override
   State<_SelectedDayCard> createState() => _SelectedDayCardState();
@@ -291,25 +285,23 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: AppText(
-                  formatKoreanDateWithWeekday(group.date),
-                  style: AppTextStyles.bodyM2.copyWith(
-                    color: AppColors.gray900,
-                  ),
-                ),
-              ),
-              HistoryDetailLink(label: '결과 상세보기', onTap: widget.onDetailTap),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
           AppText(
-            '총 ${group.count}번 리프레시했어요.',
+            formatKoreanDateWithWeekday(group.date),
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
+          const SizedBox(height: AppSpacing.sm),
+          if (group.refreshCount > 0)
+            AppText(
+              '리프레시를 총 ${group.refreshCount}번 완료했어요.',
+              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            ),
+          if (group.diagnosisCount > 0) ...[
+            if (group.refreshCount > 0) const SizedBox(height: 2),
+            AppText(
+              '헤어 상태 진단을 총 ${group.diagnosisCount}번 완료했어요.',
+              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            ),
+          ],
           const SizedBox(height: 2),
           AppText(
             group.summaryMessage,

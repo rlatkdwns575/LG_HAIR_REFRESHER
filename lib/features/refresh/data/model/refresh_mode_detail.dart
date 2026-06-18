@@ -23,7 +23,7 @@ class RefreshModeDetailStep {
 
   final String durationLabel;
   final String title;
-  final String description;
+  final String? description;
 }
 
 /// 리프레시 상세 화면 데이터.
@@ -46,17 +46,31 @@ class RefreshModeDetail {
 
   static const _defaultPreCheckItems = [
     '디바이스를 머리 가까이에 유지해 주세요.',
-    '케어 중에는 디바이스를 모발 전체에 골고루 움직여주세요.',
+    '케어 중에는 모발 전체를 따라 디바이스를 골고루 움직여주세요.',
   ];
 
   static const _intensityLabels = ['집중관리', '일반관리', '간편관리'];
 
-  static const _stepDescriptions = {
-    '먼지': '모발 표면에 묻은 먼지를 빠르게 제거해요.',
-    '냄새': '모발에 남은 냄새를 부드럽게 정리해요.',
-    '향기': '은은한 향기로 마무리해요.',
-    '두피': '두피를 시원하게 케어해요.',
+  static const Map<String, Map<CareIntensity, String>> _stepDescriptions = {
+    '먼지': {
+      CareIntensity.intensive: '모발 표면에 쌓인 먼지를 강한 바람으로 꼼꼼하게 제거해요.',
+      CareIntensity.normal: '모발 표면에 묻은 먼지를 빠르게 제거해요.',
+      CareIntensity.simple: '모발 표면의 먼지를 가볍게 털어내요.',
+    },
+    '냄새': {
+      CareIntensity.intensive: '모발 깊숙이 밴 냄새까지 집중적으로 정리해요.',
+      CareIntensity.normal: '모발에 남은 냄새를 부드럽게 정리해요.',
+      CareIntensity.simple: '가벼운 생활 냄새를 산뜻하게 환기해요.',
+    },
+    '향기': {
+      CareIntensity.intensive: '풍부한 향으로 모발을 오래 감싸는 향기를 더해요.',
+      CareIntensity.normal: '은은한 향기로 모발을 기분 좋게 마무리해요.',
+      CareIntensity.simple: '가볍고 산뜻한 향으로 살짝 마무리해요.',
+    },
   };
+
+  static String? _stepDescription(String stepCare, CareIntensity intensity) =>
+      _stepDescriptions[stepCare]?[intensity];
 
   factory RefreshModeDetail.fromMode(RefreshMode mode) {
     if (mode.isCustom) {
@@ -88,7 +102,7 @@ class RefreshModeDetail {
         RefreshModeDetailStep(
           durationLabel: _formatStepDurationLabel(durations[i]),
           title: '$stepCare ${tag.intensityLabel}',
-          description: _stepDescriptions[stepCare] ?? mode.description,
+          description: _stepDescription(stepCare, tag.intensity),
         ),
       );
     }
@@ -130,7 +144,7 @@ class RefreshModeDetail {
         RefreshModeDetailStep(
           durationLabel: _formatStepDurationLabel(durations[i]),
           title: '$stepCare ${tag.intensityLabel}',
-          description: _stepDescriptions[stepCare] ?? mode.description,
+          description: _stepDescription(stepCare, tag.intensity),
         ),
       );
     }
@@ -167,7 +181,7 @@ class RefreshModeDetail {
         RefreshModeDetailStep(
           durationLabel: _formatStepDurationLabel(totalSeconds),
           title: '먼지 $intensityLabel',
-          description: mode.description.replaceAll('\n', ' '),
+          description: _stepDescription('먼지', CareIntensity.normal),
         ),
       ],
     );
@@ -256,7 +270,7 @@ class RefreshModeDetail {
     return switch (careFull) {
       '먼지 케어' || '먼지 제거' => '먼지제거',
       '냄새 케어' || '냄새 제거' => '냄새제거',
-      '향기 케어' => '향기케어',
+      '향기 케어' || '향 케어' => '향기케어',
       _ => careFull,
     };
   }
