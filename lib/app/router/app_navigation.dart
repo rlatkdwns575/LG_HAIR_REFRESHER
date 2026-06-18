@@ -49,6 +49,10 @@ extension AppNavigation on BuildContext {
     push(AppRoutePaths.refreshDetail, extra: mode);
   }
 
+  /// 리프레시 상세로 이동하고, 커스텀 모드 삭제 여부를 반환합니다.
+  Future<bool?> pushRefreshDetailForResult({required RefreshMode mode}) =>
+      push<bool>(AppRoutePaths.refreshDetail, extra: mode);
+
   void pushRefreshProgress({RefreshMode? mode, String? modeName}) {
     assert(mode == null || modeName == null, 'mode 또는 modeName 중 하나만 전달하세요.');
     push(AppRoutePaths.refreshProgress, extra: mode ?? modeName);

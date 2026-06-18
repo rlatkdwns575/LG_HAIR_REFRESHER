@@ -48,9 +48,9 @@ class MeasureProgressRing extends StatelessWidget {
           progressColor: color,
         ),
         child: Center(
-          // '%' 글자 때문에 시각적으로 왼쪽으로 치우쳐 보여 살짝 오른쪽으로 보정.
+          // '%' 글자 때문에 시각적으로 왼쪽으로 치우쳐 보여 6px 오른쪽으로 보정.
           child: Transform.translate(
-            offset: const Offset(5, 0),
+            offset: const Offset(6, 0),
             child: AppText(
               '$percent%',
               style: AppTextStyles.headlineL.copyWith(

@@ -14,7 +14,7 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
 
   final MeasureResultDetailMetric metric;
 
-  static const double _horizontalInset = 14;
+  static const double _horizontalInset = 15;
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +26,16 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
             child: metric.showHelpIcon && metric.helpMessage != null
                 ? AppMetricHelpIcon(
                     label: metric.label,
-                    labelStyle: AppTextStyles.bodyS.copyWith(
-                      color: AppColors.gray900,
-                      fontWeight: FontWeight.w600,
+                    labelStyle: AppTextStyles.titleXs.copyWith(
+                      color: AppColors.gray800,
                     ),
                     tooltipMessage: metric.helpMessage!,
                     placement: AppMetricHelpTooltipPlacement.belowEnd,
                   )
                 : AppText(
                     metric.label,
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: AppColors.gray900,
-                      fontWeight: FontWeight.w600,
+                    style: AppTextStyles.titleXs.copyWith(
+                      color: AppColors.gray800,
                     ),
                   ),
           ),

@@ -43,6 +43,7 @@ class HistorySessionMapper {
     return RefreshHistoryRecord(
       dateTime: startedAt.toLocal(),
       modeName: mode?['display_name'] as String? ?? '리프레시',
+      modeId: session['mode_id'] as String?,
       careType: _resolveCareType(
         odorYn: odorYn,
         dustYn: dustYn,

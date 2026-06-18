@@ -20,6 +20,7 @@ abstract final class AuthScreenStyles {
 
   static const horizontalPadding = AppCommonTopHeader.pageHorizontalInset;
   static const fieldRadius = 8.0;
+  static const fieldLabelGap = 20.0;
   static const buttonHeight = 52.0;
   static const buttonRadius = 8.0;
 

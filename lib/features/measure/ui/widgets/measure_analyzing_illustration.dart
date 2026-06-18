@@ -6,17 +6,21 @@ import '../../data/measure_assets.dart';
 class MeasureAnalyzingIllustration extends StatelessWidget {
   const MeasureAnalyzingIllustration({super.key});
 
-  static const double height = 280;
+  static const double size = 230;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: height,
-      child: Image.asset(
-        MeasureAssets.analyzingIllustration,
-        fit: BoxFit.contain,
-        alignment: Alignment.center,
+    return Center(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Image.asset(
+          MeasureAssets.analyzingIllustration,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          alignment: Alignment.center,
+        ),
       ),
     );
   }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/constants/image_assets.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/app_recommend_featured_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
@@ -233,12 +234,12 @@ class _TodayRecordTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AppText(
-                  '리프레시 필요성',
+                  '청결도',
                   style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
                 ),
                 const SizedBox(height: 2),
                 AppText(
-                  record.necessityReductionLabel!,
+                  record.cleanlinessIncreaseLabel!,
                   style: AppTextStyles.titleM.copyWith(
                     color: AppColors.gray900,
                   ),
@@ -270,53 +271,95 @@ class _RoutineCard extends StatelessWidget {
   final RoutineSuggestion suggestion;
   final VoidCallback? onRegisterTap;
 
+  static const _tagStyle = TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: 10,
+    height: 1,
+    fontWeight: FontWeight.w500,
+    color: AppColors.primary700,
+  );
+
   @override
   Widget build(BuildContext context) {
-    return AppRecommendFeaturedCard(
-      headline: suggestion.title,
-      body: suggestion.subtitle,
-      metaTags: _metaTagsFor(suggestion),
-      actionLabel: '루틴으로 등록하기',
-      onAction: onRegisterTap,
+    return HistoryWhiteCard(
+      padding: const EdgeInsets.all(20),
+      backgroundColor: AppColors.primary100,
+      borderColor: null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                ImageAssets.homeRecommendSparkleIcon,
+                width: 44,
+                height: 44,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      suggestion.title,
+                      style: AppTextStyles.bodyM2.copyWith(
+                        color: AppColors.gray900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    AppText(
+                      suggestion.subtitle,
+                      style: AppTextStyles.titleXs.copyWith(
+                        color: AppColors.gray900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              for (final tag in suggestion.tags) AppText(tag, style: _tagStyle),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            height: 30,
+            width: double.infinity,
+            child: TextButton(
+              onPressed: onRegisterTap,
+              style: TextButton.styleFrom(
+                backgroundColor: onRegisterTap == null
+                    ? AppColors.gray300
+                    : AppColors.primary500,
+                disabledBackgroundColor: AppColors.gray300,
+                foregroundColor: AppColors.gray0,
+                disabledForegroundColor: AppColors.gray0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                ),
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: AppText(
+                '루틴 등록하기',
+                style: AppTextStyles.labelL.copyWith(
+                  fontSize: 12,
+                  height: 16 / 12,
+                  color: AppColors.gray0,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
-  }
-
-  List<String> _metaTagsFor(RoutineSuggestion suggestion) {
-    const weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
-    final tags = <String>[];
-    if (suggestion.modeName.isNotEmpty) {
-      tags.add(suggestion.modeName);
-    }
-    if (suggestion.weekdays.isNotEmpty) {
-      const weekdaySet = {1, 2, 3, 4, 5};
-      if (suggestion.weekdays.length == weekdaySet.length &&
-          suggestion.weekdays.toSet().containsAll(weekdaySet)) {
-        tags.add('평일');
-      } else if (suggestion.weekdays.length == 1) {
-        tags.add('${weekdayLabels[suggestion.weekdays.first - 1]}요일');
-      } else {
-        tags.add(
-          suggestion.weekdays
-              .map((value) => '${weekdayLabels[value - 1]}요일')
-              .join(' · '),
-        );
-      }
-    }
-    if (suggestion.hour != null) {
-      tags.add(_timeLabel(suggestion.hour!, suggestion.minute ?? 0));
-    }
-    if (suggestion.durationMinutes != null) {
-      tags.add('${suggestion.durationMinutes}분 소요');
-    }
-    return tags;
-  }
-
-  String _timeLabel(int hour, int minute) {
-    final period = hour < 12 ? '오전' : '오후';
-    final hour12 = hour % 12 == 0 ? 12 : hour % 12;
-    if (minute == 0) {
-      return '$period $hour12시';
-    }
-    return '$period $hour12시 $minute분';
   }
 }

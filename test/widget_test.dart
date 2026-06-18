@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/app/app.dart';
 import 'package:lg_hair_refresher/app/router/app_router.dart';
@@ -12,7 +13,10 @@ void main() {
     await tester.pumpWidget(const LgHairRefresherApp());
     await tester.pumpAndSettle();
 
-    expect(find.byType(Image), findsAtLeastNWidgets(2));
+    expect(find.bySemanticsLabel('LG PuriHair'), findsOneWidget);
+    expect(findDisplayText('헤어 케어의 새로운 기준'), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
     expect(findDisplayText('Google로 로그인하기'), findsOneWidget);
     expect(findDisplayText('이메일로 로그인'), findsOneWidget);
   });

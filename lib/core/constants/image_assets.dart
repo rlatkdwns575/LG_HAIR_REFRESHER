@@ -14,21 +14,17 @@ class ImageAssets {
   static const googleIcon = '$authDir/Google.png';
   static const checkIcon = '$commonDir/check.png';
   static const homeFilterIcon = '$homeDir/filter.png';
-  static const homeBrandLogo = '$homeDir/LOGO.png';
-  static const homeBrandTagline = '$homeDir/LOGO2.png';
+  static const homeBrandLogo = '$homeDir/lg_purihair_logo.svg';
   static const homeDeviceImage = '$homeDir/device_purihair.png';
   static const deviceImageNoBackground =
       '$homeDir/device_purihair_background_delete.png';
   static const homeRecommendSparkleIcon = '$homeDir/recommend_sparkle.png';
-  static const measureAnalyzingIllustration = '$measureDir/analyzing2.png';
+  static const measureAnalyzingIllustration = '$measureDir/analyzing.png';
   static const measurePrepareDevice = '$measureDir/machine.png';
   static const measurePrepareHair = '$measureDir/hair.png';
   static const refreshTrashIcon = '$refreshDir/trash.png';
   static const refreshShareIcon = '$refreshDir/wifi.png';
-  static const refreshCollectingFrame2 = '$refreshDir/refresh2.png';
-  static const refreshCollectingFrame3 = '$refreshDir/refresh3.png';
-  static const refreshCollectingFrame4 = '$refreshDir/refresh4.png';
-  static const refreshCollectingIllustration = refreshCollectingFrame2;
+  static const refreshCollectingIllustration = '$refreshDir/refresh.png';
   static const historyCalendarIcon = '$historyDir/calendar.png';
 
   static const homeBatteryIconDir = '$homeDir/battery';

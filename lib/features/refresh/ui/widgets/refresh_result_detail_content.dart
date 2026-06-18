@@ -82,7 +82,7 @@ class RefreshResultDetailContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         AppText(
-          '결과는 2시간 동안 유지되며, 이후 기록에서 확인할 수 있어요.',
+          '리프레시 결과는 리프레시 기록에서 확인할 수 있어요.',
           style: AppTextStyles.bodyS.copyWith(
             color: AppColors.gray500,
             height: 1.45,

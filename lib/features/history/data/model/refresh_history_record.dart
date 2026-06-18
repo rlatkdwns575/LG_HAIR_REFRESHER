@@ -21,6 +21,7 @@ class RefreshHistoryRecord {
     required this.dateTime,
     required this.modeName,
     required this.careType,
+    this.modeId,
     this.duration,
     this.necessityReductionPercent,
     this.odorBeforeStatus,
@@ -35,10 +36,13 @@ class RefreshHistoryRecord {
   /// 측정/리프레시가 일어난 시각 (날짜 + 시간).
   final DateTime dateTime;
   final String modeName;
+
+  /// `REFRESH_MODE.mode_id` — 루틴 추천·등록 prefill용.
+  final String? modeId;
   final CareType careType;
   final Duration? duration;
 
-  /// 리프레시 필요성 감소율 (예: 76 → "76% 감소").
+  /// 리프레시 필요성 감소율 (예: 76 → "76% 증가" 표시용).
   final double? necessityReductionPercent;
 
   final CareStatus? odorBeforeStatus;
@@ -71,11 +75,24 @@ class RefreshHistoryRecord {
     return '${value.toStringAsFixed(1)}% 감소';
   }
 
+  /// 기록 오늘 요약 — "청결도 76% 증가" 형태.
+  String? get cleanlinessIncreaseLabel {
+    final value = necessityReductionPercent;
+    if (value == null) {
+      return null;
+    }
+    if (value == value.roundToDouble()) {
+      return '${value.toInt()}% 증가';
+    }
+    return '${value.toStringAsFixed(1)}% 증가';
+  }
+
   factory RefreshHistoryRecord.fromJson(Map<String, dynamic> json) {
     final durationSeconds = json['duration_seconds'] as int?;
     return RefreshHistoryRecord(
       dateTime: DateTime.parse(json['measured_at'] as String),
       modeName: json['mode_name'] as String? ?? '리프레시',
+      modeId: json['mode_id'] as String?,
       careType: CareType.values.firstWhere(
         (type) => type.name == json['care_type'],
         orElse: () => CareType.both,

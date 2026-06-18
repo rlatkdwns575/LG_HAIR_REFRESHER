@@ -20,39 +20,52 @@ enum MeasureCareLevel {
       this == MeasureCareLevel.intensiveRecommended ||
       this == MeasureCareLevel.intensiveRequired;
 
-  MeasureResultStatusItem toStatusItem(String categoryLabel) {
+  /// 간편보기 결과 화면 배지 문구 (매우나쁨 · 나쁨 · 약간나쁨 · 보통 · 좋음).
+  String get simpleViewBadgeLabel => switch (this) {
+    MeasureCareLevel.notRequired => '좋음',
+    MeasureCareLevel.normal => '보통',
+    MeasureCareLevel.recommended => '약간나쁨',
+    MeasureCareLevel.intensiveRecommended => '나쁨',
+    MeasureCareLevel.intensiveRequired => '매우나쁨',
+  };
+
+  MeasureResultStatusItem toStatusItem(
+    String categoryLabel, {
+    String? badgeLabel,
+  }) {
+    final resolvedBadgeLabel = badgeLabel ?? label;
     return switch (this) {
       MeasureCareLevel.notRequired => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
-        badgeLabel: label,
+        badgeLabel: resolvedBadgeLabel,
         dotColor: AppColors.blue700,
         badgeBackgroundColor: AppColors.blue100,
         badgeTextColor: AppColors.blue700,
       ),
       MeasureCareLevel.normal => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
-        badgeLabel: label,
+        badgeLabel: resolvedBadgeLabel,
         dotColor: AppColors.blue700,
         badgeBackgroundColor: AppColors.green100,
         badgeTextColor: AppColors.green700,
       ),
       MeasureCareLevel.recommended => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
-        badgeLabel: label,
+        badgeLabel: resolvedBadgeLabel,
         dotColor: AppColors.yellow700,
         badgeBackgroundColor: AppColors.orange100,
         badgeTextColor: AppColors.yellow700,
       ),
       MeasureCareLevel.intensiveRecommended => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
-        badgeLabel: label,
+        badgeLabel: resolvedBadgeLabel,
         dotColor: AppColors.orange700,
         badgeBackgroundColor: AppColors.orange100,
         badgeTextColor: AppColors.orange700,
       ),
       MeasureCareLevel.intensiveRequired => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
-        badgeLabel: label,
+        badgeLabel: resolvedBadgeLabel,
         dotColor: AppColors.red700,
         badgeBackgroundColor: AppColors.red100,
         badgeTextColor: AppColors.red700,

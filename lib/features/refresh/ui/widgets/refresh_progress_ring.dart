@@ -24,7 +24,6 @@ class RefreshProgressRing extends StatelessWidget {
 
   static const _ringSize = 160.0;
   static const _strokeWidth = 12.0;
-  static const double _labelOffsetY = 6;
   static const Duration _animationDuration = Duration(milliseconds: 900);
 
   static const Color _activeStartColor = AppColors.primary300;
@@ -50,59 +49,42 @@ class RefreshProgressRing extends StatelessWidget {
         return SizedBox(
           width: _ringSize,
           height: _ringSize,
-          child: Stack(
-            fit: StackFit.expand,
-            alignment: Alignment.center,
-            children: [
-              CustomPaint(
-                painter: _RefreshRingPainter(
-                  progress: animatedProgress,
-                  strokeWidth: _strokeWidth,
-                  trackColor: AppColors.gray100,
-                  progressColor: progressColor,
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, _labelOffsetY),
-                child: DefaultTextStyle(
-                  style: const TextStyle(),
-                  textAlign: TextAlign.center,
-                  textHeightBehavior: const TextHeightBehavior(
-                    applyHeightToFirstAscent: false,
-                    applyHeightToLastDescent: false,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      AppText(
-                        '$displayPercent%',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.headlineL.copyWith(
-                          color: dimmed
-                              ? AppColors.gray500
-                              : AppColors.primary400,
-                          fontSize: 36,
-                          height: 1,
-                          letterSpacing: -0.72,
-                        ),
+          child: CustomPaint(
+            painter: _RefreshRingPainter(
+              progress: animatedProgress,
+              strokeWidth: _strokeWidth,
+              trackColor: AppColors.gray100,
+              progressColor: progressColor,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Transform.translate(
+                    offset: const Offset(6, 0),
+                    child: AppText(
+                      '$displayPercent%',
+                      style: AppTextStyles.headlineL.copyWith(
+                        color: dimmed
+                            ? AppColors.gray500
+                            : AppColors.primary400,
+                        fontSize: 36,
+                        height: 36 / 36,
+                        letterSpacing: -0.72,
                       ),
-                      const SizedBox(height: 6),
-                      AppText(
-                        remainingLabel,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyM1.copyWith(
-                          color: AppColors.gray700,
-                          fontWeight: FontWeight.w500,
-                          height: 1,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 6),
+                  AppText(
+                    remainingLabel,
+                    style: AppTextStyles.bodyM1.copyWith(
+                      color: AppColors.gray700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

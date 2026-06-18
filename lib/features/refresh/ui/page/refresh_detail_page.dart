@@ -7,32 +7,47 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/app_box_button.dart';
-import '../../../../shared/widgets/app_common_top_header.dart';
-import '../../../../shared/widgets/app_text.dart';
+import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/device_consumable_service.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
+import '../../../../shared/widgets/app_box_button.dart';
+import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/widgets/app_text.dart';
+import '../../data/api/custom_mode_api.dart';
+import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_mode_detail.dart';
+import '../../data/refresh_assets.dart';
 import '../../data/refresh_mode_availability.dart';
 import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_detail_timeline.dart';
 
-/// Figma Design `리프레시 상세` (833:14941 · 823:26534 · 833:15046).
+/// Figma Design `리프레시 상세` (40000083:18419 · 커스텀 모드).
 class RefreshDetailPage extends StatefulWidget {
   const RefreshDetailPage({required this.mode, super.key});
 
   final RefreshMode mode;
 
-  static const double _horizontalPadding = 28;
-  static const double _preCheckMaxWidth = 320;
+  static const double _horizontalPadding = 15;
+  static const double _preCheckMaxWidth = 279;
 
-  /// Figma 833:14941 (360×800) — 섹션 간 세로 간격.
+  /// Figma 40000083:18419 — 앱바(76) ↔ 헤더(132).
   static const double _gapAppBarToHeader = 56;
+
+  /// Figma 40000083:18471 — 타이틀 ↔ 태그 행.
   static const double _gapHeaderTitleToTags = 18;
-  static const double _gapHeaderToTimeline = 48;
-  static const double _gapTimelineToPreCheck = 72;
+
+  /// Figma 40000083:18419 — 태그 행(204) ↔ 타임라인(236).
+  static const double _gapHeaderToTimeline = 32;
+
+  /// Figma 40000083:18419 — 타임라인(486) ↔ 확인사항(542).
+  static const double _gapTimelineToPreCheck = 56;
+
+  /// Figma 40000083:18435 — 확인사항 ↔ 다른 모드 링크.
   static const double _gapPreCheckToLink = 48;
+
+  /// Figma 40000083:18432 — 링크 ↔ 시작하기 버튼.
   static const double _gapLinkToButton = 20;
 
   @override
@@ -41,9 +56,11 @@ class RefreshDetailPage extends StatefulWidget {
 
 class _RefreshDetailPageState extends State<RefreshDetailPage> {
   final _deviceConsumableService = const DeviceConsumableService();
+  final _customModeApi = const CustomModeApi();
 
   ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
   bool _isLoading = true;
+  bool _isDeleting = false;
 
   RefreshMode get mode => widget.mode;
 
@@ -76,6 +93,42 @@ class _RefreshDetailPageState extends State<RefreshDetailPage> {
     context.pushRefreshProgress(mode: mode);
   }
 
+  Future<void> _confirmDeleteMode() async {
+    if (!mode.isDeletable || _isDeleting) {
+      return;
+    }
+
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: '해당 모드를 삭제하시겠습니까?',
+      message: '모드를 삭제하면\n더 이상 해당 모드를 사용할 수 없습니다.',
+      primaryLabel: '삭제',
+      secondaryLabel: '취소',
+    );
+
+    if (!mounted || confirmed != true) {
+      return;
+    }
+
+    setState(() => _isDeleting = true);
+
+    final userId = AuthSessionService.resolveUserId();
+    final deleted = await _customModeApi.delete(
+      userId: userId,
+      modeId: mode.id,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() => _isDeleting = false);
+
+    if (deleted && CustomModeCache.instance.removeById(mode.id)) {
+      context.pop(true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final detail = RefreshModeDetail.fromMode(mode);
@@ -86,6 +139,23 @@ class _RefreshDetailPageState extends State<RefreshDetailPage> {
         variant: AppCommonTopHeaderVariant.gnb,
         title: '리프레시 상세',
         onBack: () => context.pop(),
+        actions: [
+          if (mode.isDeletable)
+            IconButton(
+              onPressed: _isDeleting ? null : _confirmDeleteMode,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+              style: IconButton.styleFrom(
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: Image.asset(
+                RefreshAssets.trashIcon,
+                width: 24,
+                height: 24,
+                fit: BoxFit.contain,
+              ),
+            ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -207,7 +277,7 @@ class _HeaderSection extends StatelessWidget {
           style: AppTextStyles.headlineL.copyWith(
             color: AppColors.gray900,
             fontWeight: FontWeight.w700,
-            height: 1.25,
+            height: 34 / 28,
           ),
         ),
         const SizedBox(height: RefreshDetailPage._gapHeaderTitleToTags),
@@ -236,12 +306,12 @@ class _CareTagRow extends StatelessWidget {
             children: [
               AppText(
                 tag.careLabel,
-                style: AppTextStyles.bodyM2.copyWith(
+                style: AppTextStyles.labelM.copyWith(
                   color: AppColors.gray900,
-                  height: 1.2,
+                  height: 16 / 12,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.xs),
               _IntensityTagChip(label: tag.intensityLabel),
             ],
           ),
@@ -260,17 +330,23 @@ class _IntensityTagChip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.gray0,
-        border: Border.all(color: AppColors.primary300),
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.primary400),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        child: AppText(
-          label,
-          style: AppTextStyles.labelM.copyWith(
-            color: AppColors.primary500,
-            fontWeight: FontWeight.w500,
-            height: 1.2,
+      child: SizedBox(
+        height: 20,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Center(
+            child: AppText(
+              label,
+              style: AppTextStyles.labelXs.copyWith(
+                fontSize: 10,
+                height: 1,
+                color: AppColors.primary500,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ),
       ),
@@ -290,9 +366,9 @@ class _PreCheckSection extends StatelessWidget {
       children: [
         AppText(
           '진행 전 확인사항',
-          style: AppTextStyles.labelL.copyWith(
-            color: AppColors.gray800,
-            fontWeight: FontWeight.w600,
+          style: AppTextStyles.bodyXs.copyWith(
+            color: AppColors.gray600,
+            height: 16 / 12,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -301,9 +377,9 @@ class _PreCheckSection extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: AppText(
               '- $item',
-              style: AppTextStyles.bodyS.copyWith(
+              style: AppTextStyles.bodyXs.copyWith(
                 color: AppColors.gray600,
-                height: 1.5,
+                height: 16 / 12,
               ),
             ),
           ),
@@ -330,10 +406,9 @@ class _SelectOtherModeLink extends StatelessWidget {
         ),
         child: AppText(
           '다른 모드 선택하기',
-          style: AppTextStyles.bodyS.copyWith(
+          style: AppTextStyles.labelM.copyWith(
             color: AppColors.gray500,
-            decoration: TextDecoration.underline,
-            decorationColor: AppColors.gray500,
+            height: 16 / 12,
           ),
         ),
       ),

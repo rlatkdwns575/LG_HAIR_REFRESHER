@@ -7,7 +7,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/measure_result_status_item.dart';
 
-/// 냄새/먼지 관리 상태 행 (점 + 라벨 + 배지).
+/// 냄새/먼지 상태 행 (점 + 라벨 + 배지).
 class MeasureResultStatusRow extends StatelessWidget {
   const MeasureResultStatusRow({required this.items, super.key});
 
@@ -17,7 +17,7 @@ class MeasureResultStatusRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: AppSpacing.lg,
+      spacing: 20,
       runSpacing: AppSpacing.sm,
       children: [for (final item in items) _StatusItem(item: item)],
     );

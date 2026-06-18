@@ -21,15 +21,16 @@ class DetailPageHorizontalPadding extends StatelessWidget {
 
 /// Figma `divider` — 섹션 구분용 8px 회색 바 (좌우 끝까지).
 class AppSectionDivider extends StatelessWidget {
-  const AppSectionDivider({super.key});
+  const AppSectionDivider({this.verticalSpacing = 32, super.key});
 
   static const double barHeight = 8;
-  static const double verticalSpacing = 32;
+
+  final double verticalSpacing;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: verticalSpacing),
+      padding: EdgeInsets.symmetric(vertical: verticalSpacing),
       child: Container(height: barHeight, color: AppColors.gray50),
     );
   }
