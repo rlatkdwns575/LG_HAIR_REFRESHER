@@ -26,6 +26,7 @@ class HistoryMeasureMapper {
         record.hairDustScore,
       ),
       resultMessage: _resultMessage(record),
+      measureRecord: record,
     );
   }
 

@@ -105,21 +105,6 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
                         label: '연결 상태',
                         value: _device.isConnected ? '연결됨' : '연결 안 됨',
                       ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '배터리',
-                        value: '${_device.batteryPercent}%',
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '필터 잔량',
-                        value: '${_device.filterRemainingPercent}%',
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '향 카트리지',
-                        value: _device.scentCartridge.detailDisplayValue,
-                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),

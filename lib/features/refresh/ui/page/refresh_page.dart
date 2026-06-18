@@ -173,7 +173,7 @@ class _RefreshPageState extends State<RefreshPage> {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '헤어 리프레시',
+        title: '리프레시하기',
         onBack: () {
           if (context.canPop()) {
             context.pop();

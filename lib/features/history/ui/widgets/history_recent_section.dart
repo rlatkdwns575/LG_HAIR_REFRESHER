@@ -27,6 +27,7 @@ class HistoryRecentSection extends StatelessWidget {
     required this.onCalendarIconTap,
     required this.onDateSelected,
     required this.onToggleExpanded,
+    this.onRecordDetailTap,
     super.key,
   });
 
@@ -42,6 +43,7 @@ class HistoryRecentSection extends StatelessWidget {
   final VoidCallback onCalendarIconTap;
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback onToggleExpanded;
+  final ValueChanged<RefreshHistoryRecord>? onRecordDetailTap;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +87,10 @@ class HistoryRecentSection extends StatelessWidget {
         ),
         if (selectedGroup != null) ...[
           const SizedBox(height: AppSpacing.md),
-          _SelectedDayCard(group: selectedGroup),
+          _SelectedDayCard(
+            group: selectedGroup,
+            onRecordDetailTap: onRecordDetailTap,
+          ),
         ],
       ],
     );
@@ -247,9 +252,10 @@ class _MonthlySummaryCard extends StatelessWidget {
 }
 
 class _SelectedDayCard extends StatefulWidget {
-  const _SelectedDayCard({required this.group});
+  const _SelectedDayCard({required this.group, this.onRecordDetailTap});
 
   final RefreshDayGroup group;
+  final ValueChanged<RefreshHistoryRecord>? onRecordDetailTap;
 
   @override
   State<_SelectedDayCard> createState() => _SelectedDayCardState();
@@ -310,7 +316,12 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
           const SizedBox(height: AppSpacing.md),
           for (var i = 0; i < visibleRecords.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacing.sm),
-            _DayRecordTile(record: visibleRecords[i]),
+            _DayRecordTile(
+              record: visibleRecords[i],
+              onTap: widget.onRecordDetailTap == null
+                  ? null
+                  : () => widget.onRecordDetailTap!(visibleRecords[i]),
+            ),
           ],
           if (hasHiddenRecords) ...[
             const SizedBox(height: AppSpacing.sm),
@@ -326,19 +337,15 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
 }
 
 class _DayRecordTile extends StatelessWidget {
-  const _DayRecordTile({required this.record});
+  const _DayRecordTile({required this.record, this.onTap});
 
   final RefreshHistoryRecord record;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    final content = Padding(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.gray0,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
       child: Row(
         children: [
           AppText(
@@ -346,15 +353,26 @@ class _DayRecordTile extends StatelessWidget {
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(width: 8),
-          Flexible(
+          Expanded(
             child: AppText(
               record.modeName,
               style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right, size: 18, color: AppColors.gray400),
+          ],
         ],
       ),
+    );
+
+    return Material(
+      color: AppColors.gray0,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(onTap: onTap, child: content),
     );
   }
 }

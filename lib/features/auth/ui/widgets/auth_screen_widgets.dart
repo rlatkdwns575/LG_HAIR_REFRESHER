@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/app_metric_help_icon.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text.dart';
 
@@ -205,21 +204,60 @@ Widget buildPasswordVisibilityIcon({
   );
 }
 
-Widget buildAuthPasswordRulesHint() {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      AppText(
-        '* 비밀번호 조건',
-        style: TextStyle(fontSize: 12, color: AuthScreenStyles.textMuted),
-      ),
-      const SizedBox(width: 3),
-      AppMetricHelpIcon(
-        tooltipMessage: AuthCredentialsValidator.passwordRulesDescription,
-        size: 16,
-        placement: AppMetricHelpTooltipPlacement.besideIcon,
-        tooltipMaxWidth: 240,
-      ),
-    ],
-  );
+/// 회원가입 비밀번호 조건 실시간 체크리스트.
+///
+/// 각 조건은 충족되면 파란색으로 표시됩니다.
+class AuthPasswordRulesChecklist extends StatelessWidget {
+  const AuthPasswordRulesChecklist({
+    required this.password,
+    required this.email,
+    super.key,
+  });
+
+  final String password;
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    final statuses = AuthCredentialsValidator.evaluateSignUpPassword(
+      password,
+      email: email,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final status in statuses)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  size: 14,
+                  color: status.satisfied
+                      ? AuthScreenStyles.primaryBlue
+                      : AuthScreenStyles.textMuted,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: AppText(
+                    status.label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: status.satisfied
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: status.satisfied
+                          ? AuthScreenStyles.primaryBlue
+                          : AuthScreenStyles.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 }

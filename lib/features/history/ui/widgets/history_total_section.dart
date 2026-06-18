@@ -94,7 +94,7 @@ class HistoryTotalSection extends StatelessWidget {
               : summary.modeUsages.first.modeName,
           descriptions: [
             summary.modeUsageDescription,
-            if (bestMode != null) '* 개선도가 가장 높았던 모드는 ${bestMode.modeName}이에요',
+            if (bestMode != null) '* 개선도가 가장 높았던 모드는 ${bestMode.modeName}예요.',
           ],
           child: Column(
             children: [

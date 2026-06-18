@@ -30,7 +30,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   static const _horizontalPadding = 15.0;
-  static final _minMonth = DateTime(1970, 1);
+  static final _minMonth = DateTime(2024, 1);
 
   RefreshHistoryReport? _report;
   late DateTime _visibleMonth;
@@ -165,6 +165,14 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void _onRecordDetailTap(RefreshHistoryRecord record) {
+    if (record.isDiagnosis) {
+      final measureRecord = record.measureRecord;
+      if (measureRecord == null) {
+        return;
+      }
+      context.pushMeasureHistoryRecordDetail(record: measureRecord);
+      return;
+    }
     context.pushRefreshHistoryRecordDetail(
       modeName: record.modeName,
       necessityReductionPercent: record.necessityReductionPercent,
@@ -181,7 +189,7 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시 내역',
+        title: '리프레시 기록 보기',
         onBack: _onBack,
       ),
       body: _buildBody(),
@@ -224,6 +232,7 @@ class _HistoryPageState extends State<HistoryPage> {
             onCalendarIconTap: _onCalendarIconTap,
             onDateSelected: _onDateSelected,
             onToggleExpanded: _onToggleExpanded,
+            onRecordDetailTap: _onRecordDetailTap,
           ),
         ),
         const HistorySectionDivider(),

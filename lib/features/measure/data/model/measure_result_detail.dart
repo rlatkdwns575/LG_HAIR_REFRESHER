@@ -13,7 +13,6 @@ class MeasureResultDetail {
     required this.odorNeedPercent,
     required this.dustNeedPercent,
     required this.hairImpactPercent,
-    required this.analysisSummary,
     required this.recommendedMode,
     this.recommendReason,
     required this.odorSection,
@@ -27,7 +26,6 @@ class MeasureResultDetail {
   final int odorNeedPercent;
   final int dustNeedPercent;
   final int hairImpactPercent;
-  final String analysisSummary;
   final RefreshMode recommendedMode;
   final String? recommendReason;
   final MeasureResultDetailSection odorSection;
@@ -37,11 +35,8 @@ class MeasureResultDetail {
   bool get exceedsThreshold => refreshNeedPercent > recommendedThresholdPercent;
 
   /// 공유하기(클립보드 복사)용 요약 텍스트.
-  String get shareSummaryText => [
-    '내 헤어 상태 진단 결과',
-    '리프레시 필요도 $refreshNeedPercent%',
-    analysisSummary.replaceAll('\n', ' '),
-  ].join('\n');
+  String get shareSummaryText =>
+      ['내 헤어 상태 진단 결과', '리프레시 필요도 $refreshNeedPercent%'].join('\n');
 
   factory MeasureResultDetail.fromMeasureResult(MeasureResult result) {
     final record = result.sourceRecord;
@@ -76,7 +71,6 @@ class MeasureResultDetail {
       odorNeedPercent: odorScore.clamp(0, 100),
       dustNeedPercent: dustScore.clamp(0, 100),
       hairImpactPercent: MeasureResultMapper.hairImpactPercent(record),
-      analysisSummary: MeasureResultMapper.analysisSummary(record),
       recommendedMode: result.recommendedMode,
       recommendReason: result.recommendReason,
       odorSection: MeasureResultDetailSection(

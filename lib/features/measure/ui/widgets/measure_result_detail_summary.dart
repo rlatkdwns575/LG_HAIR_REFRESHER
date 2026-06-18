@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/measure_result_detail.dart';
@@ -38,8 +37,8 @@ class MeasureResultDetailSummary extends StatelessWidget {
           hairPercent: detail.hairImpactPercent,
           thresholdPercent: detail.recommendedThresholdPercent,
         ),
-        const SizedBox(height: AppSpacing.xl),
-        _AnalysisSummary(detail: detail),
+        const SizedBox(height: 12),
+        const _RefreshNeedHelpRow(),
         const SizedBox(height: AppSpacing.xl),
         RefreshModeCard(
           mode: detail.recommendedMode,
@@ -109,16 +108,16 @@ class _Headline extends StatelessWidget {
             children: [
               AppText(
                 detail.refreshFocusLabel,
-                style: AppTextStyles.bodyS.copyWith(
+                style: AppTextStyles.titleM.copyWith(
                   color: AppColors.orange700,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               AppText(
                 '가 필요해요.',
-                style: AppTextStyles.bodyS.copyWith(
+                style: AppTextStyles.titleM.copyWith(
                   color: AppColors.gray600,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -129,57 +128,32 @@ class _Headline extends StatelessWidget {
   }
 }
 
-class _AnalysisSummary extends StatelessWidget {
-  const _AnalysisSummary({required this.detail});
-
-  final MeasureResultDetail detail;
+class _RefreshNeedHelpRow extends StatelessWidget {
+  const _RefreshNeedHelpRow();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.gray50,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-          ),
-          child: AppText(
-            detail.analysisSummary,
-            textAlign: TextAlign.center,
-            breakLinesBySentence: true,
-            style: AppTextStyles.bodyXs.copyWith(
-              color: AppColors.gray900,
-              height: 1.55,
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppText(
+            '리프레시 필요도',
+            style: AppTextStyles.bodyS.copyWith(
+              color: AppColors.gray600,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppText(
-                '리프레시 필요도',
-                style: AppTextStyles.bodyS.copyWith(
-                  color: AppColors.gray600,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 3),
-              AppMetricHelpIcon(
-                tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
-                size: 16,
-                placement: AppMetricHelpTooltipPlacement.belowEnd,
-                tooltipMaxWidth: 240,
-              ),
-            ],
+          const SizedBox(width: 3),
+          AppMetricHelpIcon(
+            tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
+            size: 16,
+            placement: AppMetricHelpTooltipPlacement.belowEnd,
+            tooltipMaxWidth: 240,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
