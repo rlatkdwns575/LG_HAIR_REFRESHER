@@ -24,7 +24,7 @@ class HomeNavigationMenu extends StatelessWidget {
       children: [
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '리프레시 모드 보기',
+            title: '리프레시 모드',
             onTap: onRefreshPressed,
           ),
         ),
@@ -38,7 +38,7 @@ class HomeNavigationMenu extends StatelessWidget {
         const SizedBox(height: cardGap),
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '리프레시 기록 보기',
+            title: '리프레시 기록',
             onTap: onHistoryPressed,
           ),
         ),
