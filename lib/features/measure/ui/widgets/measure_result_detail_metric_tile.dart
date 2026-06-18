@@ -23,26 +23,23 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: AppText(
+            child: metric.showHelpIcon && metric.helpMessage != null
+                ? AppMetricHelpIcon(
+                    label: metric.label,
+                    labelStyle: AppTextStyles.bodyS.copyWith(
+                      color: AppColors.gray900,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    tooltipMessage: metric.helpMessage!,
+                    placement: AppMetricHelpTooltipPlacement.belowEnd,
+                  )
+                : AppText(
                     metric.label,
                     style: AppTextStyles.bodyS.copyWith(
                       color: AppColors.gray900,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-                if (metric.showHelpIcon && metric.helpMessage != null) ...[
-                  const SizedBox(width: 2),
-                  AppMetricHelpIcon(
-                    tooltipMessage: metric.helpMessage!,
-                    placement: AppMetricHelpTooltipPlacement.besideIcon,
-                  ),
-                ],
-              ],
-            ),
           ),
           const SizedBox(width: AppSpacing.md),
           _BadgeGroup(metric: metric),

@@ -5,7 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
-/// Figma 1224-23687 — 모발 유형 그리드 선택 칩.
+/// Figma 1224-23687 — 모발 유형 선택 칩.
 class MeasureHairProfileRadioTile extends StatelessWidget {
   const MeasureHairProfileRadioTile({
     required this.label,

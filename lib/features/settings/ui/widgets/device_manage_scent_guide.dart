@@ -194,6 +194,17 @@ class _ScentTypeSection extends StatelessWidget {
   final ScentCategory? installedCategory;
   final ValueChanged<ScentCategory> onCategorySelected;
 
+  List<ScentCategory> get _displayCategories {
+    final installed = installedCategory;
+    if (installed == null) {
+      return ScentCategory.values;
+    }
+    return [
+      installed,
+      ...ScentCategory.values.where((category) => category != installed),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -221,13 +232,13 @@ class _ScentTypeSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                for (var i = 0; i < ScentCategory.values.length; i++) ...[
+                for (var i = 0; i < _displayCategories.length; i++) ...[
                   if (i > 0) const SizedBox(width: AppSpacing.xs),
                   _ScentCategoryChip(
-                    category: ScentCategory.values[i],
-                    isSelected: selectedCategory == ScentCategory.values[i],
-                    isInstalled: installedCategory == ScentCategory.values[i],
-                    onTap: () => onCategorySelected(ScentCategory.values[i]),
+                    category: _displayCategories[i],
+                    isSelected: selectedCategory == _displayCategories[i],
+                    isInstalled: installedCategory == _displayCategories[i],
+                    onTap: () => onCategorySelected(_displayCategories[i]),
                   ),
                 ],
               ],

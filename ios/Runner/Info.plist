@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>오늘 일정을 확인해 리프레시 모드 추천에 활용합니다.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>오늘 일정을 확인해 리프레시 모드 추천에 활용합니다.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>일정 참석자 정보 확인에 사용합니다.</string>
 </dict>
 </plist>

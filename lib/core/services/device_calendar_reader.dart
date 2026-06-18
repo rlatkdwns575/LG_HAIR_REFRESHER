@@ -136,7 +136,7 @@ class DeviceCalendarReader {
 
     final todayStart = CalendarDayRange.startOfDay(now);
     final todayEnd = CalendarDayRange.endOfDay(now);
-    final queryStart = todayStart;
+    final queryStart = todayStart.subtract(const Duration(days: 1));
     final queryEnd = todayEnd;
 
     final calendarsResult = await _plugin.retrieveCalendars();
@@ -195,6 +195,7 @@ class DeviceCalendarReader {
           event: event,
           calendarId: calendarId,
           todayStart: todayStart,
+          todayEnd: todayEnd,
         );
         if (parsed == null) {
           continue;
@@ -225,6 +226,7 @@ class DeviceCalendarReader {
     required Event event,
     required String calendarId,
     required DateTime todayStart,
+    required DateTime todayEnd,
   }) {
     final startsAt = _localInstant(event.start);
     if (startsAt == null) {
@@ -234,7 +236,12 @@ class DeviceCalendarReader {
     var endsAt = _localInstant(event.end);
     if (event.allDay == true) {
       final dayStart = CalendarDayRange.startOfDay(startsAt);
-      if (!_isSameLocalDay(dayStart, todayStart)) {
+      if (!_overlapsToday(
+        dayStart,
+        dayStart.add(const Duration(days: 1)),
+        todayStart,
+        todayEnd,
+      )) {
         return null;
       }
       return DeviceCalendarEvent(
@@ -246,13 +253,13 @@ class DeviceCalendarReader {
       );
     }
 
-    if (!_isSameLocalDay(startsAt, todayStart)) {
-      return null;
-    }
-
     endsAt ??= startsAt.add(const Duration(hours: 1));
     if (!endsAt.isAfter(startsAt)) {
       endsAt = startsAt.add(const Duration(hours: 1));
+    }
+
+    if (!_overlapsToday(startsAt, endsAt, todayStart, todayEnd)) {
+      return null;
     }
 
     return DeviceCalendarEvent(
@@ -264,15 +271,20 @@ class DeviceCalendarReader {
     );
   }
 
+  bool _overlapsToday(
+    DateTime start,
+    DateTime end,
+    DateTime todayStart,
+    DateTime todayEnd,
+  ) {
+    return end.isAfter(todayStart) && start.isBefore(todayEnd);
+  }
+
   DateTime? _localInstant(DateTime? value) {
     if (value == null) {
       return null;
     }
     return DateTime.fromMillisecondsSinceEpoch(value.millisecondsSinceEpoch);
-  }
-
-  bool _isSameLocalDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   String _eventTitle(String? title) {

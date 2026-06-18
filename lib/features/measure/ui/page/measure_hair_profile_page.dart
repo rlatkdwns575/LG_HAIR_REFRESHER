@@ -23,7 +23,7 @@ class MeasureHairProfilePage extends StatefulWidget {
 
 class _MeasureHairProfilePageState extends State<MeasureHairProfilePage> {
   static const double _horizontalPadding = 15;
-  static const double _gridGap = 6;
+  static const double _listGap = 6;
 
   final _userProfileService = const UserProfileService();
 
@@ -117,32 +117,18 @@ class _MeasureHairProfilePageState extends State<MeasureHairProfilePage> {
     }
   }
 
-  Widget _buildHairTypeGrid() {
+  Widget _buildHairTypeList() {
     final options = HairProfileOptions.hairTypes;
-    final rowCount = (options.length / 2).ceil();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var row = 0; row < rowCount; row++) ...[
-          if (row > 0) const SizedBox(height: _gridGap),
-          Row(
-            children: [
-              for (var col = 0; col < 2; col++) ...[
-                if (col > 0) const SizedBox(width: _gridGap),
-                Expanded(
-                  child: row * 2 + col < options.length
-                      ? MeasureHairProfileRadioTile(
-                          label: options[row * 2 + col],
-                          selected: _selectedHairType == options[row * 2 + col],
-                          onTap: () =>
-                              _onHairTypeSelected(options[row * 2 + col]),
-                        )
-                      : const SizedBox(
-                          height: MeasureHairProfileRadioTile.tileHeight,
-                        ),
-                ),
-              ],
-            ],
+        for (var i = 0; i < options.length; i++) ...[
+          if (i > 0) const SizedBox(height: _listGap),
+          MeasureHairProfileRadioTile(
+            label: options[i],
+            selected: _selectedHairType == options[i],
+            onTap: () => _onHairTypeSelected(options[i]),
           ),
         ],
       ],
@@ -180,7 +166,7 @@ class _MeasureHairProfilePageState extends State<MeasureHairProfilePage> {
                           subtitle: '가장 가까운 모발 유형을 선택해주세요.',
                         ),
                         const SizedBox(height: AppSpacing.xl),
-                        _buildHairTypeGrid(),
+                        _buildHairTypeList(),
                         const SizedBox(height: AppSpacing.xl),
                       ],
                     ),

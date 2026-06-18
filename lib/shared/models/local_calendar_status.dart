@@ -66,6 +66,10 @@ class LocalCalendarStatus {
   }
 
   String get statusMessage {
+    if (lastFetchNote == 'unsupported_platform') {
+      return 'Windows·macOS·웹에서는 로컬 캘린더 연동을 지원하지 않습니다. '
+          'Android 또는 iOS 기기에서 연동해 주세요.';
+    }
     if (!permissionGranted) {
       return '기기 캘린더 접근 권한이 필요합니다. 연동하기를 눌러 권한을 허용해 주세요.';
     }
