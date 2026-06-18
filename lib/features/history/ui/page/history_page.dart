@@ -8,6 +8,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../routine/data/model/routine.dart';
 import '../../data/api/history_api.dart';
 import '../../data/model/refresh_history_record.dart';
 import '../../data/model/refresh_history_report.dart';
@@ -183,6 +184,23 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  Future<void> _onRoutineRegister(RoutineSuggestion suggestion) async {
+    final saved = await context.pushRoutineRegister(
+      initial: _routineFromSuggestion(suggestion),
+    );
+    if (saved == true && mounted) {
+      _showComingSoon('루틴 알림을 등록했어요.');
+    }
+  }
+
+  Routine _routineFromSuggestion(RoutineSuggestion suggestion) {
+    return Routine(
+      weekdays: suggestion.weekdays.toSet(),
+      hour: suggestion.hour ?? 19,
+      minute: suggestion.minute ?? 0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,7 +232,9 @@ class _HistoryPageState extends State<HistoryPage> {
           HistoryTodaySection(
             report: report,
             onRecordDetailTap: _onRecordDetailTap,
-            onRoutineRegisterTap: () => _showComingSoon('루틴 등록 기능은 준비 중이에요.'),
+            onRoutineRegisterTap: report.routineSuggestion == null
+                ? null
+                : () => _onRoutineRegister(report.routineSuggestion!),
           ),
         ),
         const HistorySectionDivider(),

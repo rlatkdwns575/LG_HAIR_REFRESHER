@@ -20,7 +20,19 @@ void main() {
   testWidgets('shows home dashboard screen', (tester) async {
     appRouter.go(AppRoutePaths.home);
     await tester.pumpWidget(const LgHairRefresherApp());
-    await tester.pumpAndSettle();
+    await tester.pump();
+
+    // Supabase/날씨 API 미초기화 환경에서 대시보드 로딩 완료까지 대기.
+    // pumpAndSettle은 홈 디바이스 폴링 타이머 때문에 타임아웃됩니다.
+    for (var i = 0; i < 50; i++) {
+      if (find.byType(CircularProgressIndicator).evaluate().isEmpty) {
+        break;
+      }
+      await tester.binding.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+    }
 
     expect(findDisplayText('LG 퓨리헤어'), findsOneWidget);
     expect(findDisplayText('배터리'), findsOneWidget);
@@ -29,8 +41,8 @@ void main() {
     expect(findDisplayText('좋음'), findsOneWidget);
     expect(findDisplayText('디바이스 관리'), findsOneWidget);
     expect(find.byType(HomeQuickRefreshRow), findsOneWidget);
-    expect(findDisplayText('리프레시 모드 보기'), findsOneWidget);
-    expect(findDisplayText('헤어 상태 진단'), findsOneWidget);
+    expect(findDisplayText('리프레시하기'), findsOneWidget);
+    expect(findDisplayText('헤어 상태 진단하기'), findsOneWidget);
     expect(findDisplayText('리프레시 기록 보기'), findsOneWidget);
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     expect(find.byIcon(Icons.widgets_outlined), findsNothing);

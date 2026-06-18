@@ -31,6 +31,9 @@ class AppRoutePaths {
   static const settings = '/settings';
   static const settingsDevice = '/settings/device';
   static const settingsLocalCalendar = '/settings/calendar';
+
+  static const routineList = '/routine';
+  static const routineRegister = '/routine/register';
 }
 
 class AppRouteNames {
@@ -60,4 +63,6 @@ class AppRouteNames {
   static const settings = 'settings';
   static const settingsDevice = 'settingsDevice';
   static const settingsLocalCalendar = 'settingsLocalCalendar';
+  static const routineList = 'routineList';
+  static const routineRegister = 'routineRegister';
 }

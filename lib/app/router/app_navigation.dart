@@ -9,6 +9,7 @@ import '../../features/refresh/data/model/refresh_mode.dart';
 import '../../features/refresh/data/model/refresh_result.dart';
 import '../../features/refresh/data/model/refresh_result_detail.dart';
 import '../../features/refresh/data/refresh_result_detail_mapper.dart';
+import '../../features/routine/data/model/routine.dart';
 
 /// 화면에서 route path 문자열을 직접 쓰지 않고 이동할 때 사용합니다.
 ///
@@ -103,6 +104,13 @@ extension AppNavigation on BuildContext {
 
   Future<void> pushLocalCalendarSettings() =>
       push(AppRoutePaths.settingsLocalCalendar);
+
+  /// 루틴 알림 관리(목록) 화면으로 이동합니다.
+  Future<void> pushRoutineList() => push(AppRoutePaths.routineList);
+
+  /// 루틴 알림 등록/수정 화면으로 이동하고, 저장 성공 여부를 반환합니다.
+  Future<bool?> pushRoutineRegister({Routine? initial}) =>
+      push<bool>(AppRoutePaths.routineRegister, extra: initial);
 
   void goHomeNamed() => goNamed(AppRouteNames.home);
 

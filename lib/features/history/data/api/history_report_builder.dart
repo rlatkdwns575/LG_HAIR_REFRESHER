@@ -89,6 +89,7 @@ class HistoryReportBuilder {
 
     final topMode = _mostUsedMode(records);
     final topWeekday = _topWeekdayLabel(weekdayCounts);
+    final topWeekdayValues = _topWeekdayValues(weekdayCounts);
     final topHour = _topHour(records);
     if (topHour == null) {
       return null;
@@ -101,10 +102,14 @@ class HistoryReportBuilder {
     final durationCount = records
         .where((record) => record.duration != null)
         .length;
-    final durationLabel = durationCount == 0
+    final durationMinutes = durationCount == 0
         ? null
-        : '평균 시간 ${(avgDuration / durationCount).round()}분 소요';
+        : (avgDuration / durationCount).round();
+    final durationLabel = durationMinutes == null
+        ? null
+        : '평균 시간 $durationMinutes분 소요';
 
+    const careName = '퇴근 후 리프레시 케어';
     final tags = <String>[
       if (topMode != '-') topMode,
       if (topWeekday.isNotEmpty) topWeekday,
@@ -116,6 +121,11 @@ class HistoryReportBuilder {
       title: '반복적인 사용 패턴이 발견되었어요.',
       subtitle: '새로운 루틴으로 등록할까요?',
       tags: tags,
+      careName: careName,
+      weekdays: topWeekdayValues,
+      hour: topHour,
+      minute: 0,
+      durationMinutes: durationMinutes,
     );
   }
 
@@ -516,6 +526,21 @@ class HistoryReportBuilder {
       return null;
     }
     return counts.entries.reduce((a, b) => a.value >= b.value ? a : b);
+  }
+
+  /// 가장 많이 사용한 상위 2개 요일을 `DateTime.weekday`(1=월~7=일)로 반환.
+  static List<int> _topWeekdayValues(List<int> weekdayCounts) {
+    final entries = <MapEntry<int, int>>[];
+    for (var i = 0; i < weekdayCounts.length; i++) {
+      if (weekdayCounts[i] > 0) {
+        entries.add(MapEntry(i, weekdayCounts[i]));
+      }
+    }
+    if (entries.isEmpty) {
+      return const [];
+    }
+    entries.sort((a, b) => b.value.compareTo(a.value));
+    return entries.take(2).map((entry) => entry.key + 1).toList()..sort();
   }
 
   static String _topWeekdayLabel(List<int> weekdayCounts) {
