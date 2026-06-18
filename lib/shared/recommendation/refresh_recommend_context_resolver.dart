@@ -73,31 +73,32 @@ class RefreshRecommendContextResolver {
     required DateTime resolvedNow,
     String? userId,
   }) async {
-    final calendarStatus = await calendarService.fetchStatus();
-    if (!calendarStatus.isConnected) {
-      return const RefreshRecommendScheduleSnapshot(todayEventCount: 0);
+    final calendarStatus = await calendarService.fetchStatus(userId: userId);
+
+    if (calendarStatus.permissionGranted) {
+      final lastCheckedAt = calendarStatus.lastCheckedAt;
+      final isStale =
+          lastCheckedAt == null ||
+          resolvedNow.difference(lastCheckedAt) > calendarStaleAfter;
+      if (isStale) {
+        try {
+          await calendarService.refreshConnection(
+            userId: userId,
+            now: resolvedNow,
+          );
+        } catch (_) {}
+      }
     }
 
-    final lastCheckedAt = calendarStatus.lastCheckedAt;
-    final isStale =
-        lastCheckedAt == null ||
-        resolvedNow.difference(lastCheckedAt) > calendarStaleAfter;
-    if (isStale && calendarStatus.permissionGranted) {
+    List<CalendarEvent> events = const [];
+    if (calendarStatus.permissionGranted || calendarStatus.isConnected) {
       try {
-        await calendarService.refreshConnection(
+        events = await calendarEventsApi.fetchTodayEvents(
           userId: userId,
           now: resolvedNow,
         );
       } catch (_) {}
     }
-
-    List<CalendarEvent> events = const [];
-    try {
-      events = await calendarEventsApi.fetchTodayEvents(
-        userId: userId,
-        now: resolvedNow,
-      );
-    } catch (_) {}
 
     return RefreshRecommendScheduleSnapshot.fromCalendarEvents(
       events,

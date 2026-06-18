@@ -79,7 +79,10 @@ void main() {
     });
 
     test('requestAccess syncs device events to api and store', () async {
-      final status = await service.requestAccess(userId: 'test-user');
+      final status = await service.refreshConnection(
+        userId: 'test-user',
+        now: DateTime(2026, 6, 17, 12),
+      );
 
       expect(status.permissionGranted, isTrue);
       expect(status.isConnected, isTrue);
@@ -91,7 +94,10 @@ void main() {
     });
 
     test('disconnect clears connection state and deletes api rows', () async {
-      await service.requestAccess(userId: 'test-user');
+      await service.refreshConnection(
+        userId: 'test-user',
+        now: DateTime(2026, 6, 17, 12),
+      );
       final status = await service.disconnect(userId: 'test-user');
 
       expect(status.isConnected, isFalse);

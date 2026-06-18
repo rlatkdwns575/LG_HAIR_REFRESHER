@@ -14,7 +14,7 @@ import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/api/measure_refresh_recommend_service.dart';
-import '../../../measure/data/measure_result_store.dart';
+import '../../../measure/data/model/measure_result.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/refresh_scent_unavailable.dart';
@@ -266,15 +266,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (result == true) {
       context.pushMeasure();
     } else if (result == false) {
+      MeasureResult? measureResult;
       try {
-        final measureResult = await _measureRecommendService
-            .buildMeasureResult();
-        MeasureResultStore.instance.setPending(measureResult);
+        measureResult = await _measureRecommendService.buildMeasureResult();
       } catch (_) {}
       if (!mounted) {
         return;
       }
-      context.pushMeasureResult();
+      if (measureResult != null) {
+        context.pushMeasureResultDetail(result: measureResult);
+      } else {
+        context.pushMeasureResult();
+      }
     }
   }
 

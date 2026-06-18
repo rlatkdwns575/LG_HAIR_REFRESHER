@@ -265,27 +265,23 @@ class _MetricLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppText(
-          label,
-          style: AppTextStyles.bodyS.copyWith(
-            color: AppColors.gray900,
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-          ),
-        ),
-        if (showHelpIcon &&
-            helpTooltipMessage != null &&
-            helpTooltipMessage!.isNotEmpty) ...[
-          const SizedBox(width: 2),
-          AppMetricHelpIcon(
-            tooltipMessage: helpTooltipMessage!,
-            placement: AppMetricHelpTooltipPlacement.besideIcon,
-          ),
-        ],
-      ],
+    final labelStyle = AppTextStyles.bodyS.copyWith(
+      color: AppColors.gray900,
+      fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
     );
+
+    if (showHelpIcon &&
+        helpTooltipMessage != null &&
+        helpTooltipMessage!.isNotEmpty) {
+      return AppMetricHelpIcon(
+        label: label,
+        labelStyle: labelStyle,
+        tooltipMessage: helpTooltipMessage!,
+        placement: AppMetricHelpTooltipPlacement.belowEnd,
+      );
+    }
+
+    return AppText(label, style: labelStyle);
   }
 }
 

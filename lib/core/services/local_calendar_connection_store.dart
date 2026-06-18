@@ -1,4 +1,5 @@
 import '../../shared/models/calendar_event.dart';
+import 'device_calendar_reader.dart';
 
 /// 로컬 캘린더 연동 세션 저장소.
 class LocalCalendarConnectionStore {
@@ -37,9 +38,30 @@ class LocalCalendarConnectionStore {
   }) {
     todayEventCount = events.length;
     lastCheckedAt = checkedAt;
-    isConnected = true;
+    isConnected = permissionGranted;
 
     CalendarEvent? next;
+    for (final event in events) {
+      if (!event.startsAt.isBefore(checkedAt)) {
+        if (next == null || event.startsAt.isBefore(next.startsAt)) {
+          next = event;
+        }
+      }
+    }
+
+    nextEventTitle = next?.title;
+    nextEventStartAt = next?.startsAt;
+  }
+
+  void applyDevicePreview({
+    required List<DeviceCalendarEvent> events,
+    required DateTime checkedAt,
+  }) {
+    todayEventCount = events.length;
+    lastCheckedAt = checkedAt;
+    isConnected = permissionGranted;
+
+    DeviceCalendarEvent? next;
     for (final event in events) {
       if (!event.startsAt.isBefore(checkedAt)) {
         if (next == null || event.startsAt.isBefore(next.startsAt)) {

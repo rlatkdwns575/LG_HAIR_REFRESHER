@@ -31,8 +31,14 @@ class LocalCalendarService {
 
   LocalCalendarStatus get currentStatus => _buildStatus();
 
-  Future<LocalCalendarStatus> fetchStatus() async {
+  Future<LocalCalendarStatus> fetchStatus({String? userId}) async {
+    if (!calendarReader.isSupported) {
+      _store.lastFetchNote = 'unsupported_platform';
+      return _buildStatus();
+    }
+
     await _syncPermissionFromOs();
+    await _hydrateFromRemoteIfNeeded(userId: userId);
     return _buildStatus();
   }
 
@@ -51,7 +57,7 @@ class LocalCalendarService {
       if (!await calendarReader.hasCalendarAccess()) {
         return LocalCalendarConnectResult(
           outcome: LocalCalendarConnectOutcome.permissionDenied,
-          status: await fetchStatus(),
+          status: await fetchStatus(userId: userId),
           errorMessage: '캘린더 접근 권한이 필요합니다.',
         );
       }
@@ -66,7 +72,7 @@ class LocalCalendarService {
         status: connectedStatus,
       );
     } on CalendarEventsApiException catch (error) {
-      final status = await fetchStatus();
+      final status = await fetchStatus(userId: userId);
       if (status.todayEventCount > 0) {
         return LocalCalendarConnectResult(
           outcome: LocalCalendarConnectOutcome.connected,
@@ -84,8 +90,10 @@ class LocalCalendarService {
     } catch (error) {
       return LocalCalendarConnectResult(
         outcome: LocalCalendarConnectOutcome.syncFailed,
-        status: await fetchStatus(),
-        errorMessage: '캘린더 연동에 실패했습니다.',
+        status: await fetchStatus(userId: userId),
+        errorMessage: error is StateError
+            ? '로그인이 필요합니다. 로그인 후 다시 시도해 주세요.'
+            : '캘린더 연동에 실패했습니다.',
       );
     }
   }
@@ -117,6 +125,10 @@ class LocalCalendarService {
     String? userId,
     DateTime? now,
   }) async {
+    if (!calendarReader.isSupported) {
+      throw const CalendarEventsApiException('이 기기에서는 로컬 캘린더 연동을 지원하지 않습니다.');
+    }
+
     if (!await calendarReader.hasCalendarAccess()) {
       _store.permissionGranted = false;
       return _buildStatus();
@@ -135,28 +147,47 @@ class LocalCalendarService {
     );
 
     final deviceEvents = fetchResult.events;
-    final resolvedUserId = AuthSessionService.resolveUserId(override: userId);
+    _store.applyDevicePreview(events: deviceEvents, checkedAt: resolvedNow);
+    RefreshRecommendCache.instance.invalidate();
 
+    final resolvedUserId = _resolveUserIdOrThrow(userId: userId);
     final calendarEvents = await _buildCalendarEvents(
       deviceEvents: deviceEvents,
       userId: resolvedUserId,
     );
 
-    // 기기에서 읽은 결과를 UI에 먼저 반영합니다 (Supabase 실패와 무관).
     _store.applySyncedEvents(calendarEvents, checkedAt: resolvedNow);
-    RefreshRecommendCache.instance.invalidate();
 
-    try {
-      await calendarEventsApi.replaceTodayEvents(
-        userId: resolvedUserId,
-        events: calendarEvents,
-        now: resolvedNow,
-      );
-    } on CalendarEventsApiException catch (_) {
-      rethrow;
-    }
+    await calendarEventsApi.replaceTodayEvents(
+      userId: resolvedUserId,
+      events: calendarEvents,
+      now: resolvedNow,
+    );
 
     return _buildStatus();
+  }
+
+  Future<void> _hydrateFromRemoteIfNeeded({String? userId}) async {
+    if (!_store.permissionGranted) {
+      return;
+    }
+
+    if (_store.isConnected && _store.lastCheckedAt != null) {
+      return;
+    }
+
+    try {
+      final events = await calendarEventsApi.fetchTodayEvents(userId: userId);
+      if (events.isEmpty) {
+        return;
+      }
+      _store.applySyncedEvents(
+        events,
+        checkedAt: _store.lastCheckedAt ?? DateTime.now(),
+      );
+    } on CalendarEventsApiException {
+      // 테이블/RLS 미설정 등 — 기기 동기화로 복구 가능.
+    } catch (_) {}
   }
 
   Future<List<CalendarEvent>> _buildCalendarEvents({
@@ -217,6 +248,14 @@ class LocalCalendarService {
       _store.todayEventCount = 0;
       _store.nextEventTitle = null;
       _store.nextEventStartAt = null;
+    }
+  }
+
+  String _resolveUserIdOrThrow({String? userId}) {
+    try {
+      return AuthSessionService.resolveUserId(override: userId);
+    } on StateError {
+      throw const CalendarEventsApiException('로그인이 필요합니다. 로그인 후 다시 시도해 주세요.');
     }
   }
 

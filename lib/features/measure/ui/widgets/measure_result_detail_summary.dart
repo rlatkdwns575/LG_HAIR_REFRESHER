@@ -135,24 +135,17 @@ class _RefreshNeedHelpRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AppText(
-            '리프레시 필요도',
-            style: AppTextStyles.bodyS.copyWith(
-              color: AppColors.gray600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 3),
-          AppMetricHelpIcon(
-            tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
-            size: 16,
-            placement: AppMetricHelpTooltipPlacement.belowEnd,
-            tooltipMaxWidth: 240,
-          ),
-        ],
+      child: AppMetricHelpIcon(
+        label: '리프레시 필요도',
+        labelStyle: AppTextStyles.bodyS.copyWith(
+          color: AppColors.gray600,
+          fontWeight: FontWeight.w500,
+        ),
+        tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
+        size: 16,
+        placement: AppMetricHelpTooltipPlacement.belowStart,
+        tooltipMaxWidth: 240,
+        labelIconGap: 3,
       ),
     );
   }

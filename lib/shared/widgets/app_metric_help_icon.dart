@@ -8,64 +8,74 @@ import '../../app/theme/app_text_styles.dart';
 import 'app_text.dart';
 
 enum AppMetricHelpTooltipPlacement {
-  /// ? 아이콘 오른쪽에 바로 붙여 표시.
-  besideIcon,
+  /// ? 아이콘 아래, 왼쪽 정렬.
+  belowStart,
 
   /// ? 아이콘 아래, 오른쪽 정렬.
   belowEnd,
 }
 
-/// 진단·리프레시 결과 상세 — ? 도움말 아이콘 + 호버/탭 툴팁.
+/// 진단·리프레시 결과 상세 — 라벨/? 탭으로 도움말 표시, 바깥 탭 시 닫힘.
 class AppMetricHelpIcon extends StatefulWidget {
   const AppMetricHelpIcon({
     required this.tooltipMessage,
+    this.label,
+    this.labelStyle,
     this.size = 14,
-    this.placement = AppMetricHelpTooltipPlacement.besideIcon,
+    this.placement = AppMetricHelpTooltipPlacement.belowEnd,
     this.tooltipMaxWidth = 220,
+    this.labelIconGap = 2,
     super.key,
   });
 
   final String tooltipMessage;
+  final String? label;
+  final TextStyle? labelStyle;
   final double size;
   final AppMetricHelpTooltipPlacement placement;
   final double tooltipMaxWidth;
+  final double labelIconGap;
 
   @override
   State<AppMetricHelpIcon> createState() => _AppMetricHelpIconState();
 }
 
 class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
+  static _AppMetricHelpIconState? _activeTooltip;
+
+  final GlobalKey _iconKey = GlobalKey();
   OverlayEntry? _overlayEntry;
-  bool _hovering = false;
-  bool _pressing = false;
+  bool _isVisible = false;
 
   @override
   void dispose() {
-    _hideTooltip();
+    _hideTooltip(notifyActive: true);
     super.dispose();
   }
 
-  void _updateTooltipVisibility() {
-    if (_hovering || _pressing) {
-      _showTooltip();
-    } else {
+  void _toggleTooltip() {
+    if (_isVisible) {
       _hideTooltip();
+    } else {
+      _showTooltip();
     }
   }
 
   void _showTooltip() {
-    if (widget.tooltipMessage.isEmpty || _overlayEntry != null) {
+    if (widget.tooltipMessage.isEmpty) {
       return;
     }
 
-    final box = context.findRenderObject() as RenderBox?;
+    _activeTooltip?._hideTooltip(notifyActive: false);
+    _activeTooltip = this;
+
+    final box = _iconKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) {
       return;
     }
 
     final overlay = Overlay.of(context);
     final iconTopLeft = box.localToGlobal(Offset.zero);
-    const horizontalGap = 4.0;
     const verticalGap = 6.0;
     final tooltipMaxWidth = widget.tooltipMaxWidth;
 
@@ -80,39 +90,34 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
           maxWidth: tooltipMaxWidth,
         );
 
-        late final double left;
-        late final double top;
+        final left = switch (widget.placement) {
+          AppMetricHelpTooltipPlacement.belowStart => _belowStartLeft(
+            iconTopLeft: iconTopLeft,
+            tooltipMaxWidth: tooltipMaxWidth,
+            screenWidth: screenSize.width,
+          ),
+          AppMetricHelpTooltipPlacement.belowEnd => _belowEndLeft(
+            iconTopLeft: iconTopLeft,
+            iconWidth: box.size.width,
+            tooltipMaxWidth: tooltipMaxWidth,
+            screenWidth: screenSize.width,
+          ),
+        };
 
-        switch (widget.placement) {
-          case AppMetricHelpTooltipPlacement.besideIcon:
-            left = _besideIconLeft(
-              iconTopLeft: iconTopLeft,
-              iconWidth: box.size.width,
-              tooltipMaxWidth: tooltipMaxWidth,
-              screenWidth: screenSize.width,
-              horizontalGap: horizontalGap,
-            );
-            top = iconTopLeft.dy.clamp(safeTop, safeBottom - estimatedHeight);
-          case AppMetricHelpTooltipPlacement.belowEnd:
-            left = _belowEndLeft(
-              iconTopLeft: iconTopLeft,
-              iconWidth: box.size.width,
-              tooltipMaxWidth: tooltipMaxWidth,
-              screenWidth: screenSize.width,
-            );
-            final belowTop = iconTopLeft.dy + box.size.height + verticalGap;
-            if (belowTop + estimatedHeight <= safeBottom) {
-              top = belowTop;
-            } else {
-              top = (iconTopLeft.dy - estimatedHeight - verticalGap).clamp(
-                safeTop,
-                safeBottom - estimatedHeight,
-              );
-            }
+        var top = iconTopLeft.dy + box.size.height + verticalGap;
+        if (top + estimatedHeight > safeBottom) {
+          top = safeBottom - estimatedHeight;
         }
+        top = top.clamp(safeTop, safeBottom - estimatedHeight);
 
         return Stack(
           children: [
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _hideTooltip,
+              ),
+            ),
             Positioned(
               left: left,
               top: top,
@@ -149,6 +154,20 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     );
 
     overlay.insert(_overlayEntry!);
+    setState(() => _isVisible = true);
+  }
+
+  void _hideTooltip({bool notifyActive = true}) {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    if (notifyActive && _activeTooltip == this) {
+      _activeTooltip = null;
+    }
+    if (_isVisible && mounted) {
+      setState(() => _isVisible = false);
+    } else {
+      _isVisible = false;
+    }
   }
 
   double _estimateTooltipHeight({
@@ -170,16 +189,14 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     return verticalPadding + lineCount * lineHeight;
   }
 
-  double _besideIconLeft({
+  double _belowStartLeft({
     required Offset iconTopLeft,
-    required double iconWidth,
     required double tooltipMaxWidth,
     required double screenWidth,
-    required double horizontalGap,
   }) {
-    var left = iconTopLeft.dx + iconWidth + horizontalGap;
+    var left = iconTopLeft.dx;
     if (left + tooltipMaxWidth > screenWidth - 16) {
-      left = iconTopLeft.dx - tooltipMaxWidth - horizontalGap;
+      left = screenWidth - tooltipMaxWidth - 16;
     }
     if (left < 16) {
       left = 16;
@@ -203,14 +220,9 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     return left;
   }
 
-  void _hideTooltip() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = Container(
+  Widget _buildIcon() {
+    return Container(
+      key: _iconKey,
       width: widget.size,
       height: widget.size,
       decoration: BoxDecoration(
@@ -227,32 +239,25 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
         ),
       ),
     );
+  }
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.help,
-      onEnter: (_) {
-        _hovering = true;
-        _updateTooltipVisibility();
-      },
-      onExit: (_) {
-        _hovering = false;
-        _updateTooltipVisibility();
-      },
-      child: Listener(
-        behavior: HitTestBehavior.opaque,
-        onPointerDown: (_) {
-          _pressing = true;
-          _updateTooltipVisibility();
-        },
-        onPointerUp: (_) {
-          _pressing = false;
-          _updateTooltipVisibility();
-        },
-        onPointerCancel: (_) {
-          _pressing = false;
-          _updateTooltipVisibility();
-        },
-        child: icon,
+  @override
+  Widget build(BuildContext context) {
+    final label = widget.label;
+    final labelStyle = widget.labelStyle;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggleTooltip,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (label != null && labelStyle != null) ...[
+            Flexible(child: AppText(label, style: labelStyle)),
+            SizedBox(width: widget.labelIconGap),
+          ],
+          _buildIcon(),
+        ],
       ),
     );
   }
