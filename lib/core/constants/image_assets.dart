@@ -17,6 +17,8 @@ class ImageAssets {
   static const homeBrandLogo = '$homeDir/LOGO.png';
   static const homeBrandTagline = '$homeDir/LOGO2.png';
   static const homeDeviceImage = '$homeDir/device_purihair.png';
+  static const deviceImageNoBackground =
+      '$homeDir/device_purihair_background_delete.png';
   static const homeRecommendSparkleIcon = '$homeDir/recommend_sparkle.png';
   static const measureAnalyzingIllustration = '$measureDir/analyzing2.png';
   static const measurePrepareDevice = '$measureDir/machine.png';

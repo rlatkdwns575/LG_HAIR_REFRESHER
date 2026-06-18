@@ -62,8 +62,11 @@ void main() {
       );
       expect(detail.dustSection.metrics, hasLength(2));
       expect(detail.hairSection.analysisBadgeLabel, '컨디션 영향 낮음');
-      expect(detail.hairSection.metrics, hasLength(3));
-      expect(detail.hairSection.metrics[2].label, '모발 굵기');
+      expect(detail.hairSection.metrics, hasLength(4));
+      expect(detail.hairSection.metrics[1].label, '모발 손상도');
+      expect(detail.hairSection.metrics[2].label, '모발 유분량');
+      expect(detail.hairSection.metrics[2].badgeLabel, '보통');
+      expect(detail.hairSection.metrics[3].label, '모발 굵기');
     });
 
     test('stable DB record derives lower refresh need', () {

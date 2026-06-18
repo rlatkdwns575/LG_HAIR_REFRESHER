@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -41,14 +42,14 @@ class SettingsProfileCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppText(
                   user.nickname,
                   style: AppTextStyles.titleS.copyWith(
                     color: AppColors.gray900,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                AppText(
                   user.profileLine,
                   style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
                 ),

@@ -3,6 +3,7 @@ import '../../../../shared/widgets/app_badge.dart';
 import '../../../history/data/api/history_session_mapper.dart';
 import '../../../history/data/model/care_status.dart';
 import '../model/measure_care_level.dart';
+import '../model/measure_result.dart';
 import '../model/measure_result_detail_metric.dart';
 import '../model/measure_result_record.dart';
 
@@ -26,6 +27,27 @@ class MeasureResultMapper {
       '가까운 거리에서 잔여 냄새나 외부 흔적이\n'
       '느껴질 가능성을 나타내요. 대면 전 케어\n'
       '필요성을 판단하는 데 활용돼요.';
+
+  /// 저장된 측정 데이터를 진단 상세 화면용 [MeasureResult]로 변환합니다.
+  ///
+  /// 기록(히스토리)에서 과거 진단 결과를 다시 열 때 사용합니다.
+  static MeasureResult toMeasureResult(MeasureResultRecord record) {
+    final odor = odorLevel(record);
+    final dust = dustLevel(record);
+    final needsAction = odor.needsAction || dust.needsAction;
+    final template = needsAction
+        ? MeasureResult.sampleActionRequired
+        : MeasureResult.sampleStable;
+
+    return MeasureResult(
+      odorLevel: odor,
+      dustLevel: dust,
+      headline: template.headline,
+      recommendedMode: template.recommendedMode,
+      recommendReason: template.recommendReason,
+      sourceRecord: record,
+    );
+  }
 
   static MeasureCareLevel odorLevel(MeasureResultRecord record) {
     return careLevelFromPollutionScore(record.hairOdorScore);
@@ -78,25 +100,42 @@ class MeasureResultMapper {
     return '균형 잡힌 리프레시';
   }
 
-  static String analysisSummary(MeasureResultRecord record) {
-    if (record.totalPollutionScore <= recommendedThresholdPercent) {
-      return '현재 헤어 상태는 안정적이에요.\n가벼운 관리만으로 충분해요.';
-    }
-
-    final focus = focusLabel(record);
-    if (focus.startsWith('먼지')) {
-      return '먼지 케어의 필요도가 권장 기준을 넘었어요.\n먼지를 중심으로 냄새 케어도 함께 진행이 필요해요';
-    }
-    if (focus.startsWith('냄새')) {
-      return '냄새 케어의 필요도가 권장 기준을 넘었어요.\n냄새를 중심으로 먼지 케어도 함께 진행이 필요해요';
-    }
-    return '냄새와 먼지 케어가 함께 필요해요.\n균형 잡힌 리프레시를 권장해요.';
-  }
-
   static (String label, AppBadgeSmallVariant variant) badgeForHairLevel(
     String? raw, {
     String fallbackLabel = '-',
   }) => MetricBadgeMapper.badgeForHairLevel(raw, fallbackLabel: fallbackLabel);
+
+  static (String label, AppBadgeSmallVariant variant) badgeForHairSebum(
+    String? raw, {
+    String fallbackLabel = '-',
+  }) {
+    if (raw == null || raw.trim().isEmpty) {
+      return (fallbackLabel, AppBadgeSmallVariant.gray);
+    }
+
+    final normalized = raw.trim();
+    final lower = normalized.toLowerCase();
+
+    return switch (lower) {
+      'low' || '낮음' || '적음' => ('낮음', AppBadgeSmallVariant.low),
+      'medium' || '보통' || '중간' => ('보통', AppBadgeSmallVariant.medium),
+      'high' || '높음' || '많음' || '과다' => ('높음', AppBadgeSmallVariant.high),
+      _ => (normalized, AppBadgeSmallVariant.gray),
+    };
+  }
+
+  static (String label, AppBadgeSmallVariant variant) pollutionRetentionBadge(
+    MeasureResultRecord record,
+  ) {
+    final impact = hairImpactPercent(record);
+    if (impact <= 20) {
+      return ('낮음', AppBadgeSmallVariant.low);
+    }
+    if (impact <= 35) {
+      return ('보통', AppBadgeSmallVariant.medium);
+    }
+    return ('높음', AppBadgeSmallVariant.high);
+  }
 
   static (String label, AppBadgeSmallVariant variant) badgeForHairThickness(
     String? raw, {

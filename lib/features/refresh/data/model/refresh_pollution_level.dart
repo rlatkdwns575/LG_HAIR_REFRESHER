@@ -1,7 +1,7 @@
-/// 리프레시 결과 그래프의 오염도 단계 (매우 높음 → 좋음).
+/// 리프레시 결과 그래프의 오염도 단계 (매우 나쁨 → 좋음).
 enum RefreshPollutionLevel {
-  veryHigh('매우 높음', 0),
-  high('높음', 1),
+  veryHigh('매우 나쁨', 0),
+  high('나쁨', 1),
   normal('보통', 2),
   good('좋음', 3);
 

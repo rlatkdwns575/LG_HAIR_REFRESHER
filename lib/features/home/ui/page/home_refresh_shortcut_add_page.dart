@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
@@ -23,9 +24,12 @@ import '../../../refresh/ui/widgets/refresh_section_header.dart';
 import '../widgets/refresh_shortcut_select_card.dart';
 import '../../../refresh/data/refresh_mode_filter.dart';
 
-/// Figma `리프레시 바로가기 추가` — 홈 즐겨찾기 모드 선택 화면.
+/// Figma `리프레시 바로가기 추가` — 홈 즐겨찾기 모드 선택·수정 화면.
 class HomeRefreshShortcutAddPage extends StatefulWidget {
-  const HomeRefreshShortcutAddPage({super.key});
+  const HomeRefreshShortcutAddPage({this.initialMode, super.key});
+
+  /// 수정 진입 시 현재 즐겨찾기 모드.
+  final RefreshMode? initialMode;
 
   @override
   State<HomeRefreshShortcutAddPage> createState() =>
@@ -42,6 +46,8 @@ class _HomeRefreshShortcutAddPageState
   int _selectedChipIndex = 0;
   String? _selectedModeId;
   ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
+
+  bool get _isEditing => widget.initialMode != null;
 
   List<RefreshMode> get _allModes => getAllRefreshModes();
 
@@ -71,6 +77,7 @@ class _HomeRefreshShortcutAddPageState
 
     setState(() {
       _scentCartridge = cartridge;
+      _selectedModeId = widget.initialMode?.id ?? _selectedModeId;
       _isLoading = false;
     });
   }
@@ -132,7 +139,7 @@ class _HomeRefreshShortcutAddPageState
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시 추가',
+        title: _isEditing ? '즐겨찾기 수정' : '리프레시 추가',
         onBack: () => context.pop(),
       ),
       body: _isLoading
@@ -148,7 +155,9 @@ class _HomeRefreshShortcutAddPageState
                     children: [
                       RefreshSectionHeader(
                         title: '리프레시 모드',
-                        subtitle: '홈 바로가기에 추가할 모드를 선택하세요',
+                        subtitle: _isEditing
+                            ? '변경할 모드를 선택하세요'
+                            : '홈 바로가기에 추가할 모드를 선택하세요',
                         trailingLabel: '커스텀하기',
                         onTrailingTap: _openCustomCreate,
                       ),
@@ -180,7 +189,7 @@ class _HomeRefreshShortcutAddPageState
                   ),
                 ),
                 AppBottomButtonBar(
-                  primaryLabel: '추가하기',
+                  primaryLabel: _isEditing ? '저장하기' : '추가하기',
                   onPrimaryPressed: _selectedModeId == null
                       ? null
                       : _confirmSelection,
@@ -198,7 +207,7 @@ class _HomeRefreshShortcutAddPageState
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 56),
       child: Center(
-        child: Text(
+        child: AppText(
           message,
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),

@@ -14,7 +14,7 @@ class MeasureIntroStepIndicator {
 class MeasureStepIndicator extends StatelessWidget {
   const MeasureStepIndicator({
     required this.currentStep,
-    this.totalSteps = 3,
+    this.totalSteps = MeasureIntroStepIndicator.totalSteps,
     super.key,
   });
 

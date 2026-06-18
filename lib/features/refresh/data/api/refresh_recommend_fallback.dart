@@ -1,3 +1,4 @@
+import '../../../../shared/recommendation/refresh_recommend_input.dart';
 import '../../../home/data/model/environment_snapshot.dart';
 import '../model/refresh_mode.dart';
 
@@ -6,6 +7,16 @@ class RefreshRecommendFallback {
   const RefreshRecommendFallback._();
 
   static RefreshMode? pickMode({
+    required List<RefreshMode> candidates,
+    required RefreshRecommendInput context,
+  }) {
+    return pickModeFromEnvironment(
+      candidates: candidates,
+      environment: context.environment,
+    );
+  }
+
+  static RefreshMode? pickModeFromEnvironment({
     required List<RefreshMode> candidates,
     required EnvironmentSnapshot environment,
   }) {

@@ -1,11 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/services/app_env.dart';
-import '../model/environment_snapshot.dart';
-import 'home_recommend_craft_prompt.dart';
+import '../../../../shared/recommendation/refresh_recommend_input.dart';
+import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
 
 class GeminiRecommendApi {
   const GeminiRecommendApi();
@@ -20,22 +19,26 @@ class GeminiRecommendApi {
   static const _minMessageLength = 25;
 
   Future<String> generateMessage(
-    EnvironmentSnapshot environment, {
-    String? recommendedModeName,
+    RefreshRecommendInput context, {
+    required String recommendedModeName,
   }) async {
     final apiKey = AppEnv.geminiApiKey;
     final body = jsonEncode({
       'system_instruction': {
         'parts': [
-          {'text': HomeRecommendCraftPrompt.systemInstruction.trim()},
+          {
+            'text': RefreshRecommendPrompt.messageSystemInstruction(
+              context.basis,
+            ).trim(),
+          },
         ],
       },
       'contents': [
         {
           'parts': [
             {
-              'text': HomeRecommendCraftPrompt.userPrompt(
-                environment,
+              'text': RefreshRecommendPrompt.messageUserPrompt(
+                context: context,
                 recommendedModeName: recommendedModeName,
               ),
             },
@@ -57,26 +60,17 @@ class GeminiRecommendApi {
       if (response.statusCode == 200) {
         try {
           final message = _parseMessage(response.body);
-          debugPrint('GeminiRecommendApi succeeded with model=$model');
           return message;
-        } catch (error) {
-          debugPrint('GeminiRecommendApi model=$model parse failed: $error');
+        } catch (_) {
+          continue;
         }
-        continue;
       }
-
-      debugPrint(
-        'GeminiRecommendApi model=$model failed (${response.statusCode})',
-      );
-
       if (response.statusCode != 429 && response.statusCode != 404) {
         break;
       }
     }
 
     final statusCode = lastResponse?.statusCode ?? 0;
-    final responseBody = lastResponse?.body ?? '';
-    debugPrint('GeminiRecommendApi failed ($statusCode): $responseBody');
     throw GeminiRecommendApiException('Gemini request failed ($statusCode)');
   }
 

@@ -31,7 +31,7 @@ class RefreshModeMapper {
       name: row['display_name'] as String? ?? '리프레시 모드',
       description: descriptionText.isNotEmpty
           ? descriptionText
-          : _buildDescription(
+          : buildCareDescription(
               odorYn: odorYn,
               dustYn: dustYn,
               scentYn: scentYn,
@@ -122,7 +122,10 @@ class RefreshModeMapper {
     };
   }
 
-  static String _buildDescription({
+  /// 선택한 케어(먼지/냄새/향) 조합에 따른 모드 설명 문구를 생성합니다.
+  ///
+  /// 예: 먼지+향 선택 시 `먼지·향 케어로 모발 컨디션을 정돈해요.`
+  static String buildCareDescription({
     required bool odorYn,
     required bool dustYn,
     required bool scentYn,

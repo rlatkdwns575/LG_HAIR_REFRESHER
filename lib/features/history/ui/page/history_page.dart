@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
@@ -30,7 +31,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   static const _horizontalPadding = 15.0;
-  static final _minMonth = DateTime(1970, 1);
+  static final _minMonth = DateTime(2024, 1);
 
   RefreshHistoryReport? _report;
   late DateTime _visibleMonth;
@@ -62,8 +63,7 @@ class _HistoryPageState extends State<HistoryPage> {
         _selectedDate = report.monthDataFor(_visibleMonth).latestRecordedDate;
         _isLoading = false;
       });
-    } catch (error, stackTrace) {
-      debugPrint('History report load failed: $error\n$stackTrace');
+    } catch (error, _) {
       if (!mounted) {
         return;
       }
@@ -158,11 +158,22 @@ class _HistoryPageState extends State<HistoryPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: AppText(message),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 
   void _onRecordDetailTap(RefreshHistoryRecord record) {
+    if (record.isDiagnosis) {
+      final measureRecord = record.measureRecord;
+      if (measureRecord == null) {
+        return;
+      }
+      context.pushMeasureHistoryRecordDetail(record: measureRecord);
+      return;
+    }
     context.pushRefreshHistoryRecordDetail(
       modeName: record.modeName,
       necessityReductionPercent: record.necessityReductionPercent,
@@ -190,25 +201,13 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  void _onDayResultDetailTap() {
-    final selectedDate = _selectedDate;
-    if (selectedDate == null) {
-      return;
-    }
-    final group = _visibleMonthData.groupForDate(selectedDate);
-    if (group == null || group.records.isEmpty) {
-      return;
-    }
-    _onRecordDetailTap(group.records.first);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시 내역',
+        title: '리프레시 기록 보기',
         onBack: _onBack,
       ),
       body: _buildBody(),
@@ -253,7 +252,7 @@ class _HistoryPageState extends State<HistoryPage> {
             onCalendarIconTap: _onCalendarIconTap,
             onDateSelected: _onDateSelected,
             onToggleExpanded: _onToggleExpanded,
-            onDayResultDetailTap: _onDayResultDetailTap,
+            onRecordDetailTap: _onRecordDetailTap,
           ),
         ),
         const HistorySectionDivider(),
@@ -269,13 +268,13 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            AppText(
               _errorMessage!,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray700),
             ),
             const SizedBox(height: AppSpacing.md),
-            TextButton(onPressed: _loadReport, child: const Text('다시 시도')),
+            TextButton(onPressed: _loadReport, child: AppText('다시 시도')),
           ],
         ),
       ),
@@ -293,12 +292,12 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '나의 리프레시 기록 리포트',
             style: AppTextStyles.titleL.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 6),
-          Text(
+          AppText(
             formatKoreanAsOf(report.asOfDate),
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
           ),

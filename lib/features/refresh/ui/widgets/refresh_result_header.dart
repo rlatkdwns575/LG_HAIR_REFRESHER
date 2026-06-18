@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
@@ -13,7 +14,7 @@ class RefreshResultHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           '리프레시 결과',
           style: AppTextStyles.titleL.copyWith(
             color: AppColors.gray800,
@@ -21,7 +22,7 @@ class RefreshResultHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        Text(
+        AppText(
           '리프레시 결과는 2시간 동안 확인하실 수 있습니다.',
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
         ),

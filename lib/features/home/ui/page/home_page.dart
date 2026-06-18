@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/device_consumable_service.dart';
@@ -11,23 +10,18 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/models/scent_cartridge_status.dart';
+import '../../../../shared/recommendation/refresh_recommend_cache.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/api/measure_refresh_recommend_service.dart';
-import '../../../measure/data/measure_result_store.dart';
-import '../../../refresh/data/api/refresh_api.dart';
-import '../../../refresh/data/api/refresh_recommend_api.dart';
-import '../../../refresh/data/api/refresh_recommend_fallback.dart';
+import '../../../measure/data/model/measure_result.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
-import '../../../refresh/data/refresh_mode_catalog.dart';
+import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/refresh_scent_unavailable.dart';
-import '../../data/api/gemini_recommend_api.dart';
 import '../../data/api/home_api.dart';
-import '../../data/api/weather_api.dart';
-import '../../data/api/weather_recommend_fallback.dart';
 import '../../data/home_device_status_watcher.dart';
-import '../../data/home_recommend_cache.dart';
 import '../../data/home_shortcut_store.dart';
-import '../../data/model/environment_snapshot.dart';
 import '../../data/model/home_dashboard_data.dart';
 import '../../data/model/home_device_status_snapshot.dart';
 import '../widgets/home_device_status_section.dart';
@@ -50,20 +44,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   static const _sectionGap = 6.0;
   final _homeApi = const HomeApi();
   final _deviceStatusWatcher = HomeDeviceStatusWatcher();
-  final _weatherApi = const WeatherApi();
   final _measureApi = const MeasureApi();
-  final _measureRecommendService = const MeasureRefreshRecommendService();
-  final _refreshApi = const RefreshApi();
-  final _geminiRecommendApi = const GeminiRecommendApi();
-  final _refreshRecommendApi = const RefreshRecommendApi();
+  final _measureRecommendService = MeasureRefreshRecommendService();
+  final _recommendService = RefreshRecommendService.instance;
   final _deviceConsumableService = const DeviceConsumableService();
 
   HomeDashboardData _dashboardData = const HomeDashboardData();
   bool _isLoading = true;
   bool _isScentCartridgeAttached = false;
   String? _recommendMessage;
+  RefreshMode? _recommendedRefreshMode;
   HomeQuickRefreshMode? _recommendedQuickMode;
   bool _useRecommendForQuickSlot = false;
+  int _lastCalendarSyncToken = 0;
   HomeQuickRefreshMode? get _favoriteMode =>
       HomeShortcutStore.instance.favoriteQuickMode;
 
@@ -120,9 +113,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   @override
+  void activate() {
+    super.activate();
+    unawaited(_refreshRecentDiagnosisFlag());
+    _refreshRecommendationIfCalendarSynced();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(_deviceStatusWatcher.refresh());
+      unawaited(_refreshDeviceStatus());
+      unawaited(_refreshRecentDiagnosisFlag());
     }
   }
 
@@ -132,82 +133,34 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     try {
       dashboard = await _homeApi.fetchDashboard();
-    } catch (error, stackTrace) {
-      debugPrint('Home dashboard load failed: $error\n$stackTrace');
+    } catch (error, _) {
       dashboard = fallback.copyWith(
-        modelName: 'Supabase 연동 필요 · RLS/USER_DEVICES 확인',
+        modelName: error is HomeApiException
+            ? error.message
+            : 'Supabase 연동 필요 · RLS/USER_DEVICES 확인',
       );
-      if (error is HomeApiException) {
-        debugPrint(
-          'HomeApi hint: Supabase SQL Editor에서 supabase/dev_read_policies.sql '
-          '실행 후 USER_DEVICES 연결을 확인하세요.',
-        );
-      }
     }
 
-    String? recommendMessage = HomeRecommendCache.instance.message;
+    String? recommendMessage;
+    RefreshMode? recommendedRefreshMode;
     HomeQuickRefreshMode? recommendedQuickMode;
     var useRecommendForQuickSlot = false;
-    EnvironmentSnapshot? environment;
 
     try {
-      environment = await _weatherApi.fetchSnapshot();
-      debugPrint(
-        'Home weather loaded: '
-        '${environment.temperatureCelsius}°C, '
-        'humidity ${environment.humidityPercent}%, '
-        'rain=${environment.isRaining}, snow=${environment.isSnowing}',
-      );
-
-      final apiRecommendedMode = await _resolveRecommendApiMode(environment);
-      if (apiRecommendedMode != null) {
-        recommendedQuickMode = apiRecommendedMode.toHomeQuickRefreshMode();
+      final recommendation = await _recommendService.resolve();
+      if (recommendation != null) {
+        recommendMessage = recommendation.message;
+        recommendedRefreshMode = recommendation.mode;
+        recommendedQuickMode = recommendation.mode.toHomeQuickRefreshMode();
         useRecommendForQuickSlot = true;
-        debugPrint(
-          'Home quick slot using RECOMMEND API mode: ${apiRecommendedMode.name}',
-        );
-      } else {
-        debugPrint('Home quick slot falling back to frequent mode.');
       }
-
-      if (recommendMessage == null) {
-        final recommendedMode =
-            apiRecommendedMode ?? await _resolveRecommendedMode(environment);
-        final recommendedModeName = recommendedMode?.name;
-
-        try {
-          recommendMessage = await _geminiRecommendApi.generateMessage(
-            environment,
-            recommendedModeName: recommendedModeName,
-          );
-          debugPrint('Home Gemini banner message generated.');
-        } catch (error, stackTrace) {
-          debugPrint('Home Gemini failed: $error\n$stackTrace');
-          recommendMessage = WeatherRecommendFallback.message(
-            environment,
-            recommendedModeName: recommendedModeName,
-          );
-          debugPrint('Home banner using weather fallback message.');
-        }
-
-        HomeRecommendCache.instance.save(recommendMessage);
-      } else {
-        debugPrint('Home banner using cached recommend message.');
-      }
-    } catch (error, stackTrace) {
-      debugPrint('Home weather/recommend load failed: $error\n$stackTrace');
-    }
+    } catch (_) {}
 
     if (!mounted) {
       return;
     }
 
-    var hasRecentDiagnosis = false;
-    try {
-      hasRecentDiagnosis = await _measureApi.hasRecentResult();
-    } catch (error, stackTrace) {
-      debugPrint('Home recent diagnosis check failed: $error\n$stackTrace');
-    }
+    var hasRecentDiagnosis = await _fetchHasRecentDiagnosisResult();
 
     final cartridge = await _deviceConsumableService
         .fetchScentCartridgeStatus();
@@ -217,10 +170,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         hasRecentDiagnosisResult: hasRecentDiagnosis,
       );
       _recommendMessage = recommendMessage;
+      _recommendedRefreshMode = recommendedRefreshMode;
       _recommendedQuickMode = recommendedQuickMode;
       _useRecommendForQuickSlot = useRecommendForQuickSlot;
       _isScentCartridgeAttached = cartridge.isAttached;
       _isLoading = false;
+      _lastCalendarSyncToken = RefreshRecommendCache.instance.calendarSyncToken;
     });
 
     final deviceId = dashboard.linkedDeviceId;
@@ -257,54 +212,75 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _refreshDeviceStatus() => _deviceStatusWatcher.refresh();
 
-  Future<RefreshMode?> _resolveRecommendApiMode(
-    EnvironmentSnapshot environment,
-  ) async {
+  Future<bool> _fetchHasRecentDiagnosisResult() async {
     try {
-      final presets = await _refreshApi.fetchPresetModes();
-      RefreshPresetModeStore.instance.setPresets(presets);
-      if (presets.isEmpty) {
-        return null;
-      }
-
-      return await _refreshRecommendApi.recommendMode(
-        candidates: presets,
-        environment: environment,
-      );
-    } catch (error, stackTrace) {
-      debugPrint('Home RECOMMEND API failed: $error\n$stackTrace');
-      return null;
+      return await _measureApi.hasRecentResult();
+    } catch (_) {
+      return false;
     }
   }
 
-  Future<RefreshMode?> _resolveRecommendedMode(
-    EnvironmentSnapshot environment,
-  ) async {
-    try {
-      final presets = await _refreshApi.fetchPresetModes();
-      RefreshPresetModeStore.instance.setPresets(presets);
-      if (presets.isEmpty) {
-        return null;
-      }
-
-      final recommended = await _refreshRecommendApi.recommendMode(
-        candidates: presets,
-        environment: environment,
-      );
-
-      return recommended ??
-          RefreshRecommendFallback.pickMode(
-            candidates: presets,
-            environment: environment,
-          );
-    } catch (error, stackTrace) {
-      debugPrint('Home recommend mode resolve failed: $error\n$stackTrace');
-      return null;
+  Future<void> _refreshRecentDiagnosisFlag() async {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted || _dashboardData.hasRecentDiagnosisResult == hasRecent) {
+      return;
     }
+    setState(() {
+      _dashboardData = _dashboardData.copyWith(
+        hasRecentDiagnosisResult: hasRecent,
+      );
+    });
+  }
+
+  Future<void> _refreshHomeIndicators() async {
+    await Future.wait([
+      _refreshDeviceStatus(),
+      _refreshRecentDiagnosisFlag(),
+      _refreshRecommendation(forceRefresh: true),
+    ]);
+  }
+
+  void _refreshRecommendationIfCalendarSynced() {
+    final token = RefreshRecommendCache.instance.calendarSyncToken;
+    if (token == _lastCalendarSyncToken) {
+      return;
+    }
+    _lastCalendarSyncToken = token;
+    unawaited(_refreshRecommendation(forceRefresh: true));
+  }
+
+  Future<void> _refreshRecommendation({bool forceRefresh = false}) async {
+    try {
+      final recommendation = await _recommendService.resolve(
+        forceRefresh: forceRefresh,
+      );
+      if (!mounted || recommendation == null) {
+        return;
+      }
+      setState(() {
+        _recommendMessage = recommendation.message;
+        _recommendedRefreshMode = recommendation.mode;
+        _recommendedQuickMode = recommendation.mode.toHomeQuickRefreshMode();
+        _useRecommendForQuickSlot = true;
+      });
+    } catch (_) {}
   }
 
   Future<void> _handleDiagnosisTap() async {
-    if (!_dashboardData.hasRecentDiagnosisResult) {
+    final hasRecent = await _fetchHasRecentDiagnosisResult();
+    if (!mounted) {
+      return;
+    }
+
+    if (_dashboardData.hasRecentDiagnosisResult != hasRecent) {
+      setState(() {
+        _dashboardData = _dashboardData.copyWith(
+          hasRecentDiagnosisResult: hasRecent,
+        );
+      });
+    }
+
+    if (!hasRecent) {
       context.pushMeasure();
       return;
     }
@@ -324,22 +300,57 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (result == true) {
       context.pushMeasure();
     } else if (result == false) {
+      MeasureResult? measureResult;
       try {
-        final measureResult = await _measureRecommendService
-            .buildMeasureResult();
-        MeasureResultStore.instance.setPending(measureResult);
-      } catch (error, stackTrace) {
-        debugPrint('Home measure result preload failed: $error\n$stackTrace');
-      }
+        measureResult = await _measureRecommendService.buildMeasureResult();
+      } catch (_) {}
       if (!mounted) {
         return;
       }
-      context.pushMeasureResult();
+      if (measureResult != null) {
+        context.pushMeasureResultDetail(result: measureResult);
+      } else {
+        context.pushMeasureResult();
+      }
     }
   }
 
   Future<void> _handleFavoriteAdd() async {
     final selected = await context.pushRefreshShortcutAdd();
+    if (!mounted || selected == null) {
+      return;
+    }
+
+    HomeShortcutStore.instance.setFavorite(selected);
+    setState(() {});
+  }
+
+  void _handleRecommendBannerTap() {
+    final mode = _recommendedRefreshMode;
+    if (mode == null) {
+      return;
+    }
+
+    if (!RefreshModeAvailability.isEnabled(
+      mode,
+      ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
+    )) {
+      showRefreshScentUnavailableSnackBar(context);
+      return;
+    }
+
+    context.pushRefreshDetail(mode: mode);
+  }
+
+  // 즐겨찾기 수정 UI — HomeQuickRefreshRow.onFavoriteEditPressed 연결 시 활성화
+  // ignore: unused_element
+  Future<void> _handleFavoriteEdit() async {
+    final current = HomeShortcutStore.instance.favoriteMode;
+    if (current == null) {
+      return;
+    }
+
+    final selected = await context.pushRefreshShortcutAdd(initialMode: current);
     if (!mounted || selected == null) {
       return;
     }
@@ -360,7 +371,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _refreshDeviceStatus,
+              onRefresh: _refreshHomeIndicators,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: AppSystemInsets.onlyBottom(
@@ -383,7 +394,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         children: [
                           const SizedBox(height: _sectionGap),
                           if (_recommendMessage != null) ...[
-                            HomeRecommendBanner(message: _recommendMessage!),
+                            HomeRecommendBanner(
+                              message: _recommendMessage!,
+                              onTap: _recommendedRefreshMode == null
+                                  ? null
+                                  : _handleRecommendBannerTap,
+                            ),
                             const SizedBox(height: _sectionGap),
                           ],
                           HomeQuickRefreshRow(
@@ -408,15 +424,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton.small(
-              heroTag: 'widgetGallery',
-              tooltip: 'Shared Widget Gallery',
-              onPressed: context.pushWidgetGallery,
-              child: const Icon(Icons.widgets_outlined, size: 20),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

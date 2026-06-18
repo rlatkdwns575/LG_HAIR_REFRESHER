@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_radius.dart';
@@ -41,7 +42,7 @@ class AppCapsuleButton extends StatelessWidget {
           Icon(icon, size: 16, color: textStyle.color),
           const SizedBox(width: 4),
         ],
-        Text(label, style: textStyle),
+        AppText(label, style: textStyle),
         if (icon != null &&
             iconPosition == AppCapsuleButtonIconPosition.right) ...[
           const SizedBox(width: 4),

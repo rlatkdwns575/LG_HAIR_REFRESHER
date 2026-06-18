@@ -15,6 +15,8 @@ void main() {
       expect(detail.necessityReductionPercent, 40.9);
       expect(detail.metrics, hasLength(3));
       expect(detail.odorSection.changes, hasLength(3));
+      expect(detail.shareSummaryText, contains('리프레시 결과'));
+      expect(detail.shareSummaryText, contains(detail.summaryMessage));
     });
 
     test('uses fallback mode name when recommendedMode is null', () {
@@ -24,7 +26,7 @@ void main() {
           odorRemovalPercent: 92,
           overallImprovementPercent: 40.9,
           headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-          headlineAfter: '개선되었어요.',
+          headlineAfter: '줄어들었어요.',
           disclaimer: 'disclaimer',
           dustChange: RefreshResult.sample.dustChange,
           odorChange: RefreshResult.sample.odorChange,
@@ -88,5 +90,10 @@ void main() {
   test('RefreshResultDetail sample matches figma headline percent', () {
     expect(RefreshResultDetail.sample.necessityReductionLabel, '40.9%');
     expect(RefreshResultDetail.sample.metrics, hasLength(3));
+    expect(RefreshResultDetail.sample.hairSection.hairMetrics, hasLength(4));
+    expect(
+      RefreshResultDetail.sample.hairSection.hairMetrics[2].label,
+      '모발 유분량',
+    );
   });
 }

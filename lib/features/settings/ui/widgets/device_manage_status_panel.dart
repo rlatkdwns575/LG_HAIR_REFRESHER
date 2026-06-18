@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -25,9 +26,21 @@ class DeviceManageStatusPanel extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.dry_cleaning_outlined, size: 96, color: AppColors.gray300),
+          Image.asset(
+            ImageAssets.deviceImageNoBackground,
+            width: 140,
+            height: 140,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(
+                Icons.dry_cleaning_outlined,
+                size: 96,
+                color: AppColors.gray300,
+              );
+            },
+          ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
+          AppText(
             device.modelName,
             style: AppTextStyles.titleM.copyWith(color: AppColors.gray900),
           ),
@@ -36,7 +49,7 @@ class DeviceManageStatusPanel extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           Align(
             alignment: Alignment.centerLeft,
-            child: Text(
+            child: AppText(
               '소모품 잔량',
               style: AppTextStyles.labelM.copyWith(color: AppColors.gray600),
             ),
@@ -152,7 +165,7 @@ class _ConsumableCapacityRow extends StatelessWidget {
               icon,
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text(
+                child: AppText(
                   label,
                   style: AppTextStyles.bodyM2.copyWith(
                     color: AppColors.gray800,
@@ -160,7 +173,7 @@ class _ConsumableCapacityRow extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
+              AppText(
                 valueText,
                 style: AppTextStyles.bodyM2.copyWith(
                   color: valueColor,
@@ -182,14 +195,14 @@ class _ConsumableCapacityRow extends StatelessWidget {
             ),
             if (statusLabel != null) ...[
               const SizedBox(height: 6),
-              Text(
+              AppText(
                 statusLabel!,
                 style: AppTextStyles.labelS.copyWith(color: valueColor),
               ),
             ],
           ] else ...[
             const SizedBox(height: 6),
-            Text(
+            AppText(
               '탈부착형 카트리지가 장착되어 있지 않습니다.',
               style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
             ),
@@ -238,7 +251,7 @@ class _ConnectionBadge extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
-          Text(
+          AppText(
             label,
             style: AppTextStyles.labelS.copyWith(
               color: color,
@@ -268,12 +281,12 @@ class DeviceManageInfoRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
+            child: AppText(
               label,
               style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray600),
             ),
           ),
-          Text(
+          AppText(
             value,
             style: AppTextStyles.bodyM2.copyWith(
               color: AppColors.gray900,

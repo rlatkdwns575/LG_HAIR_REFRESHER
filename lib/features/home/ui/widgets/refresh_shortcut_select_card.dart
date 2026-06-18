@@ -71,7 +71,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                           horizontal: 6,
                           vertical: 3,
                         ),
-                        child: Text(
+                        child: AppText(
                           mode.category,
                           style: AppTextStyles.labelXs.copyWith(
                             color: badgeTextColor,
@@ -85,7 +85,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
+                        child: AppText(
                           mode.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -107,7 +107,7 @@ class RefreshShortcutSelectCard extends StatelessWidget {
                   ),
                   if (_isDisabled) ...[
                     const SizedBox(height: 6),
-                    Text(
+                    AppText(
                       '향 카트리지가 없어 사용할 수 없어요',
                       style: AppTextStyles.labelS.copyWith(
                         color: AppColors.gray500,

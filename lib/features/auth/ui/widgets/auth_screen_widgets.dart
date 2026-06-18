@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../data/auth_credentials_validator.dart';
 import 'auth_screen_styles.dart';
@@ -13,22 +15,37 @@ class AuthCloseHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const closeIconSize = 20.0;
+
     return SizedBox(
       height: 48,
       child: Row(
         children: [
-          IconButton(
-            onPressed: onClose ?? () => context.pop(),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            icon: const Icon(
-              Icons.close,
-              size: 20,
-              color: AuthScreenStyles.textDark,
+          SizedBox(
+            width: AppCommonTopHeader.backIconSlotWidth,
+            height: closeIconSize,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: onClose ?? () => context.pop(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: closeIconSize,
+                  minHeight: closeIconSize,
+                ),
+                style: IconButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(
+                  Icons.close,
+                  size: closeIconSize,
+                  color: AuthScreenStyles.textDark,
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 4),
-          Text(
+          const SizedBox(width: AppCommonTopHeader.backToTitleGap),
+          AppText(
             title,
             style: const TextStyle(
               fontSize: 16,
@@ -99,14 +116,14 @@ class AuthPrimaryButton extends StatelessWidget {
           ),
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
-        child: Text(label),
+        child: AppText(label),
       ),
     );
   }
 }
 
 Widget buildAuthFieldLabel(String text, {double fontSize = 14}) {
-  return Text(
+  return AppText(
     text,
     style: TextStyle(
       fontSize: fontSize,
@@ -187,42 +204,60 @@ Widget buildPasswordVisibilityIcon({
   );
 }
 
-Widget buildAuthPasswordRulesHint() {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const Text(
-        '* 비밀번호 조건',
-        style: TextStyle(fontSize: 12, color: AuthScreenStyles.textMuted),
-      ),
-      const SizedBox(width: 6),
-      Tooltip(
-        message: AuthCredentialsValidator.passwordRulesDescription,
-        preferBelow: true,
-        waitDuration: const Duration(milliseconds: 150),
-        showDuration: const Duration(seconds: 8),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.help,
-          child: Container(
-            width: 18,
-            height: 18,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AuthScreenStyles.textMuted, width: 1),
-            ),
-            child: const Text(
-              '?',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                height: 1,
-                color: AuthScreenStyles.textMuted,
-              ),
+/// 회원가입 비밀번호 조건 실시간 체크리스트.
+///
+/// 각 조건은 충족되면 파란색으로 표시됩니다.
+class AuthPasswordRulesChecklist extends StatelessWidget {
+  const AuthPasswordRulesChecklist({
+    required this.password,
+    required this.email,
+    super.key,
+  });
+
+  final String password;
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    final statuses = AuthCredentialsValidator.evaluateSignUpPassword(
+      password,
+      email: email,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final status in statuses)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  size: 14,
+                  color: status.satisfied
+                      ? AuthScreenStyles.primaryBlue
+                      : AuthScreenStyles.textMuted,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: AppText(
+                    status.label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: status.satisfied
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: status.satisfied
+                          ? AuthScreenStyles.primaryBlue
+                          : AuthScreenStyles.textMuted,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

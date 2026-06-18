@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/measure_result_detail.dart';
@@ -9,7 +8,7 @@ import '../../../refresh/data/refresh_mode_availability.dart';
 import '../../../refresh/ui/widgets/refresh_mode_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import 'measure_result_detail_need_bars.dart';
-import 'measure_result_metric_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 import '../../data/api/measure_result_mapper.dart';
 
 /// 리프레시 필요도 요약 블록 (Figma Frame 2085668905~8906).
@@ -38,13 +37,14 @@ class MeasureResultDetailSummary extends StatelessWidget {
           hairPercent: detail.hairImpactPercent,
           thresholdPercent: detail.recommendedThresholdPercent,
         ),
-        const SizedBox(height: AppSpacing.xl),
-        _AnalysisSummary(detail: detail),
+        const SizedBox(height: 12),
+        const _RefreshNeedHelpRow(),
         const SizedBox(height: AppSpacing.xl),
         RefreshModeCard(
           mode: detail.recommendedMode,
           variant: RefreshModeCardVariant.featured,
           badgeLabel: '추천',
+          descriptionOverride: detail.recommendReason,
           enabled: isRecommendEnabled,
           disabledReason: isRecommendEnabled
               ? null
@@ -71,53 +71,53 @@ class _Headline extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             '리프레시 필요도가',
-            style: AppTextStyles.titleS.copyWith(
-              color: AppColors.gray800,
-              height: 1.25,
+            style: AppTextStyles.titleM.copyWith(
+              color: AppColors.gray900,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
+              AppText(
                 '${detail.refreshNeedPercent}%',
                 style: AppTextStyles.headlineL.copyWith(
-                  fontSize: 48,
-                  height: 1.05,
+                  fontSize: 44,
+                  height: 1.1,
                   color: AppColors.gray900,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2, bottom: 2),
-                child: Text(
+                child: AppText(
                   suffix,
-                  style: AppTextStyles.titleS.copyWith(
-                    color: AppColors.gray800,
-                    height: 1.25,
+                  style: AppTextStyles.titleM.copyWith(
+                    color: AppColors.gray900,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Text(
+              AppText(
                 detail.refreshFocusLabel,
-                style: AppTextStyles.titleS.copyWith(
+                style: AppTextStyles.titleM.copyWith(
                   color: AppColors.orange700,
-                  height: 1.25,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
+              AppText(
                 '가 필요해요.',
-                style: AppTextStyles.titleS.copyWith(
-                  color: AppColors.gray800,
-                  height: 1.25,
+                style: AppTextStyles.titleM.copyWith(
+                  color: AppColors.gray600,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -128,49 +128,25 @@ class _Headline extends StatelessWidget {
   }
 }
 
-class _AnalysisSummary extends StatelessWidget {
-  const _AnalysisSummary({required this.detail});
-
-  final MeasureResultDetail detail;
+class _RefreshNeedHelpRow extends StatelessWidget {
+  const _RefreshNeedHelpRow();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          decoration: BoxDecoration(
-            color: AppColors.gray50,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-          ),
-          child: AppText(
-            detail.analysisSummary,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyXs.copyWith(
-              color: AppColors.gray700,
-              height: 16 / 12,
-            ),
-          ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: AppMetricHelpIcon(
+        label: '리프레시 필요도',
+        labelStyle: AppTextStyles.bodyS.copyWith(
+          color: AppColors.gray600,
+          fontWeight: FontWeight.w500,
         ),
-        const SizedBox(height: AppSpacing.sm),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '리프레시 필요도',
-                style: AppTextStyles.labelS.copyWith(color: AppColors.gray600),
-              ),
-              MeasureResultMetricHelpIcon(
-                message: MeasureResultMapper.refreshNeedHelpMessage,
-              ),
-            ],
-          ),
-        ),
-      ],
+        tooltipMessage: MeasureResultMapper.refreshNeedHelpMessage,
+        size: 16,
+        placement: AppMetricHelpTooltipPlacement.belowStart,
+        tooltipMaxWidth: 240,
+        labelIconGap: 3,
+      ),
     );
   }
 }

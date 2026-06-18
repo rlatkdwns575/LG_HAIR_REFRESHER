@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result_record.dart';
 import 'package:lg_hair_refresher/features/refresh/data/api/refresh_session_result_generator.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
-import 'package:lg_hair_refresher/features/refresh/data/refresh_mode_catalog.dart';
 
 void main() {
   const generator = RefreshSessionResultGenerator();

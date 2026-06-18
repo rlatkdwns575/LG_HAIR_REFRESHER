@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
+import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_search_text_field.dart';
 
@@ -26,6 +28,15 @@ class AppCommonTopHeader extends StatelessWidget
     this.actions = const [],
     super.key,
   });
+
+  /// 본문 [AppSystemInsets.pageHorizontal] 좌우 inset과 동일.
+  static const pageHorizontalInset = 15.0;
+
+  /// GNB 뒤로가기 아이콘(20) + 타이틀 사이 — Figma 8dp.
+  static const backToTitleGap = AppSpacing.sm;
+
+  /// GNB 뒤로가기 터치 영역 너비. 아이콘은 좌측 정렬해 본문 15dp와 맞춥니다.
+  static const backIconSlotWidth = 24.0;
 
   final AppCommonTopHeaderVariant variant;
   final String? featureName;
@@ -71,7 +82,9 @@ class AppCommonTopHeader extends StatelessWidget
           child: SizedBox(
             height: preferredSize.height,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(
+                horizontal: pageHorizontalInset,
+              ),
               child: switch (variant) {
                 AppCommonTopHeaderVariant.game => _buildGame(),
                 AppCommonTopHeaderVariant.home => _buildHome(),
@@ -91,7 +104,7 @@ class AppCommonTopHeader extends StatelessWidget
         Expanded(
           child: Row(
             children: [
-              Text(
+              AppText(
                 featureName ?? '기능명',
                 style: AppTextStyles.titleM.copyWith(
                   color: AppComponentColors.headerTitle,
@@ -99,7 +112,7 @@ class AppCommonTopHeader extends StatelessWidget
               ),
               const SizedBox(width: 17),
               Flexible(
-                child: Text(
+                child: AppText(
                   pageName ?? '페이지명',
                   style: AppTextStyles.titleS.copyWith(
                     color: AppComponentColors.headerSubtitle,
@@ -133,7 +146,7 @@ class AppCommonTopHeader extends StatelessWidget
     return Row(
       children: [
         Expanded(
-          child: Text(
+          child: AppText(
             title ?? 'LG ThinQ',
             style: AppTextStyles.headlineM.copyWith(
               color: AppComponentColors.headerTitle,
@@ -160,15 +173,12 @@ class AppCommonTopHeader extends StatelessWidget
         Expanded(
           child: Row(
             children: [
-              if (onBack != null)
-                _HeaderIconButton(
-                  icon: Icons.arrow_back,
-                  onPressed: onBack,
-                  size: 20,
-                ),
-              const SizedBox(width: 2),
+              if (onBack != null) ...[
+                _HeaderBackButton(onPressed: onBack!),
+                const SizedBox(width: backToTitleGap),
+              ],
               Expanded(
-                child: Text(
+                child: AppText(
                   title ?? '타이틀',
                   style: AppTextStyles.titleM.copyWith(
                     color: AppComponentColors.headerTitle,
@@ -207,8 +217,8 @@ class AppCommonTopHeader extends StatelessWidget
     return Row(
       children: [
         if (onBack != null) ...[
-          _HeaderIconButton(icon: Icons.arrow_back, onPressed: onBack),
-          const SizedBox(width: 8),
+          _HeaderBackButton(onPressed: onBack!, iconSize: 24),
+          const SizedBox(width: backToTitleGap),
         ],
         Expanded(
           child: AppSearchTextField(
@@ -217,6 +227,30 @@ class AppCommonTopHeader extends StatelessWidget
           ),
         ),
       ],
+    );
+  }
+}
+
+/// GNB/Search 뒤로가기 — 아이콘 좌측을 본문 inset(15dp)에 맞추고, 타이틀과 8dp 간격.
+class _HeaderBackButton extends StatelessWidget {
+  const _HeaderBackButton({required this.onPressed, this.iconSize = 20});
+
+  final VoidCallback onPressed;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: AppCommonTopHeader.backIconSlotWidth,
+      height: iconSize,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: _HeaderIconButton(
+          icon: Icons.arrow_back,
+          onPressed: onPressed,
+          size: iconSize,
+        ),
+      ),
     );
   }
 }
@@ -248,8 +282,11 @@ class _HeaderIconButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       icon: iconWidget,
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.zero,
       constraints: BoxConstraints(minWidth: size, minHeight: size),
+      style: IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
     );
   }
 }

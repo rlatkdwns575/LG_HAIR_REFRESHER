@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/widgets/app_text.dart';
 
 import '../data/refresh_mode_availability.dart';
 
@@ -7,7 +8,7 @@ void showRefreshScentUnavailableSnackBar(BuildContext context) {
     ..hideCurrentSnackBar()
     ..showSnackBar(
       const SnackBar(
-        content: Text(RefreshModeAvailability.unavailableReason),
+        content: AppText(RefreshModeAvailability.unavailableReason),
         behavior: SnackBarBehavior.floating,
       ),
     );

@@ -1,3 +1,4 @@
+import '../../../measure/data/model/measure_result_record.dart';
 import 'care_status.dart';
 
 /// 케어 집중 유형 (요약 메시지·통계 계산용).
@@ -28,6 +29,7 @@ class RefreshHistoryRecord {
     this.dustAfterStatus,
     this.resultMessage,
     this.isDiagnosis = false,
+    this.measureRecord,
   });
 
   /// 측정/리프레시가 일어난 시각 (날짜 + 시간).
@@ -49,6 +51,9 @@ class RefreshHistoryRecord {
 
   /// 리프레시가 아닌 헤어 상태 진단 기록 여부.
   final bool isDiagnosis;
+
+  /// 진단 기록의 원본 측정 데이터 (진단 상세 화면 연동용).
+  final MeasureResultRecord? measureRecord;
 
   /// 날짜만 (시간 0으로 정규화) — 캘린더 그룹핑 키.
   DateTime get dateKey => DateTime(dateTime.year, dateTime.month, dateTime.day);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -137,7 +138,7 @@ class _MeasureRunPageState extends State<MeasureRunPage>
               child: Center(
                 child: TextButton(
                   onPressed: _navigated ? null : _requestStop,
-                  child: Text(
+                  child: AppText(
                     '중단하기',
                     style: AppTextStyles.labelL.copyWith(
                       color: AppColors.gray500,

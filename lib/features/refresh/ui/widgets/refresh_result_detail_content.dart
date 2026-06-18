@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -8,7 +9,7 @@ import '../../../../shared/widgets/app_section_divider.dart';
 import '../../data/model/refresh_result_detail.dart';
 import 'refresh_result_detail_metric_bars.dart';
 import 'refresh_result_detail_status_section.dart';
-import 'refresh_result_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 
 /// Figma 1170-16711 — 리프레시 결과 상세보기 본문.
 class RefreshResultDetailContent extends StatelessWidget {
@@ -72,7 +73,7 @@ class RefreshResultDetailContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           '리프레시 결과',
           style: AppTextStyles.titleL.copyWith(
             color: AppColors.gray900,
@@ -80,7 +81,7 @@ class RefreshResultDetailContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        AppText(
           '결과는 2시간 동안 유지되며, 이후 기록에서 확인할 수 있어요.',
           style: AppTextStyles.bodyS.copyWith(
             color: AppColors.gray500,
@@ -107,18 +108,18 @@ class RefreshResultDetailContent extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: modeBlueText,
+                  text: modeBlueText.softWrapWords(),
                   style: modeLineStyle.copyWith(color: AppColors.primary500),
                 ),
                 TextSpan(
-                  text: modeBlackSuffix,
+                  text: modeBlackSuffix.softWrapWords(),
                   style: modeLineStyle.copyWith(color: AppColors.gray900),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          Text(
+          AppText(
             '리프레시 필요도가',
             style: AppTextStyles.titleM.copyWith(
               color: AppColors.gray900,
@@ -130,7 +131,7 @@ class RefreshResultDetailContent extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: detail.necessityReductionLabel,
+                  text: detail.necessityReductionLabel.softWrapWords(),
                   style: AppTextStyles.headlineL.copyWith(
                     color: AppColors.gray900,
                     fontWeight: FontWeight.w800,
@@ -139,7 +140,7 @@ class RefreshResultDetailContent extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: ' 낮아졌어요.',
+                  text: ' 낮아졌어요.'.softWrapWords(),
                   style: AppTextStyles.titleM.copyWith(
                     color: AppColors.gray900,
                     fontWeight: FontWeight.w600,
@@ -149,7 +150,7 @@ class RefreshResultDetailContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Text(
+          AppText(
             '현재 케어 필요도 ${detail.currentCareNeedLabel}',
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray600,
@@ -176,7 +177,7 @@ class _SummaryMessageCard extends StatelessWidget {
         color: AppColors.gray50,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      child: Text(
+      child: AppText(
         message,
         textAlign: TextAlign.center,
         style: AppTextStyles.bodyXs.copyWith(
@@ -195,24 +196,17 @@ class _NecessityHelpRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '리프레시 필요도',
-            style: AppTextStyles.bodyS.copyWith(
-              color: AppColors.gray600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 3),
-          RefreshResultHelpIcon(
-            tooltipMessage: RefreshResultDetail.necessityHelpTooltip,
-            size: 16,
-            placement: RefreshResultHelpTooltipPlacement.belowEnd,
-            tooltipMaxWidth: 240,
-          ),
-        ],
+      child: AppMetricHelpIcon(
+        label: '리프레시 필요도',
+        labelStyle: AppTextStyles.bodyS.copyWith(
+          color: AppColors.gray600,
+          fontWeight: FontWeight.w500,
+        ),
+        tooltipMessage: RefreshResultDetail.necessityHelpTooltip,
+        size: 16,
+        placement: AppMetricHelpTooltipPlacement.belowStart,
+        tooltipMaxWidth: 240,
+        labelIconGap: 3,
       ),
     );
   }

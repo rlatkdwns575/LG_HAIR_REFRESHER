@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -6,7 +7,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/refresh_result_detail.dart';
-import 'refresh_result_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 
 /// Figma 1182-20490 — 냄새 / 먼지 / 모발 상태 섹션.
 class RefreshResultDetailStatusSection extends StatelessWidget {
@@ -32,7 +33,7 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
+          AppText(
             section.title,
             style: AppTextStyles.titleM.copyWith(
               color: AppColors.gray900,
@@ -40,8 +41,9 @@ class RefreshResultDetailStatusSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          AppText(
             section.description,
+            breakLinesBySentence: true,
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray500,
               height: 1.45,
@@ -117,8 +119,9 @@ class _InsightCard extends StatelessWidget {
             backgroundColor: insight.badgeBackgroundColor,
           ),
           const SizedBox(height: 12),
-          Text(
+          AppText(
             insight.description,
+            breakLinesBySentence: true,
             textAlign: TextAlign.start,
             style: AppTextStyles.bodyS.copyWith(
               color: AppColors.gray900,
@@ -156,7 +159,7 @@ class _OutlineBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.sm),
         border: _showBorder ? Border.all(color: borderColor, width: 1) : null,
       ),
-      child: Text(
+      child: AppText(
         label,
         style: AppTextStyles.labelS.copyWith(
           color: textColor,
@@ -262,24 +265,23 @@ class _MetricLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyS.copyWith(
-            color: AppColors.gray900,
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-          ),
-        ),
-        if (showHelpIcon &&
-            helpTooltipMessage != null &&
-            helpTooltipMessage!.isNotEmpty) ...[
-          const SizedBox(width: 2),
-          RefreshResultHelpIcon(tooltipMessage: helpTooltipMessage!),
-        ],
-      ],
+    final labelStyle = AppTextStyles.bodyS.copyWith(
+      color: AppColors.gray900,
+      fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
     );
+
+    if (showHelpIcon &&
+        helpTooltipMessage != null &&
+        helpTooltipMessage!.isNotEmpty) {
+      return AppMetricHelpIcon(
+        label: label,
+        labelStyle: labelStyle,
+        tooltipMessage: helpTooltipMessage!,
+        placement: AppMetricHelpTooltipPlacement.belowEnd,
+      );
+    }
+
+    return AppText(label, style: labelStyle);
   }
 }
 

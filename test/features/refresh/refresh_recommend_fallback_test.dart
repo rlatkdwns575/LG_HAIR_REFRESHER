@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/home/data/model/environment_snapshot.dart';
 import 'package:lg_hair_refresher/features/refresh/data/api/refresh_recommend_fallback.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
 
 void main() {
   final candidates = [
@@ -32,15 +34,24 @@ void main() {
     ),
   ];
 
+  RefreshRecommendInput context(EnvironmentSnapshot environment) {
+    return RefreshRecommendInput(
+      basis: RefreshRecommendBasis.weatherOnly,
+      environment: environment,
+    );
+  }
+
   group('RefreshRecommendFallback.pickMode', () {
     test('비·눈 날씨면 날씨 카테고리를 우선한다', () {
       final mode = RefreshRecommendFallback.pickMode(
         candidates: candidates,
-        environment: const EnvironmentSnapshot(
-          temperatureCelsius: 18,
-          humidityPercent: 50,
-          isRaining: true,
-          isSnowing: false,
+        context: context(
+          const EnvironmentSnapshot(
+            temperatureCelsius: 18,
+            humidityPercent: 50,
+            isRaining: true,
+            isSnowing: false,
+          ),
         ),
       );
 
@@ -50,11 +61,13 @@ void main() {
     test('높은 습도면 외출 후 카테고리를 우선한다', () {
       final mode = RefreshRecommendFallback.pickMode(
         candidates: candidates,
-        environment: const EnvironmentSnapshot(
-          temperatureCelsius: 24,
-          humidityPercent: 75,
-          isRaining: false,
-          isSnowing: false,
+        context: context(
+          const EnvironmentSnapshot(
+            temperatureCelsius: 24,
+            humidityPercent: 75,
+            isRaining: false,
+            isSnowing: false,
+          ),
         ),
       );
 
@@ -64,11 +77,13 @@ void main() {
     test('기본 조건이면 외출 전 카테고리를 우선한다', () {
       final mode = RefreshRecommendFallback.pickMode(
         candidates: candidates,
-        environment: const EnvironmentSnapshot(
-          temperatureCelsius: 22,
-          humidityPercent: 45,
-          isRaining: false,
-          isSnowing: false,
+        context: context(
+          const EnvironmentSnapshot(
+            temperatureCelsius: 22,
+            humidityPercent: 45,
+            isRaining: false,
+            isSnowing: false,
+          ),
         ),
       );
 
@@ -78,11 +93,13 @@ void main() {
     test('후보가 비어 있으면 null을 반환한다', () {
       final mode = RefreshRecommendFallback.pickMode(
         candidates: const [],
-        environment: const EnvironmentSnapshot(
-          temperatureCelsius: 22,
-          humidityPercent: 45,
-          isRaining: false,
-          isSnowing: false,
+        context: context(
+          const EnvironmentSnapshot(
+            temperatureCelsius: 22,
+            humidityPercent: 45,
+            isRaining: false,
+            isSnowing: false,
+          ),
         ),
       );
 

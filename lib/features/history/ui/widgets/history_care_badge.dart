@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -27,7 +28,7 @@ class HistoryCareBadge extends StatelessWidget {
         color: status.backgroundColor,
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
-      child: Text(
+      child: AppText(
         status.label,
         maxLines: 1,
         softWrap: false,
@@ -94,7 +95,7 @@ class HistoryCareStatusRow extends StatelessWidget {
       children: [
         SizedBox(
           width: compact ? 44 : labelWidth,
-          child: Text(
+          child: AppText(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

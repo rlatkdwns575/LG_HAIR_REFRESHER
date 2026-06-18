@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
@@ -39,7 +40,7 @@ class AppTextLinkButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: AppTextStyles.labelM),
+          AppText(label, style: AppTextStyles.labelM),
           if (showChevron) ...[
             const SizedBox(width: 2),
             const Icon(Icons.chevron_right, size: 20),

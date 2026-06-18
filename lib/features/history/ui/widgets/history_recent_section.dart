@@ -27,7 +27,7 @@ class HistoryRecentSection extends StatelessWidget {
     required this.onCalendarIconTap,
     required this.onDateSelected,
     required this.onToggleExpanded,
-    this.onDayResultDetailTap,
+    this.onRecordDetailTap,
     super.key,
   });
 
@@ -43,7 +43,7 @@ class HistoryRecentSection extends StatelessWidget {
   final VoidCallback onCalendarIconTap;
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback onToggleExpanded;
-  final VoidCallback? onDayResultDetailTap;
+  final ValueChanged<RefreshHistoryRecord>? onRecordDetailTap;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +89,7 @@ class HistoryRecentSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           _SelectedDayCard(
             group: selectedGroup,
-            onDetailTap: onDayResultDetailTap,
+            onRecordDetailTap: onRecordDetailTap,
           ),
         ],
       ],
@@ -129,7 +129,7 @@ class _MonthNavRow extends StatelessWidget {
           onTap: onPrevious,
         ),
         const SizedBox(width: 4),
-        Text(
+        AppText(
           _label,
           style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
         ),
@@ -208,18 +208,18 @@ class _MonthlySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${summary.month.month}월 간 총 ${summary.totalCount}회 리프레시 했어요.',
+          AppText(
+            '${summary.month.month}월 총 리프레시 횟수 : ${summary.totalCount}회',
             style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(
+              AppText(
                 '지난 $_previousMonthLabel보다 ',
                 style: AppTextStyles.bodyS.copyWith(color: AppColors.gray900),
               ),
-              Text(
+              AppText(
                 '↑${summary.vsLastMonthDelta}회',
                 style: AppTextStyles.bodyS.copyWith(
                   color: AppColors.primary500,
@@ -251,48 +251,84 @@ class _MonthlySummaryCard extends StatelessWidget {
   }
 }
 
-class _SelectedDayCard extends StatelessWidget {
-  const _SelectedDayCard({required this.group, this.onDetailTap});
+class _SelectedDayCard extends StatefulWidget {
+  const _SelectedDayCard({required this.group, this.onRecordDetailTap});
 
   final RefreshDayGroup group;
-  final VoidCallback? onDetailTap;
+  final ValueChanged<RefreshHistoryRecord>? onRecordDetailTap;
+
+  @override
+  State<_SelectedDayCard> createState() => _SelectedDayCardState();
+}
+
+class _SelectedDayCardState extends State<_SelectedDayCard> {
+  bool _showAllRecords = false;
+
+  @override
+  void didUpdateWidget(covariant _SelectedDayCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_isSameDay(oldWidget.group.date, widget.group.date)) {
+      _showAllRecords = false;
+    }
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final group = widget.group;
+    final records = group.records;
+    final hasHiddenRecords = records.length > historyMaxVisibleDayRecords;
+    final visibleRecords = _showAllRecords || !hasHiddenRecords
+        ? records
+        : records.take(historyMaxVisibleDayRecords).toList();
+
     return HistoryWhiteCard(
       backgroundColor: AppColors.gray50,
       borderColor: null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  formatKoreanDateWithWeekday(group.date),
-                  style: AppTextStyles.bodyM2.copyWith(
-                    color: AppColors.gray900,
-                  ),
-                ),
-              ),
-              HistoryDetailLink(label: '결과 상세보기', onTap: onDetailTap),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            '총 ${group.count}번 리프레시했어요.',
+          AppText(
+            formatKoreanDateWithWeekday(group.date),
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
+          const SizedBox(height: AppSpacing.sm),
+          if (group.refreshCount > 0)
+            AppText(
+              '리프레시를 총 ${group.refreshCount}번 완료했어요.',
+              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            ),
+          if (group.diagnosisCount > 0) ...[
+            if (group.refreshCount > 0) const SizedBox(height: 2),
+            AppText(
+              '헤어 상태 진단을 총 ${group.diagnosisCount}번 완료했어요.',
+              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            ),
+          ],
           const SizedBox(height: 2),
           AppText(
             group.summaryMessage,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
           ),
           const SizedBox(height: AppSpacing.md),
-          for (var i = 0; i < group.records.length; i++) ...[
+          for (var i = 0; i < visibleRecords.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacing.sm),
-            _DayRecordTile(record: group.records[i]),
+            _DayRecordTile(
+              record: visibleRecords[i],
+              onTap: widget.onRecordDetailTap == null
+                  ? null
+                  : () => widget.onRecordDetailTap!(visibleRecords[i]),
+            ),
+          ],
+          if (hasHiddenRecords) ...[
+            const SizedBox(height: AppSpacing.sm),
+            HistoryRecordsExpandToggle(
+              expanded: _showAllRecords,
+              onTap: () => setState(() => _showAllRecords = !_showAllRecords),
+            ),
           ],
         ],
       ),
@@ -301,35 +337,42 @@ class _SelectedDayCard extends StatelessWidget {
 }
 
 class _DayRecordTile extends StatelessWidget {
-  const _DayRecordTile({required this.record});
+  const _DayRecordTile({required this.record, this.onTap});
 
   final RefreshHistoryRecord record;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    final content = Padding(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.gray0,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
       child: Row(
         children: [
-          Text(
+          AppText(
             formatKoreanTime(record.dateTime),
             style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
           ),
           const SizedBox(width: 8),
-          Flexible(
-            child: Text(
+          Expanded(
+            child: AppText(
               record.modeName,
               style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right, size: 18, color: AppColors.gray400),
+          ],
         ],
       ),
+    );
+
+    return Material(
+      color: AppColors.gray0,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(onTap: onTap, child: content),
     );
   }
 }

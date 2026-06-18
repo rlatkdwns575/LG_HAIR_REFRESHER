@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/constants/external_urls.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../data/api/settings_api.dart';
 import '../../data/model/settings_device_detail.dart';
-import '../../../../shared/models/scent_cartridge_status.dart';
 import '../widgets/device_manage_scent_guide.dart';
 import '../widgets/device_manage_status_panel.dart';
 import '../widgets/settings_section_card.dart';
@@ -49,7 +50,23 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('$feature 기능은 준비 중입니다.'),
+          content: AppText('$feature 기능은 준비 중입니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+  }
+
+  Future<void> _openLgeHome() async {
+    final uri = Uri.parse(ExternalUrls.lgeHome);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!mounted || launched) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: AppText('LGE.com 페이지를 열지 못했습니다.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -63,13 +80,6 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
       return deviceId;
     }
     return '···${deviceId.substring(deviceId.length - 8)}';
-  }
-
-  String _scentCategoryDisplayValue(ScentCartridgeStatus cartridge) {
-    if (!cartridge.isAttached) {
-      return '카트리지 없음';
-    }
-    return cartridge.categoryLabel ?? '미등록';
   }
 
   @override
@@ -112,28 +122,6 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
                         label: '연결 상태',
                         value: _device.isConnected ? '연결됨' : '연결 안 됨',
                       ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '배터리',
-                        value: '${_device.batteryPercent}%',
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '필터 잔량',
-                        value: '${_device.filterRemainingPercent}%',
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '향 카트리지',
-                        value: _device.scentCartridge.detailDisplayValue,
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '향 종류',
-                        value: _scentCategoryDisplayValue(
-                          _device.scentCartridge,
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -142,17 +130,7 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
                     children: [
                       DeviceManageScentCartridgeGuide(
                         cartridge: _device.scentCartridge,
-                      ),
-                      const SettingsDivider(),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
-                        child: Text(
-                          _consumableTip(_device),
-                          style: AppTextStyles.bodyS.copyWith(
-                            color: AppColors.gray600,
-                            height: 1.5,
-                          ),
-                        ),
+                        onPurchaseTap: _openLgeHome,
                       ),
                     ],
                   ),
@@ -180,18 +158,5 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
               ),
             ),
     );
-  }
-
-  String _consumableTip(SettingsDeviceDetail device) {
-    if (device.filterRemainingPercent <= 10) {
-      return '필터 잔량이 거의 없습니다. 교체 후 리프레시 효과가 떨어지지 않도록 관리해 주세요.';
-    }
-    if (device.filterRemainingPercent <= 30) {
-      return '필터 교체 시기가 가까워졌습니다. 교체 예정일을 확인하고 미리 준비해 두세요.';
-    }
-    if (device.batteryPercent <= 20) {
-      return '배터리가 부족합니다. 충전 후 측정·리프레시를 진행하면 더 안정적으로 사용할 수 있습니다.';
-    }
-    return '배터리·필터·향 카트리지를 정기적으로 확인해 주세요.';
   }
 }

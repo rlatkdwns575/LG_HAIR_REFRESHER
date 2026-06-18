@@ -30,7 +30,7 @@ class RefreshSectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppText(
                   title,
                   style: AppTextStyles.titleM.copyWith(
                     color: AppColors.gray800,
@@ -55,7 +55,7 @@ class RefreshSectionHeader extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  AppText(
                     trailingLabel!,
                     style: AppTextStyles.labelM.copyWith(
                       color: AppColors.gray500,

@@ -45,7 +45,15 @@ class RefreshDayGroup {
   final List<RefreshHistoryRecord> records;
   final String summaryMessage;
 
+  /// 진단 포함 전체 기록 수.
   int get count => records.length;
+
+  /// 리프레시(진단 제외) 기록 수.
+  int get refreshCount => records.where((record) => !record.isDiagnosis).length;
+
+  /// 헤어 상태 진단 기록 수.
+  int get diagnosisCount =>
+      records.where((record) => record.isDiagnosis).length;
 }
 
 /// 가로 막대 통계 한 줄.
@@ -88,11 +96,15 @@ class ModeUsage {
     required this.count,
     required this.modeName,
     required this.improvementPercent,
+    this.isMostUsed = false,
+    this.isBestImprovement = false,
   });
 
   final int count;
   final String modeName;
   final double improvementPercent;
+  final bool isMostUsed;
+  final bool isBestImprovement;
 }
 
 /// 인사이트 카드 (제목 + 설명들 + 막대).
@@ -163,7 +175,10 @@ class RefreshHistoryMonthData {
   }
 
   Map<DateTime, int> get countByDate {
-    return {for (final group in dayGroups) group.date: group.count};
+    return {
+      for (final group in dayGroups)
+        if (group.refreshCount > 0) group.date: group.refreshCount,
+    };
   }
 
   RefreshDayGroup? groupForDate(DateTime date) {
@@ -210,10 +225,15 @@ class RefreshTotalSummary {
   final String modeUsageDescription;
   final List<ModeUsage> modeUsages;
 
-  /// 가장 개선도가 높은 모드 (해당 항목 강조용).
+  /// 가장 개선도가 높은 모드 (상위 5개 중, 해당 % 강조용).
   ModeUsage? get bestImprovementMode {
     if (modeUsages.isEmpty) {
       return null;
+    }
+    for (final usage in modeUsages) {
+      if (usage.isBestImprovement) {
+        return usage;
+      }
     }
     return modeUsages.reduce(
       (a, b) => a.improvementPercent >= b.improvementPercent ? a : b,
@@ -317,8 +337,8 @@ class RefreshHistoryReport {
     routineSuggestion: const RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
       subtitle: '새로운 루틴으로 등록할까요?',
-      tags: ['퇴근 후 리프레시 케어', '수요일·금요일', '오후 7시', '5분 소요'],
-      weekdays: [3, 5],
+      tags: ['외부 냄새 리프레시', '금요일', '오후 7시', '평균 시간 5분 소요'],
+      weekdays: [5],
       hour: 19,
       minute: 0,
       durationMinutes: 5,
@@ -632,8 +652,18 @@ class RefreshHistoryReport {
       ),
       modeUsageDescription: '00000모드를 가장 많이 사용했어요',
       modeUsages: [
-        ModeUsage(count: 56, modeName: '00000모드', improvementPercent: 70),
-        ModeUsage(count: 12, modeName: '00000모드', improvementPercent: 86),
+        ModeUsage(
+          count: 56,
+          modeName: '00000모드',
+          improvementPercent: 70,
+          isMostUsed: true,
+        ),
+        ModeUsage(
+          count: 12,
+          modeName: '00000모드',
+          improvementPercent: 86,
+          isBestImprovement: true,
+        ),
         ModeUsage(count: 3, modeName: '00000모드', improvementPercent: 50),
       ],
     ),

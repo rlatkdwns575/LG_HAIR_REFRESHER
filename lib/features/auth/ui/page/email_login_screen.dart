@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/services/local_calendar_login_prompt.dart';
 import '../../data/api/auth_api.dart';
 import '../../data/auth_credentials_validator.dart';
 import '../widgets/auth_screen_styles.dart';
@@ -17,6 +19,7 @@ class EmailLoginScreen extends StatefulWidget {
 
 class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final _authApi = const AuthApi();
+  final _calendarLoginPrompt = LocalCalendarLoginPrompt();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -52,7 +55,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: AppText(message),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 
@@ -81,6 +87,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       if (!mounted) {
         return;
       }
+      await _calendarLoginPrompt.showIfNeeded(context);
+      if (!mounted) {
+        return;
+      }
       context.go(AppRoutePaths.home);
     } on AuthApiException catch (error) {
       if (!mounted) {
@@ -90,7 +100,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: AppText(error.message),
             behavior: SnackBarBehavior.floating,
           ),
         );

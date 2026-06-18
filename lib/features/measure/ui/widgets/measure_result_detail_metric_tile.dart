@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/measure_result_detail_metric.dart';
-import 'measure_result_metric_help_icon.dart';
+import '../../../../shared/widgets/app_metric_help_icon.dart';
 
 /// Figma Card_small — 지표 행 (좌우 여백 + 라벨·뱃지 간격).
 class MeasureResultDetailMetricTile extends StatelessWidget {
@@ -22,22 +23,23 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
+            child: metric.showHelpIcon && metric.helpMessage != null
+                ? AppMetricHelpIcon(
+                    label: metric.label,
+                    labelStyle: AppTextStyles.bodyS.copyWith(
+                      color: AppColors.gray900,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    tooltipMessage: metric.helpMessage!,
+                    placement: AppMetricHelpTooltipPlacement.belowEnd,
+                  )
+                : AppText(
                     metric.label,
-                    style: AppTextStyles.titleXs.copyWith(
-                      color: AppColors.gray800,
+                    style: AppTextStyles.bodyS.copyWith(
+                      color: AppColors.gray900,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-                if (metric.showHelpIcon && metric.helpMessage != null) ...[
-                  const SizedBox(width: 2),
-                  MeasureResultMetricHelpIcon(message: metric.helpMessage!),
-                ],
-              ],
-            ),
           ),
           const SizedBox(width: AppSpacing.md),
           _BadgeGroup(metric: metric),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../shared/widgets/app_text.dart';
 
 import '../../core/constants/route_paths.dart';
 import '../layout/app_layout.dart';
@@ -35,7 +36,6 @@ import '../../features/routine/ui/page/routine_register_page.dart';
 import '../../features/settings/ui/page/device_manage_page.dart';
 import '../../features/settings/ui/page/local_calendar_settings_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
-import '../../shared/widgets/shared_widget_gallery_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutePaths.login,
@@ -186,7 +186,9 @@ final appRouter = GoRouter(
         GoRoute(
           name: AppRouteNames.refreshShortcutAdd,
           path: AppRoutePaths.refreshShortcutAdd,
-          builder: (context, state) => const HomeRefreshShortcutAddPage(),
+          builder: (context, state) => HomeRefreshShortcutAddPage(
+            initialMode: resolveRefreshMode(state.extra),
+          ),
         ),
         GoRoute(
           name: AppRouteNames.history,
@@ -223,11 +225,6 @@ final appRouter = GoRouter(
             );
           },
         ),
-        GoRoute(
-          name: AppRouteNames.widgetGallery,
-          path: AppRoutePaths.widgetGallery,
-          builder: (context, state) => const SharedWidgetGalleryPage(),
-        ),
       ],
     ),
   ],
@@ -242,17 +239,17 @@ class _RouteErrorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('페이지를 찾을 수 없습니다')),
+      appBar: AppBar(title: AppText('페이지를 찾을 수 없습니다')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('요청한 경로가 존재하지 않습니다.'),
+              AppText('요청한 경로가 존재하지 않습니다.'),
               if (error != null) ...[
                 const SizedBox(height: 12),
-                Text(
+                AppText(
                   error.toString(),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -261,7 +258,7 @@ class _RouteErrorPage extends StatelessWidget {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => context.go(AppRoutePaths.home),
-                child: const Text('홈으로'),
+                child: AppText('홈으로'),
               ),
             ],
           ),

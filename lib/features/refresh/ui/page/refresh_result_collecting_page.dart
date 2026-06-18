@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/constants/route_paths.dart';
+import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/model/measure_result_record.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
@@ -52,12 +54,7 @@ class _RefreshResultCollectingPageState
     MeasureResultRecord? baseline;
     try {
       baseline = await _measureApi.fetchLatestResult();
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage baseline fetch failed: '
-        '$error\n$stackTrace',
-      );
-    }
+    } catch (_) {}
 
     try {
       final outcome = _resultGenerator.generate(mode: mode, baseline: baseline);
@@ -68,11 +65,8 @@ class _RefreshResultCollectingPageState
         outcome: outcome,
         mode: mode,
       );
-    } on RefreshSessionApiException catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage persist session failed: '
-        '$error\n$stackTrace',
-      );
+      RefreshRecommendService.invalidateCache();
+    } on RefreshSessionApiException catch (_) {
       if (RefreshResultStore.instance.peekPendingResult() == null) {
         final outcome = _resultGenerator.generate(
           mode: mode,
@@ -80,12 +74,7 @@ class _RefreshResultCollectingPageState
         );
         RefreshResultStore.instance.setPending(outcome.result, mode: mode);
       }
-    } catch (error, stackTrace) {
-      debugPrint(
-        'RefreshResultCollectingPage persist session failed: '
-        '$error\n$stackTrace',
-      );
-
+    } catch (_) {
       if (RefreshResultStore.instance.peekPendingResult() == null) {
         final outcome = _resultGenerator.generate(
           mode: mode,
@@ -131,13 +120,13 @@ class _RefreshResultCollectingPageState
             const SizedBox(height: 160),
             const RefreshResultCollectingIllustration(),
             const SizedBox(height: 40),
-            Text(
+            AppText(
               '리프레시 결과를 수집중이에요',
               textAlign: TextAlign.center,
               style: AppTextStyles.titleL.copyWith(color: AppColors.gray900),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
+            AppText(
               '케어 결과를 정리한 뒤 최종 결과를 보여드릴게요.',
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyM1.copyWith(color: AppColors.gray500),

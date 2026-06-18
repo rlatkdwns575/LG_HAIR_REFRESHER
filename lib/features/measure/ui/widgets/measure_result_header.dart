@@ -14,7 +14,7 @@ class MeasureResultHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AppText(
           '진단 결과',
           style: AppTextStyles.titleL.copyWith(
             color: AppColors.gray800,
@@ -23,7 +23,7 @@ class MeasureResultHeader extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         AppText(
-          '진단 결과는 2시간 동안 유지되며, 이후 기록에서 확인할 수 있어요.',
+          '진단 결과는 리프레시 기록에서 확인할 수 있어요.',
           style: AppTextStyles.bodyXs.copyWith(color: AppColors.gray500),
         ),
       ],

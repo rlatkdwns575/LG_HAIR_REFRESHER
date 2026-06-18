@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -43,7 +44,7 @@ class HistoryMonthCalendar extends StatelessWidget {
             for (final label in _weekdayLabels)
               Expanded(
                 child: Center(
-                  child: Text(
+                  child: AppText(
                     label,
                     style: AppTextStyles.labelM.copyWith(
                       color: AppColors.gray500,
@@ -152,7 +153,7 @@ class HistoryMonthCalendar extends StatelessWidget {
                       border: Border.all(color: AppColors.primary500),
                     )
                   : null,
-              child: Text(
+              child: AppText(
                 '${date.day}',
                 style: AppTextStyles.bodyS.copyWith(color: textColor),
               ),
@@ -174,7 +175,7 @@ class HistoryMonthCalendar extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 2),
-                        Text(
+                        AppText(
                           '$count',
                           style: AppTextStyles.labelS.copyWith(
                             color: AppColors.primary500,

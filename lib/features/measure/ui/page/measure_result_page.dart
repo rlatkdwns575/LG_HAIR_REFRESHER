@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/services/device_consumable_service.dart';
@@ -23,7 +24,7 @@ class MeasureResultPage extends StatefulWidget {
 }
 
 class _MeasureResultPageState extends State<MeasureResultPage> {
-  final _recommendService = const MeasureRefreshRecommendService();
+  final _recommendService = MeasureRefreshRecommendService();
   final _deviceConsumableService = const DeviceConsumableService();
 
   MeasureResult? _result;
@@ -82,7 +83,6 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         _isLoading = false;
       });
     } on MeasureApiException catch (error) {
-      debugPrint('MeasureResultPage load failed: $error');
       if (!mounted) {
         return;
       }
@@ -90,8 +90,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         _loadError = error.message;
         _isLoading = false;
       });
-    } catch (error, stackTrace) {
-      debugPrint('MeasureResultPage load failed: $error\n$stackTrace');
+    } catch (_) {
       if (!mounted) {
         return;
       }
@@ -155,7 +154,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
         backgroundColor: AppColors.surface,
         appBar: AppCommonTopHeader(
           variant: AppCommonTopHeaderVariant.gnb,
-          title: '헤어 상태 진단',
+          title: '헤어 상태 진단하기',
           onBack: _goHome,
         ),
         body: _isLoading
@@ -164,7 +163,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
             ? Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(
+                  child: AppText(
                     _loadError ?? '진단 결과가 없습니다.',
                     textAlign: TextAlign.center,
                     style: Theme.of(
@@ -183,7 +182,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                         15,
                         0,
                       ),
-                      child: Text(
+                      child: AppText(
                         _loadError!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.gray500,

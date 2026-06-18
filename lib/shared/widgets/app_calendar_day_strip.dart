@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -43,7 +44,7 @@ class AppCalendarDayStrip extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    AppText(
                       days[i].weekdayLabel,
                       style: AppTextStyles.labelS.copyWith(
                         color: days[i].isSelected
@@ -53,7 +54,7 @@ class AppCalendarDayStrip extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    AppText(
                       days[i].dayLabel,
                       style: AppTextStyles.titleS.copyWith(
                         color: days[i].isSelected

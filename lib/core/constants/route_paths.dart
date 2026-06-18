@@ -34,8 +34,6 @@ class AppRoutePaths {
 
   static const routineList = '/routine';
   static const routineRegister = '/routine/register';
-
-  static const widgetGallery = '/dev/widgets';
 }
 
 class AppRouteNames {
@@ -67,5 +65,4 @@ class AppRouteNames {
   static const settingsLocalCalendar = 'settingsLocalCalendar';
   static const routineList = 'routineList';
   static const routineRegister = 'routineRegister';
-  static const widgetGallery = 'widgetGallery';
 }

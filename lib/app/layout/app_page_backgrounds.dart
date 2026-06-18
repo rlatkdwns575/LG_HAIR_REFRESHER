@@ -40,8 +40,6 @@ abstract final class AppPageBackgrounds {
       AppRoutePaths.settings ||
       AppRoutePaths.settingsDevice ||
       AppRoutePaths.settingsLocalCalendar => AppColors.gray50,
-      // dev — shared_widget_gallery_page.dart
-      AppRoutePaths.widgetGallery => AppColors.gray50,
       // home — home_page.dart (ShellRoute 밖, 참고용)
       AppRoutePaths.home => AppColors.homeBackground,
       _ => _forUnknownPath(path),

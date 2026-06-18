@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
@@ -23,7 +24,7 @@ class SettingsSectionCard extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.sm),
-          child: Text(
+          child: AppText(
             title,
             style: AppTextStyles.labelM.copyWith(color: AppColors.gray600),
           ),
@@ -34,7 +35,10 @@ class SettingsSectionCard extends StatelessWidget {
             color: AppColors.gray0,
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          child: Column(children: children),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
         ),
       ],
     );

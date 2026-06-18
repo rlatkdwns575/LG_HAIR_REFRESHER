@@ -19,22 +19,9 @@ class HomeApi {
   Future<HomeDashboardData> fetchDashboard({String? userId}) async {
     final resolvedUserId = AuthSessionService.resolveUserId(override: userId);
 
-    await _logDiagnostics(resolvedUserId);
-
     var userDevice = await _fetchUserDeviceLink(resolvedUserId);
 
-    if (userDevice == null && kDebugMode) {
-      debugPrint(
-        'HomeApi: no USER_DEVICES for user_id=$resolvedUserId. '
-        'Trying first linked device (debug fallback).',
-      );
-      userDevice = await _fetchUserDeviceLink(null);
-      if (userDevice != null) {
-        debugPrint(
-          'HomeApi dev fallback: using user_id=${userDevice['user_id']}.',
-        );
-      }
-    }
+    userDevice ??= await _fetchUserDeviceLink(null);
 
     if (userDevice == null) {
       throw HomeApiException(
@@ -52,21 +39,7 @@ class HomeApi {
     final device = await _fetchDevice(deviceId);
     final consumable = await _fetchConsumableStatus(deviceId);
 
-    if (kDebugMode) {
-      debugPrint(
-        'HomeApi consumable_status for device_id=$deviceId: $consumable',
-      );
-    }
-
     final statusSnapshot = _snapshotFromConsumable(consumable);
-
-    if (kDebugMode) {
-      debugPrint(
-        'HomeApi resolved percents for user_id=$resolvedUserId '
-        'device_id=$deviceId: battery=${statusSnapshot.batteryPercent} '
-        'filter=${statusSnapshot.filterStatus.label}',
-      );
-    }
 
     final rawModelName = device?['model_name'] as String? ?? _defaultModelName;
     final displayModelName = _displayModelName(rawModelName);
@@ -166,53 +139,6 @@ class HomeApi {
     );
   }
 
-  Future<void> _logDiagnostics(String userId) async {
-    if (!kDebugMode) {
-      return;
-    }
-
-    try {
-      final authUser = await SupabaseService.client
-          .from(SupabaseTables.authUsers)
-          .select('user_id, email, nickname')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-      final linkedDevices = await SupabaseService.client
-          .from(SupabaseTables.userDevices)
-          .select('user_device_id, user_id, device_id')
-          .eq('user_id', userId);
-
-      final anyLinks = await SupabaseService.client
-          .from(SupabaseTables.userDevices)
-          .select('user_device_id, user_id, device_id')
-          .limit(5);
-
-      debugPrint(
-        'HomeApi diagnostics for user_id=$userId: '
-        'AUTH_USERS=${authUser != null ? 'found' : 'missing'}, '
-        'USER_DEVICES(filtered)=${linkedDevices.length}, '
-        'USER_DEVICES(any visible)=${anyLinks.length}',
-      );
-
-      if (authUser != null && linkedDevices.isEmpty && anyLinks.isNotEmpty) {
-        debugPrint(
-          'HomeApi: AUTH_USERS는 있지만 USER_DEVICES에 이 user_id 연결이 없습니다. '
-          'USER_DEVICES.user_id=${anyLinks.first['user_id']} 등과 불일치할 수 있습니다.',
-        );
-      }
-
-      if (anyLinks.isEmpty) {
-        debugPrint(
-          'HomeApi: USER_DEVICES 테이블에서 보이는 행이 0건입니다. '
-          '데이터 미삽입 또는 RLS 정책으로 anon/publishable key read가 차단됐을 수 있습니다.',
-        );
-      }
-    } catch (error, stackTrace) {
-      debugPrint('HomeApi diagnostics failed: $error\n$stackTrace');
-    }
-  }
-
   Future<Map<String, dynamic>?> _fetchUserDeviceLink(String? userId) async {
     var query = SupabaseService.client
         .from(SupabaseTables.userDevices)
@@ -295,8 +221,7 @@ class HomeApi {
         captionItems: _buildCaptionItems(mode),
         requiresScentCartridge: mode['scent_yn'] == true,
       );
-    } catch (error, stackTrace) {
-      debugPrint('HomeApi frequent mode lookup failed: $error\n$stackTrace');
+    } catch (_) {
       return null;
     }
   }
@@ -357,12 +282,6 @@ class HomeApi {
       if (value is num) {
         return value.round();
       }
-    }
-
-    if (kDebugMode) {
-      debugPrint(
-        'HomeApi: missing $fieldName in CONSUMABLE_STATUS row keys=${row.keys}',
-      );
     }
 
     return fallback;

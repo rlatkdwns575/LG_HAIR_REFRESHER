@@ -3,37 +3,48 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/app/app.dart';
 import 'package:lg_hair_refresher/app/router/app_router.dart';
 import 'package:lg_hair_refresher/core/constants/route_paths.dart';
+import 'package:lg_hair_refresher/features/home/ui/widgets/home_quick_refresh_row.dart';
+
+import 'test_helpers.dart';
 
 void main() {
   testWidgets('shows login screen on app start', (tester) async {
     await tester.pumpWidget(const LgHairRefresherApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Google로 로그인하기'), findsOneWidget);
-    expect(find.text('이메일로 로그인'), findsOneWidget);
     expect(find.byType(Image), findsAtLeastNWidgets(2));
+    expect(findDisplayText('Google로 로그인하기'), findsOneWidget);
+    expect(findDisplayText('이메일로 로그인'), findsOneWidget);
   });
 
   testWidgets('shows home dashboard screen', (tester) async {
     appRouter.go(AppRoutePaths.home);
     await tester.pumpWidget(const LgHairRefresherApp());
-    await tester.pumpAndSettle();
+    await tester.pump();
 
-    expect(find.text('LG 퓨리헤어'), findsOneWidget);
-    expect(find.text('배터리'), findsOneWidget);
-    expect(find.text('60%'), findsOneWidget);
-    expect(find.text('필터 상태'), findsOneWidget);
-    expect(find.text('좋음'), findsOneWidget);
-    expect(find.text('디바이스 관리'), findsOneWidget);
-    expect(find.text('취침 전 안심 케어'), findsOneWidget);
-    expect(find.text('자주 쓰는 리프레시를\n홈에 등록해보세요.'), findsOneWidget);
-    expect(find.text('자주 사용한 모드'), findsNothing);
-    expect(find.text('자주 사용'), findsNothing);
-    expect(find.text('추천'), findsOneWidget);
-    expect(find.text('리프레시 모드 보기'), findsOneWidget);
-    expect(find.text('헤어 상태 진단'), findsOneWidget);
-    expect(find.text('리프레시 기록 보기'), findsOneWidget);
+    // Supabase/날씨 API 미초기화 환경에서 대시보드 로딩 완료까지 대기.
+    // pumpAndSettle은 홈 디바이스 폴링 타이머 때문에 타임아웃됩니다.
+    for (var i = 0; i < 50; i++) {
+      if (find.byType(CircularProgressIndicator).evaluate().isEmpty) {
+        break;
+      }
+      await tester.binding.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+    }
+
+    expect(findDisplayText('LG 퓨리헤어'), findsOneWidget);
+    expect(findDisplayText('배터리'), findsOneWidget);
+    expect(findDisplayText('60%'), findsOneWidget);
+    expect(findDisplayText('필터 상태'), findsOneWidget);
+    expect(findDisplayText('좋음'), findsOneWidget);
+    expect(findDisplayText('디바이스 관리'), findsOneWidget);
+    expect(find.byType(HomeQuickRefreshRow), findsOneWidget);
+    expect(findDisplayText('리프레시하기'), findsOneWidget);
+    expect(findDisplayText('헤어 상태 진단하기'), findsOneWidget);
+    expect(findDisplayText('리프레시 기록 보기'), findsOneWidget);
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.widgets_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.widgets_outlined), findsNothing);
   });
 }

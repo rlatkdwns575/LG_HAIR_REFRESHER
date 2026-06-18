@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_text.dart';
 
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -35,7 +36,7 @@ class AppCalendarItem extends StatelessWidget {
               minimumSize: const Size(45, 34),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: Text(
+            child: AppText(
               todayLabel,
               style: AppTextStyles.bodyM1.copyWith(
                 color: AppComponentColors.calendarPrimaryText,
@@ -49,7 +50,7 @@ class AppCalendarItem extends StatelessWidget {
               children: [
                 _NavIconButton(icon: Icons.chevron_left, onPressed: onPrevious),
                 const SizedBox(width: 8),
-                Text(
+                AppText(
                   value,
                   style: AppTextStyles.headlineM.copyWith(
                     color: AppComponentColors.calendarPrimaryText,

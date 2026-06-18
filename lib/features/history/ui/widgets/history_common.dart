@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -88,7 +89,7 @@ class HistoryKeyValueRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Text(
+          child: AppText(
             label,
             style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
           ),
@@ -98,12 +99,12 @@ class HistoryKeyValueRow extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              AppText(
                 value,
                 style: AppTextStyles.bodyM2.copyWith(color: valueColor),
               ),
               const SizedBox(width: 2),
-              Text(
+              AppText(
                 trailingDelta!,
                 style: AppTextStyles.labelM.copyWith(
                   color: AppColors.primary500,
@@ -112,8 +113,44 @@ class HistoryKeyValueRow extends StatelessWidget {
             ],
           )
         else
-          Text(value, style: AppTextStyles.bodyM2.copyWith(color: valueColor)),
+          AppText(
+            value,
+            style: AppTextStyles.bodyM2.copyWith(color: valueColor),
+          ),
       ],
+    );
+  }
+}
+
+/// 하루 기록 목록 — 접힘 시 최대 표시 개수.
+const historyMaxVisibleDayRecords = 3;
+
+/// 하루 기록 접기/펼치기 토글.
+class HistoryRecordsExpandToggle extends StatelessWidget {
+  const HistoryRecordsExpandToggle({
+    required this.expanded,
+    required this.onTap,
+    super.key,
+  });
+
+  final bool expanded;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        height: 28,
+        child: Center(
+          child: Icon(
+            expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            size: 22,
+            color: AppColors.gray400,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -133,7 +170,7 @@ class HistoryDetailLink extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          AppText(
             label,
             style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
           ),

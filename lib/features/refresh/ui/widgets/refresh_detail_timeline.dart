@@ -17,15 +17,25 @@ class RefreshDetailTimeline extends StatelessWidget {
   final String totalDurationLabel;
   final List<RefreshModeDetailStep> steps;
 
-  static const double _dotSize = 10;
+  static const double _dotSize = 8;
   static const double _lineWidth = 1;
   static const double _railWidth = 22;
-  static const double _textGap = 18;
+  static const double _textGap = 7;
   static const Color _timelineLineColor = Color(0xFFE6EAF0);
-  static const double _dotTopPadding = 8;
+  static const double _dotTopPadding = 6;
   static const double _dotCenterYOffset = _dotTopPadding + _dotSize / 2;
-  static const double _lineEndExtension = 84;
-  static const double _stepContentHeight = 54;
+
+  /// Figma: 총소요시간 ↔ 단계 목록 간격 20px.
+  static const double _durationToStepsGap = 20;
+
+  /// Figma: 단계 간 세로 간격 28px.
+  static const double _stepGap = 28;
+
+  /// 연결선 높이 계산용 — 제목·설명 1줄 기준 행 높이.
+  static const double _stepRowHeight = 48;
+
+  /// 첫·마지막 점 바깥으로 연장하는 세로선 길이.
+  static const double _lineEndExtension = 63;
 
   static const double _contentIndent = _railWidth + _textGap;
 
@@ -33,8 +43,7 @@ class RefreshDetailTimeline extends StatelessWidget {
     if (stepCount <= 1) {
       return _dotCenterYOffset;
     }
-    return _dotCenterYOffset +
-        (stepCount - 1) * (_stepContentHeight + AppSpacing.lg);
+    return _dotCenterYOffset + (stepCount - 1) * (_stepRowHeight + _stepGap);
   }
 
   @override
@@ -52,7 +61,7 @@ class RefreshDetailTimeline extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(left: _contentIndent),
-              child: Text(
+              child: AppText(
                 totalDurationLabel,
                 style: AppTextStyles.labelL.copyWith(
                   color: AppColors.gray500,
@@ -60,21 +69,22 @@ class RefreshDetailTimeline extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: _durationToStepsGap),
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Positioned(
-                  left: (_railWidth - _lineWidth) / 2,
-                  top: _dotCenterYOffset - _lineEndExtension,
-                  height:
-                      (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
-                      (_lineEndExtension * 2),
-                  child: Container(
-                    width: _lineWidth,
-                    color: _timelineLineColor,
+                if (steps.length > 1)
+                  Positioned(
+                    left: (_railWidth - _lineWidth) / 2,
+                    top: _dotCenterYOffset - _lineEndExtension,
+                    height:
+                        (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
+                        (_lineEndExtension * 2),
+                    child: Container(
+                      width: _lineWidth,
+                      color: _timelineLineColor,
+                    ),
                   ),
-                ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +114,9 @@ class _TimelineStepRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.lg),
+      padding: EdgeInsets.only(
+        bottom: isLast ? 0 : RefreshDetailTimeline._stepGap,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,24 +152,27 @@ class _TimelineStepRow extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(
-                        text: '${step.durationLabel} ',
+                        text: '${step.durationLabel} '.softWrapWords(),
                         style: const TextStyle(color: AppColors.primary500),
                       ),
                       TextSpan(
-                        text: step.title,
+                        text: step.title.softWrapWords(),
                         style: const TextStyle(color: AppColors.gray900),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                AppText(
-                  step.description,
-                  style: AppTextStyles.bodyM1.copyWith(
-                    color: AppColors.gray500,
-                    height: 1.5,
+                if (step.description != null &&
+                    step.description!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  AppText(
+                    step.description!,
+                    style: AppTextStyles.bodyM1.copyWith(
+                      color: AppColors.gray500,
+                      height: 1.5,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
