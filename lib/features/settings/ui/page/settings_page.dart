@@ -201,6 +201,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           setState(() => _recommendPushEnabled = value);
                         },
                       ),
+                      const SettingsDivider(),
+                      SettingsListTile(
+                        title: '추천 알림 관리',
+                        caption: '리프레시 추천 알림을 추가·관리해요',
+                        leadingIcon: Icons.notifications_active_outlined,
+                        onTap: context.pushRoutineList,
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xl),

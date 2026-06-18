@@ -87,7 +87,8 @@ class HistoryReportBuilder {
     }
 
     final topBucket = _topEntry(bucketCounts);
-    final topWeekdays = _topWeekdayLabels(weekdayCounts);
+    final topWeekdayValues = _topWeekdayValues(weekdayCounts);
+    final topWeekdays = _formatWeekdayLabels(topWeekdayValues);
     if (topBucket == null) {
       return null;
     }
@@ -99,21 +100,32 @@ class HistoryReportBuilder {
     final durationCount = records
         .where((record) => record.duration != null)
         .length;
-    final durationLabel = durationCount == 0
+    final durationMinutes = durationCount == 0
         ? null
-        : '${(avgDuration / durationCount).round()}분 소요';
+        : (avgDuration / durationCount).round();
+    final durationLabel = durationMinutes == null
+        ? null
+        : '$durationMinutes분 소요';
 
+    const careName = '퇴근 후 리프레시 케어';
     final tags = <String>[
-      '퇴근 후 리프레시 케어',
+      careName,
       if (topWeekdays.isNotEmpty) topWeekdays,
       topBucket.key,
       ?durationLabel,
     ];
 
+    final bucket = _bucketForLabel(topBucket.key);
+
     return RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
       subtitle: '새로운 루틴으로 등록할까요?',
       tags: tags,
+      careName: careName,
+      weekdays: topWeekdayValues,
+      hour: bucket?.startHour,
+      minute: 0,
+      durationMinutes: durationMinutes,
     );
   }
 
@@ -481,7 +493,8 @@ class HistoryReportBuilder {
     return counts.entries.reduce((a, b) => a.value >= b.value ? a : b);
   }
 
-  static String _topWeekdayLabels(List<int> weekdayCounts) {
+  /// 가장 많이 사용한 상위 2개 요일을 `DateTime.weekday`(1=월~7=일)로 반환.
+  static List<int> _topWeekdayValues(List<int> weekdayCounts) {
     final entries = <MapEntry<int, int>>[];
     for (var i = 0; i < weekdayCounts.length; i++) {
       if (weekdayCounts[i] > 0) {
@@ -489,11 +502,18 @@ class HistoryReportBuilder {
       }
     }
     if (entries.isEmpty) {
-      return '';
+      return const [];
     }
     entries.sort((a, b) => b.value.compareTo(a.value));
+    return entries.take(2).map((entry) => entry.key + 1).toList()..sort();
+  }
+
+  static String _formatWeekdayLabels(List<int> weekdays) {
+    if (weekdays.isEmpty) {
+      return '';
+    }
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
-    return entries.take(2).map((entry) => '${labels[entry.key]}요일').join('·');
+    return weekdays.map((value) => '${labels[value - 1]}요일').join('·');
   }
 
   static _TimeBucket? _bucketForHour(int hour) {

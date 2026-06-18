@@ -29,6 +29,9 @@ import '../../features/refresh/ui/page/refresh_progress_page.dart';
 import '../../features/refresh/ui/page/refresh_result_collecting_page.dart';
 import '../../features/refresh/ui/page/refresh_result_detail_page.dart';
 import '../../features/refresh/ui/page/refresh_result_page.dart';
+import '../../features/routine/data/model/routine.dart';
+import '../../features/routine/ui/page/routine_list_page.dart';
+import '../../features/routine/ui/page/routine_register_page.dart';
 import '../../features/settings/ui/page/device_manage_page.dart';
 import '../../features/settings/ui/page/local_calendar_settings_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
@@ -204,6 +207,21 @@ final appRouter = GoRouter(
           name: AppRouteNames.settingsLocalCalendar,
           path: AppRoutePaths.settingsLocalCalendar,
           builder: (context, state) => const LocalCalendarSettingsPage(),
+        ),
+        GoRoute(
+          name: AppRouteNames.routineList,
+          path: AppRoutePaths.routineList,
+          builder: (context, state) => const RoutineListPage(),
+        ),
+        GoRoute(
+          name: AppRouteNames.routineRegister,
+          path: AppRoutePaths.routineRegister,
+          builder: (context, state) {
+            final extra = state.extra;
+            return RoutineRegisterPage(
+              initial: extra is Routine ? extra : null,
+            );
+          },
         ),
         GoRoute(
           name: AppRouteNames.widgetGallery,

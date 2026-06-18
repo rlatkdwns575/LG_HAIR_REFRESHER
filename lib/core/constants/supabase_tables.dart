@@ -13,4 +13,5 @@ class SupabaseTables {
   static const refreshMode = 'REFRESH_MODE';
   static const refreshSessions = 'REFRESH_SESSIONS';
   static const calendarEvents = 'CALENDAR_EVENTS';
+  static const refreshRecommendAlarms = 'REFRESH_RECOMMEND_ALARMS';
 }
