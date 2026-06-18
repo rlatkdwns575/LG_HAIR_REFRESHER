@@ -104,7 +104,6 @@ class HistoryReportBuilder {
     final durationMinutes = durationCount == 0
         ? null
         : (avgDuration / durationCount).round();
-
     final topMinute = _topMinute(records, topHour);
     final modeName = topMode == '-' ? '리프레시 모드' : topMode;
     final weekdayPattern = _weekdayPatternLabel(topWeekdayValues);
