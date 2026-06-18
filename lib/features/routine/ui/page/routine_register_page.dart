@@ -61,6 +61,14 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
     setState(() {
       _modeOptions = options;
       _isLoadingModes = false;
+      if (_selectedModeId == null && _selectedModeName != null) {
+        for (final option in options) {
+          if (option.name == _selectedModeName) {
+            _selectedModeId = option.id;
+            break;
+          }
+        }
+      }
       // prefill된 modeId의 이름을 옵션에서 보강합니다.
       if (_selectedModeId != null && _selectedModeName == null) {
         for (final option in options) {

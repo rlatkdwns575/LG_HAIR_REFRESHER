@@ -7,10 +7,5 @@ class RefreshAssets {
   static const trashIcon = ImageAssets.refreshTrashIcon;
   static const collectingIllustration =
       ImageAssets.refreshCollectingIllustration;
-  static const collectingIllustrationFrames = [
-    ImageAssets.refreshCollectingFrame2,
-    ImageAssets.refreshCollectingFrame3,
-    ImageAssets.refreshCollectingFrame4,
-  ];
   static const actionArrowIcon = ImageAssets.checkIcon;
 }

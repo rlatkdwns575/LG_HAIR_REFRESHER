@@ -5,6 +5,4 @@ class AuthAssets {
   const AuthAssets._();
 
   static const googleIcon = ImageAssets.googleIcon;
-  static const brandLogo = ImageAssets.homeBrandLogo;
-  static const brandTagline = ImageAssets.homeBrandTagline;
 }

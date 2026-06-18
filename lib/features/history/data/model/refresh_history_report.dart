@@ -9,10 +9,9 @@ class RoutineSuggestion {
   const RoutineSuggestion({
     required this.title,
     required this.subtitle,
-    this.tags = const [],
-    this.captionItems = const [],
-    this.modeName = '',
-    this.careName = '',
+    required this.tags,
+    this.modeId,
+    this.modeName,
     this.weekdays = const [],
     this.hour,
     this.minute,
@@ -21,18 +20,13 @@ class RoutineSuggestion {
 
   final String title;
   final String subtitle;
-
-  /// 하단 메타 태그 (예: 먼지 제거 간편관리 · 향 케어 집중관리).
-  final List<String> captionItems;
-
-  /// 레거시 태그 — 신규 UI에서는 [captionItems] 사용.
   final List<String> tags;
 
-  /// 패턴 본문에 노출되는 모드 이름.
-  final String modeName;
+  /// 루틴 등록 화면 prefill용 모드 ID.
+  final String? modeId;
 
-  /// 루틴 등록 화면 prefill용 케어 이름.
-  final String careName;
+  /// 루틴 등록 화면 prefill용 가장 많이 사용한 모드 이름.
+  final String? modeName;
 
   /// 추천 요일 (`DateTime.weekday` 1=월~7=일).
   final List<int> weekdays;
@@ -346,12 +340,9 @@ class RefreshHistoryReport {
     ],
     routineSuggestion: const RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
-      subtitle:
-          '매주 금요일 오후 7시에 \'외부 냄새 리프레시\' 모드를 사용하시네요. '
-          '루틴으로 등록하고 알림을 받아보시겠어요?',
-      captionItems: ['먼지 제거 간편관리', '향 케어 집중관리'],
-      modeName: '외부 냄새 리프레시',
-      careName: '외부 냄새 리프레시',
+      subtitle: '새로운 루틴으로 등록할까요?',
+      tags: ['외부 냄새 리프레시', '금요일', '오후 7시', '평균 시간 5분 소요'],
+      modeName: '리프레시 모드 이름',
       weekdays: [5],
       hour: 19,
       minute: 0,

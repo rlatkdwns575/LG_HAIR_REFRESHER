@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../../app/theme/app_colors.dart';
 import 'measure_care_level.dart';
+import '../api/measure_result_mapper.dart';
 import 'measure_result_headline.dart';
 import 'measure_result_record.dart';
 import 'measure_result_status_item.dart';
@@ -39,9 +40,15 @@ class MeasureResult {
       : MeasureResultViewType.stable;
 
   List<MeasureResultStatusItem> get statusItems => [
-    odorLevel.toStatusItem('냄새 관리'),
-    dustLevel.toStatusItem('먼지 관리'),
+    odorLevel.toStatusItem('냄새', badgeLabel: odorLevel.simpleViewBadgeLabel),
+    dustLevel.toStatusItem('먼지', badgeLabel: dustLevel.simpleViewBadgeLabel),
   ];
+
+  int get refreshNeedPercent => MeasureResultMapper.refreshNeedPercentFor(
+    record: sourceRecord,
+    odorLevel: odorLevel,
+    dustLevel: dustLevel,
+  );
 
   static const RefreshMode _outdoorSafeRefresh = RefreshMode(
     id: 'outdoor-safe-refresh',

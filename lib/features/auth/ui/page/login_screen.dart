@@ -6,6 +6,10 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../core/services/local_calendar_login_prompt.dart';
 import '../../data/api/auth_api.dart';
 import '../../data/auth_dev_credentials.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_spacing.dart';
+import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_brand_logo.dart';
 import '../../data/auth_assets.dart';
 import '../widgets/auth_screen_styles.dart';
 
@@ -159,26 +163,19 @@ class _LoginScreenState extends State<LoginScreen> {
 class _LogoSection extends StatelessWidget {
   const _LogoSection();
 
-  static const _logoWidth = 228.0;
-  static const _taglineWidth = 204.0;
+  static const _tagline = '헤어 케어의 새로운 기준';
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(
-          AuthAssets.brandLogo,
-          width: _logoWidth,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-        ),
-        const SizedBox(height: 14),
-        Image.asset(
-          AuthAssets.brandTagline,
-          width: _taglineWidth,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
+        const AppBrandLogo(),
+        const SizedBox(height: AppSpacing.md),
+        AppText(
+          _tagline,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.titleM.copyWith(color: AppColors.gray500),
         ),
       ],
     );

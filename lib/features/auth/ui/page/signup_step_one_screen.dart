@@ -88,6 +88,7 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -103,32 +104,44 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
               const SizedBox(height: 12),
               const AuthSignupProgressLine(step: 1),
               const SizedBox(height: 36),
-              buildAuthFieldLabel('이메일을 입력해주세요.', fontSize: 18),
-              const SizedBox(height: 12),
-              buildAuthEmailField(
-                controller: _emailController,
-                hintText: '이메일 입력',
-              ),
-              const SizedBox(height: 32),
-              buildAuthFieldLabel('사용할 비밀번호를 입력해주세요.', fontSize: 18),
-              const SizedBox(height: 12),
-              buildAuthPasswordField(
-                controller: _passwordController,
-                hintText: '비밀번호 입력',
-                obscureText: _obscurePassword,
-                suffixIcon: buildPasswordVisibilityIcon(
-                  obscure: _obscurePassword,
-                  onToggle: () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  },
+              Expanded(
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      buildAuthFieldLabel('이메일을 입력해주세요.', fontSize: 18),
+                      const SizedBox(height: AuthScreenStyles.fieldLabelGap),
+                      buildAuthEmailField(
+                        controller: _emailController,
+                        hintText: '이메일 입력',
+                      ),
+                      const SizedBox(height: 32),
+                      buildAuthFieldLabel('사용할 비밀번호를 입력해주세요.', fontSize: 18),
+                      const SizedBox(height: AuthScreenStyles.fieldLabelGap),
+                      buildAuthPasswordField(
+                        controller: _passwordController,
+                        hintText: '비밀번호 입력',
+                        obscureText: _obscurePassword,
+                        suffixIcon: buildPasswordVisibilityIcon(
+                          obscure: _obscurePassword,
+                          onToggle: () {
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      AuthPasswordRulesChecklist(
+                        password: _passwordController.text,
+                        email: _emailController.text,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              AuthPasswordRulesChecklist(
-                password: _passwordController.text,
-                email: _emailController.text,
-              ),
-              const Spacer(),
               AuthPrimaryButton(
                 label: '다음',
                 enabled: _isFormValid,

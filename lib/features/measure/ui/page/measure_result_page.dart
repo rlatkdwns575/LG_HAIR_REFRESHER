@@ -193,7 +193,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(
                         15,
-                        AppSpacing.sm,
+                        AppSpacing.lg,
                         15,
                         0,
                       ),
@@ -210,12 +210,7 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                   SafeArea(
                     top: false,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        15,
-                        AppSpacing.lg,
-                        15,
-                        20,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
                       child: AppBoxButton(
                         label: '재진단 하기',
                         variant: AppBoxButtonVariant.line,

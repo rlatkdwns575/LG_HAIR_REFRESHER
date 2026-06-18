@@ -54,52 +54,50 @@ class RefreshDetailTimeline extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: _contentIndent),
-              child: AppText(
-                totalDurationLabel,
-                style: AppTextStyles.labelL.copyWith(
-                  color: AppColors.gray500,
-                  fontWeight: FontWeight.w500,
-                ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: _contentIndent),
+            child: AppText(
+              totalDurationLabel,
+              style: AppTextStyles.labelM.copyWith(
+                color: AppColors.gray500,
+                height: 16 / 12,
               ),
             ),
-            const SizedBox(height: _durationToStepsGap),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                if (steps.length > 1)
-                  Positioned(
-                    left: (_railWidth - _lineWidth) / 2,
-                    top: _dotCenterYOffset - _lineEndExtension,
-                    height:
-                        (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
-                        (_lineEndExtension * 2),
-                    child: Container(
-                      width: _lineWidth,
-                      color: _timelineLineColor,
-                    ),
+          ),
+          const SizedBox(height: _durationToStepsGap),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              if (steps.length > 1)
+                Positioned(
+                  left: (_railWidth - _lineWidth) / 2,
+                  top: _dotCenterYOffset - _lineEndExtension,
+                  height:
+                      (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
+                      (_lineEndExtension * 2),
+                  child: Container(
+                    width: _lineWidth,
+                    color: _timelineLineColor,
                   ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var i = 0; i < steps.length; i++)
-                      _TimelineStepRow(
-                        step: steps[i],
-                        isLast: i == steps.length - 1,
-                      ),
-                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < steps.length; i++)
+                    _TimelineStepRow(
+                      step: steps[i],
+                      isLast: i == steps.length - 1,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -118,7 +116,6 @@ class _TimelineStepRow extends StatelessWidget {
         bottom: isLast ? 0 : RefreshDetailTimeline._stepGap,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
@@ -140,8 +137,7 @@ class _TimelineStepRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: RefreshDetailTimeline._textGap),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 280),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -153,7 +149,7 @@ class _TimelineStepRow extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '${step.durationLabel} '.softWrapWords(),
-                        style: const TextStyle(color: AppColors.primary500),
+                        style: const TextStyle(color: AppColors.primary700),
                       ),
                       TextSpan(
                         text: step.title.softWrapWords(),
@@ -167,9 +163,9 @@ class _TimelineStepRow extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
                   AppText(
                     step.description!,
-                    style: AppTextStyles.bodyM1.copyWith(
-                      color: AppColors.gray500,
-                      height: 1.5,
+                    style: AppTextStyles.labelS.copyWith(
+                      color: AppColors.gray700,
+                      height: 14 / 11,
                     ),
                   ),
                 ],

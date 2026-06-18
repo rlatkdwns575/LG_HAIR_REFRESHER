@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_text.dart';
 
@@ -21,7 +20,7 @@ class MeasureResultHeader extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: 6),
         AppText(
           '진단 결과는 리프레시 기록에서 확인할 수 있어요.',
           style: AppTextStyles.bodyXs.copyWith(color: AppColors.gray500),

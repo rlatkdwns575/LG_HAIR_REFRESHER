@@ -28,6 +28,41 @@ class MeasureResultMapper {
       '느껴질 가능성을 나타내요. 대면 전 케어\n'
       '필요성을 판단하는 데 활용돼요.';
 
+  static int refreshNeedPercent(MeasureResultRecord record) {
+    return record.totalPollutionScore.clamp(0, 100);
+  }
+
+  static int refreshNeedPercentFor({
+    MeasureResultRecord? record,
+    required MeasureCareLevel odorLevel,
+    required MeasureCareLevel dustLevel,
+  }) {
+    if (record != null) {
+      return refreshNeedPercent(record);
+    }
+    return _estimatedRefreshNeedPercent(
+      odorLevel: odorLevel,
+      dustLevel: dustLevel,
+    );
+  }
+
+  static int _estimatedRefreshNeedPercent({
+    required MeasureCareLevel odorLevel,
+    required MeasureCareLevel dustLevel,
+  }) {
+    int scoreFor(MeasureCareLevel level) => switch (level) {
+      MeasureCareLevel.notRequired => 15,
+      MeasureCareLevel.normal => 45,
+      MeasureCareLevel.recommended => 55,
+      MeasureCareLevel.intensiveRecommended => 68,
+      MeasureCareLevel.intensiveRequired => 82,
+    };
+
+    final odorScore = scoreFor(odorLevel);
+    final dustScore = scoreFor(dustLevel);
+    return odorScore > dustScore ? odorScore : dustScore;
+  }
+
   /// 저장된 측정 데이터를 진단 상세 화면용 [MeasureResult]로 변환합니다.
   ///
   /// 기록(히스토리)에서 과거 진단 결과를 다시 열 때 사용합니다.

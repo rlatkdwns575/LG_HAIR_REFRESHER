@@ -22,7 +22,6 @@ class RefreshModeCard extends StatelessWidget {
     this.disabledReason,
     this.onTap,
     this.onAction,
-    this.onDelete,
     super.key,
   });
 
@@ -34,7 +33,6 @@ class RefreshModeCard extends StatelessWidget {
   final String? disabledReason;
   final VoidCallback? onTap;
   final VoidCallback? onAction;
-  final VoidCallback? onDelete;
 
   String get _badge => badgeLabel ?? mode.category;
 
@@ -147,9 +145,8 @@ class RefreshModeCard extends StatelessWidget {
   }
 
   Widget _buildList() {
-    return _ListCardShell(
+    return _CardShell(
       onTap: onTap,
-      onDelete: enabled ? onDelete : null,
       child: Opacity(
         opacity: _contentOpacity,
         child: Column(
@@ -191,55 +188,6 @@ class RefreshModeCard extends StatelessWidget {
                 style: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
               ),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 목록 카드 — 본문 탭(상세 이동)과 삭제 버튼 탭 영역을 분리합니다.
-class _ListCardShell extends StatelessWidget {
-  const _ListCardShell({required this.child, this.onTap, this.onDelete});
-
-  final Widget child;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Material(
-        color: AppColors.gray0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          side: const BorderSide(color: AppColors.gray100),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(onTap: onTap, child: const SizedBox.expand()),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: child),
-                  if (onDelete != null) ...[
-                    const SizedBox(width: AppSpacing.sm),
-                    _DeleteButton(onPressed: onDelete!),
-                  ],
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -364,32 +312,6 @@ class _MetaRow extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: AppTextStyles.labelS.copyWith(
         color: enabled ? AppColors.gray600 : AppColors.gray400,
-      ),
-    );
-  }
-}
-
-class _DeleteButton extends StatelessWidget {
-  const _DeleteButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-        child: Padding(
-          padding: const EdgeInsets.all(2),
-          child: Image.asset(
-            RefreshAssets.trashIcon,
-            width: 20,
-            height: 20,
-            fit: BoxFit.contain,
-          ),
-        ),
       ),
     );
   }

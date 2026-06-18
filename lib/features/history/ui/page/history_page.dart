@@ -195,9 +195,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Routine _routineFromSuggestion(RoutineSuggestion suggestion) {
     return Routine(
-      modeName: suggestion.modeName.isNotEmpty
-          ? suggestion.modeName
-          : suggestion.careName,
+      modeId: suggestion.modeId,
+      modeName: suggestion.modeName,
       weekdays: suggestion.weekdays.toSet(),
       hour: suggestion.hour ?? 19,
       minute: suggestion.minute ?? 0,
