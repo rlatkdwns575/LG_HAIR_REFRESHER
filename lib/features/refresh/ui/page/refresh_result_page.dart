@@ -104,7 +104,7 @@ class _RefreshResultPageState extends State<RefreshResultPage> {
         backgroundColor: AppColors.surface,
         appBar: AppCommonTopHeader(
           variant: AppCommonTopHeaderVariant.gnb,
-          title: '헤어 리프레시',
+          title: '리프레시 결과 보기',
           onBack: _goHome,
         ),
         body: ListView(

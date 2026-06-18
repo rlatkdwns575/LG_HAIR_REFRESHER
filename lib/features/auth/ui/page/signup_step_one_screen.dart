@@ -22,7 +22,7 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
 
   bool _obscurePassword = true;
 
-  bool get _isFormValid => AuthCredentialsValidator.isLoginFormValid(
+  bool get _isFormValid => AuthCredentialsValidator.isSignUpFormValid(
     email: _emailController.text,
     password: _passwordController.text,
   );
@@ -60,7 +60,7 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
 
   void _handleNext() {
     final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+    final password = _passwordController.text;
 
     final emailError = AuthCredentialsValidator.emailValidationMessage(email);
     if (emailError != null) {
@@ -68,9 +68,11 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
       return;
     }
 
-    final passwordError = AuthCredentialsValidator.passwordValidationMessage(
-      password,
-    );
+    final passwordError =
+        AuthCredentialsValidator.signUpPasswordValidationMessage(
+          password,
+          email: email,
+        );
     if (passwordError != null) {
       _showValidationSnackBar(passwordError);
       return;
@@ -121,8 +123,11 @@ class _SignUpStepOneScreenState extends State<SignUpStepOneScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 8),
-              buildAuthPasswordRulesHint(),
+              const SizedBox(height: 12),
+              AuthPasswordRulesChecklist(
+                password: _passwordController.text,
+                email: _emailController.text,
+              ),
               const Spacer(),
               AuthPrimaryButton(
                 label: '다음',

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/route_paths.dart';
+import '../../features/measure/data/api/measure_result_mapper.dart';
 import '../../features/measure/data/model/measure_result.dart';
+import '../../features/measure/data/model/measure_result_record.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
 import '../../features/refresh/data/model/refresh_result.dart';
 import '../../features/refresh/data/model/refresh_result_detail.dart';
@@ -30,6 +32,14 @@ extension AppNavigation on BuildContext {
 
   void pushMeasureResultDetail({required MeasureResult result}) {
     push(AppRoutePaths.measureResultDetail, extra: result);
+  }
+
+  /// 기록(히스토리)의 과거 진단 데이터를 진단 상세 화면으로 엽니다.
+  void pushMeasureHistoryRecordDetail({required MeasureResultRecord record}) {
+    push(
+      AppRoutePaths.measureResultDetail,
+      extra: MeasureResultMapper.toMeasureResult(record),
+    );
   }
 
   void pushRefresh() => push(AppRoutePaths.refresh);

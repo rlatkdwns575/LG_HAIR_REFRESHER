@@ -34,7 +34,7 @@ class RefreshResultDetailPage extends StatelessWidget {
       backgroundColor: AppColors.gray0,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '리프레시 결과보기',
+        title: '리프레시 결과 보기',
         onBack: () => context.pop(),
         onShare: () => _onShare(context),
       ),

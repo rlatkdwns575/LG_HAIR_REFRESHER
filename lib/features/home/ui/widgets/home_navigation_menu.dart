@@ -24,14 +24,14 @@ class HomeNavigationMenu extends StatelessWidget {
       children: [
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '리프레시 모드',
+            title: '리프레시하기',
             onTap: onRefreshPressed,
           ),
         ),
         const SizedBox(height: cardGap),
         HomeActionCard(
           child: HomeTappableNavigationRow(
-            title: '헤어 상태 진단',
+            title: '헤어 상태 진단하기',
             onTap: onDiagnosisPressed,
           ),
         ),

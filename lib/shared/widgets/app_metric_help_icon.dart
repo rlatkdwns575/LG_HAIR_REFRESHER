@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
@@ -38,28 +36,21 @@ class AppMetricHelpIcon extends StatefulWidget {
 
 class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
   OverlayEntry? _overlayEntry;
-  Timer? _hideTimer;
-  bool _pointerOverIcon = false;
-  bool _pointerOverTooltip = false;
+  bool _hovering = false;
+  bool _pressing = false;
 
   @override
   void dispose() {
-    _hideTimer?.cancel();
     _hideTooltip();
     super.dispose();
   }
 
-  void _scheduleHide() {
-    _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(milliseconds: 80), () {
-      if (!_pointerOverIcon && !_pointerOverTooltip) {
-        _hideTooltip();
-      }
-    });
-  }
-
-  void _cancelHide() {
-    _hideTimer?.cancel();
+  void _updateTooltipVisibility() {
+    if (_hovering || _pressing) {
+      _showTooltip();
+    } else {
+      _hideTooltip();
+    }
   }
 
   void _showTooltip() {
@@ -80,7 +71,15 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
 
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
-        final screenWidth = MediaQuery.sizeOf(overlayContext).width;
+        final mediaQuery = MediaQuery.of(overlayContext);
+        final screenSize = mediaQuery.size;
+        final safeTop = mediaQuery.padding.top + 8;
+        final safeBottom = screenSize.height - mediaQuery.padding.bottom - 8;
+        final estimatedHeight = _estimateTooltipHeight(
+          message: widget.tooltipMessage,
+          maxWidth: tooltipMaxWidth,
+        );
+
         late final double left;
         late final double top;
 
@@ -90,18 +89,26 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
               iconTopLeft: iconTopLeft,
               iconWidth: box.size.width,
               tooltipMaxWidth: tooltipMaxWidth,
-              screenWidth: screenWidth,
+              screenWidth: screenSize.width,
               horizontalGap: horizontalGap,
             );
-            top = iconTopLeft.dy;
+            top = iconTopLeft.dy.clamp(safeTop, safeBottom - estimatedHeight);
           case AppMetricHelpTooltipPlacement.belowEnd:
             left = _belowEndLeft(
               iconTopLeft: iconTopLeft,
               iconWidth: box.size.width,
               tooltipMaxWidth: tooltipMaxWidth,
-              screenWidth: screenWidth,
+              screenWidth: screenSize.width,
             );
-            top = iconTopLeft.dy + box.size.height + verticalGap;
+            final belowTop = iconTopLeft.dy + box.size.height + verticalGap;
+            if (belowTop + estimatedHeight <= safeBottom) {
+              top = belowTop;
+            } else {
+              top = (iconTopLeft.dy - estimatedHeight - verticalGap).clamp(
+                safeTop,
+                safeBottom - estimatedHeight,
+              );
+            }
         }
 
         return Stack(
@@ -109,15 +116,7 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
             Positioned(
               left: left,
               top: top,
-              child: MouseRegion(
-                onEnter: (_) {
-                  _pointerOverTooltip = true;
-                  _cancelHide();
-                },
-                onExit: (_) {
-                  _pointerOverTooltip = false;
-                  _scheduleHide();
-                },
+              child: IgnorePointer(
                 child: Material(
                   color: Colors.transparent,
                   child: ConstrainedBox(
@@ -150,6 +149,25 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     );
 
     overlay.insert(_overlayEntry!);
+  }
+
+  double _estimateTooltipHeight({
+    required String message,
+    required double maxWidth,
+  }) {
+    const horizontalPadding = 24.0;
+    const verticalPadding = 20.0;
+    const lineHeight = 18.0;
+    const averageCharWidth = 11.0;
+
+    final contentWidth = maxWidth - horizontalPadding;
+    final charsPerLine = (contentWidth / averageCharWidth).floor().clamp(
+      1,
+      999,
+    );
+    final lineCount = (message.length / charsPerLine).ceil().clamp(1, 999);
+
+    return verticalPadding + lineCount * lineHeight;
   }
 
   double _besideIconLeft({
@@ -190,14 +208,6 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     _overlayEntry = null;
   }
 
-  void _toggleTooltip() {
-    if (_overlayEntry == null) {
-      _showTooltip();
-    } else {
-      _hideTooltip();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final icon = Container(
@@ -221,17 +231,27 @@ class _AppMetricHelpIconState extends State<AppMetricHelpIcon> {
     return MouseRegion(
       cursor: SystemMouseCursors.help,
       onEnter: (_) {
-        _pointerOverIcon = true;
-        _cancelHide();
-        _showTooltip();
+        _hovering = true;
+        _updateTooltipVisibility();
       },
       onExit: (_) {
-        _pointerOverIcon = false;
-        _scheduleHide();
+        _hovering = false;
+        _updateTooltipVisibility();
       },
-      child: GestureDetector(
+      child: Listener(
         behavior: HitTestBehavior.opaque,
-        onTap: _toggleTooltip,
+        onPointerDown: (_) {
+          _pressing = true;
+          _updateTooltipVisibility();
+        },
+        onPointerUp: (_) {
+          _pressing = false;
+          _updateTooltipVisibility();
+        },
+        onPointerCancel: (_) {
+          _pressing = false;
+          _updateTooltipVisibility();
+        },
         child: icon,
       ),
     );
