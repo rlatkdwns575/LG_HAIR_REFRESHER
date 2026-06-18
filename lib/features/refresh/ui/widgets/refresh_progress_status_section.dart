@@ -21,12 +21,20 @@ class RefreshProgressStatusSection extends StatelessWidget {
   final String deviceGuide;
   final String pausedHint;
 
-  static const double _maxContentWidth = 330;
+  static const double _maxContentWidthPhone = 330;
+  static const double _maxContentWidthTablet = 420;
+
+  static double _maxContentWidthFor(BuildContext context) {
+    if (MediaQuery.sizeOf(context).shortestSide >= 600) {
+      return _maxContentWidthTablet;
+    }
+    return _maxContentWidthPhone;
+  }
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+      constraints: BoxConstraints(maxWidth: _maxContentWidthFor(context)),
       child: SizedBox(
         width: double.infinity,
         child: isPaused ? _buildPausedContent() : _buildRunningContent(),

@@ -82,6 +82,7 @@ class RefreshRecommendService {
       mode: mode,
       message: message,
       basis: context.basis,
+      environment: context.environment,
       resolvedAt: now ?? DateTime.now(),
       signature: signature,
     );

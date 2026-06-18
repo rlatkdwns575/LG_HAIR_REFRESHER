@@ -88,7 +88,6 @@ class HistoryReportBuilder {
     }
 
     final topMode = _mostUsedMode(records);
-    final topWeekday = _topWeekdayLabel(weekdayCounts);
     final topWeekdayValues = _topWeekdayValues(weekdayCounts);
     final topHour = _topHour(records);
     if (topHour == null) {
@@ -105,26 +104,25 @@ class HistoryReportBuilder {
     final durationMinutes = durationCount == 0
         ? null
         : (avgDuration / durationCount).round();
-    final durationLabel = durationMinutes == null
-        ? null
-        : '평균 시간 $durationMinutes분 소요';
 
-    const careName = '퇴근 후 리프레시 케어';
-    final tags = <String>[
-      if (topMode != '-') topMode,
-      if (topWeekday.isNotEmpty) topWeekday,
-      _hourLabel(topHour),
-      ?durationLabel,
-    ];
+    final topMinute = _topMinute(records, topHour);
+    final modeName = topMode == '-' ? '리프레시 모드' : topMode;
+    final weekdayPattern = _weekdayPatternLabel(topWeekdayValues);
+    final timeLabel = _timeLabel(topHour, topMinute);
+    final subtitle =
+        '$weekdayPattern $timeLabel에 \'$modeName\' 모드를 사용하시네요. '
+        '루틴으로 등록하고 알림을 받아보시겠어요?';
+    final captionItems = _captionItemsForRecords(records, modeName);
 
     return RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
-      subtitle: '새로운 루틴으로 등록할까요?',
-      tags: tags,
-      careName: careName,
+      subtitle: subtitle,
+      captionItems: captionItems,
+      modeName: modeName,
+      careName: modeName,
       weekdays: topWeekdayValues,
       hour: topHour,
-      minute: 0,
+      minute: topMinute,
       durationMinutes: durationMinutes,
     );
   }
@@ -543,21 +541,6 @@ class HistoryReportBuilder {
     return entries.take(2).map((entry) => entry.key + 1).toList()..sort();
   }
 
-  static String _topWeekdayLabel(List<int> weekdayCounts) {
-    final entries = <MapEntry<int, int>>[];
-    for (var i = 0; i < weekdayCounts.length; i++) {
-      if (weekdayCounts[i] > 0) {
-        entries.add(MapEntry(i, weekdayCounts[i]));
-      }
-    }
-    if (entries.isEmpty) {
-      return '';
-    }
-    entries.sort((a, b) => b.value.compareTo(a.value));
-    const labels = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${labels[entries.first.key]}요일';
-  }
-
   static int? _topHour(List<RefreshHistoryRecord> records) {
     final hourCounts = List<int>.filled(24, 0);
     for (final record in records) {
@@ -576,17 +559,69 @@ class HistoryReportBuilder {
     return topCount == 0 ? null : topHour;
   }
 
-  static String _hourLabel(int hour) {
-    if (hour == 0) {
-      return '밤 12시';
+  static String _timeLabel(int hour, int minute) {
+    final period = hour < 12 ? '오전' : '오후';
+    final hour12 = hour % 12 == 0 ? 12 : hour % 12;
+    if (minute == 0) {
+      return '$period $hour12시';
     }
-    if (hour < 12) {
-      return '오전 $hour시';
+    return '$period $hour12시 $minute분';
+  }
+
+  static String _weekdayPatternLabel(List<int> weekdays) {
+    if (weekdays.isEmpty) {
+      return '매주';
     }
-    if (hour == 12) {
-      return '낮 12시';
+    const weekdaySet = {1, 2, 3, 4, 5};
+    if (weekdays.length == weekdaySet.length &&
+        weekdays.toSet().containsAll(weekdaySet)) {
+      return '매주 평일';
     }
-    return '오후 ${hour - 12}시';
+    const labels = ['월', '화', '수', '목', '금', '토', '일'];
+    if (weekdays.length == 1) {
+      return '매주 ${labels[weekdays.first - 1]}요일';
+    }
+    final joined = weekdays.map((value) => '${labels[value - 1]}요일').join('·');
+    return '매주 $joined';
+  }
+
+  static int _topMinute(List<RefreshHistoryRecord> records, int topHour) {
+    final minuteCounts = List<int>.filled(60, 0);
+    for (final record in records) {
+      if (record.dateTime.hour == topHour) {
+        minuteCounts[record.dateTime.minute]++;
+      }
+    }
+
+    var topMinute = 0;
+    var topCount = 0;
+    for (var minute = 0; minute < minuteCounts.length; minute++) {
+      if (minuteCounts[minute] > topCount) {
+        topCount = minuteCounts[minute];
+        topMinute = minute;
+      }
+    }
+    return topMinute;
+  }
+
+  static List<String> _captionItemsForRecords(
+    List<RefreshHistoryRecord> records,
+    String modeName,
+  ) {
+    final careTypes = records
+        .where((record) => record.modeName == modeName && !record.isDiagnosis)
+        .map((record) => record.careType)
+        .toSet();
+    final items = <String>[];
+    if (careTypes.contains(CareType.dust) ||
+        careTypes.contains(CareType.both)) {
+      items.add('먼지 제거 간편관리');
+    }
+    if (careTypes.contains(CareType.odor) ||
+        careTypes.contains(CareType.both)) {
+      items.add('향 케어 집중관리');
+    }
+    return items;
   }
 
   static _TimeBucket? _bucketForHour(int hour) {
