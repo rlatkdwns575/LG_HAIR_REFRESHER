@@ -1,7 +1,7 @@
 import '../../features/measure/data/api/measure_schedule_classifier_api.dart';
 import '../../shared/models/calendar_event.dart';
 import '../../shared/models/local_calendar_status.dart';
-import '../../shared/recommendation/refresh_recommend_cache.dart';
+import '../../shared/recommendation/refresh_recommend_service.dart';
 import '../utils/stable_calendar_event_id.dart';
 import 'auth_session_service.dart';
 import 'calendar_events_api.dart';
@@ -16,15 +16,29 @@ class LocalCalendarService {
     CalendarEventsApi? calendarEventsApi,
     MeasureScheduleClassifierApi? classifierApi,
     LocalCalendarConnectionStore? store,
+    Future<void> Function({String? userId, DateTime? now})? onCalendarSynced,
   }) : calendarReader = calendarReader ?? DeviceCalendarReader(),
        calendarEventsApi = calendarEventsApi ?? const CalendarEventsApi(),
        classifierApi = classifierApi ?? const MeasureScheduleClassifierApi(),
-       _storeOverride = store;
+       _storeOverride = store,
+       _onCalendarSynced = onCalendarSynced ?? _defaultOnCalendarSynced;
+
+  static Future<void> _defaultOnCalendarSynced({
+    String? userId,
+    DateTime? now,
+  }) {
+    return RefreshRecommendService.refreshAfterCalendarSync(
+      userId: userId,
+      now: now,
+    );
+  }
 
   final DeviceCalendarReader calendarReader;
   final CalendarEventsApi calendarEventsApi;
   final MeasureScheduleClassifierApi classifierApi;
   final LocalCalendarConnectionStore? _storeOverride;
+  final Future<void> Function({String? userId, DateTime? now})
+  _onCalendarSynced;
 
   LocalCalendarConnectionStore get _store =>
       _storeOverride ?? LocalCalendarConnectionStore.instance;
@@ -148,7 +162,6 @@ class LocalCalendarService {
 
     final deviceEvents = fetchResult.events;
     _store.applyDevicePreview(events: deviceEvents, checkedAt: resolvedNow);
-    RefreshRecommendCache.instance.invalidate();
 
     final resolvedUserId = _resolveUserIdOrThrow(userId: userId);
     final calendarEvents = await _buildCalendarEvents(
@@ -158,11 +171,15 @@ class LocalCalendarService {
 
     _store.applySyncedEvents(calendarEvents, checkedAt: resolvedNow);
 
-    await calendarEventsApi.replaceTodayEvents(
-      userId: resolvedUserId,
-      events: calendarEvents,
-      now: resolvedNow,
-    );
+    try {
+      await calendarEventsApi.replaceTodayEvents(
+        userId: resolvedUserId,
+        events: calendarEvents,
+        now: resolvedNow,
+      );
+    } finally {
+      await _onCalendarSynced(userId: resolvedUserId, now: resolvedNow);
+    }
 
     return _buildStatus();
   }
@@ -225,7 +242,8 @@ class LocalCalendarService {
       }
     } finally {
       _store.clear();
-      RefreshRecommendCache.instance.invalidate();
+      RefreshRecommendService.invalidateCache();
+      await _onCalendarSynced(userId: userId, now: now);
     }
     return _buildStatus();
   }

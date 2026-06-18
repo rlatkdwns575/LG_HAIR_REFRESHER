@@ -10,6 +10,10 @@ class RefreshRecommendCache {
 
   RefreshRecommendResult? _result;
   DateTime? _cachedAt;
+  int _calendarSyncToken = 0;
+
+  /// 캘린더 동기화 후 UI가 추천을 다시 불러올 때 비교합니다.
+  int get calendarSyncToken => _calendarSyncToken;
 
   bool get hasValidCache =>
       _result != null &&
@@ -34,5 +38,10 @@ class RefreshRecommendCache {
   void invalidate() {
     _result = null;
     _cachedAt = null;
+  }
+
+  void markCalendarSynced() {
+    invalidate();
+    _calendarSyncToken++;
   }
 }
