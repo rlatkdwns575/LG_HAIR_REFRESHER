@@ -95,6 +95,15 @@ class RefreshRecommendService {
     RefreshRecommendCache.instance.invalidate();
   }
 
+  /// 로컬 캘린더 동기화 후 추천을 다시 계산합니다.
+  static Future<RefreshRecommendResult?> refreshAfterCalendarSync({
+    String? userId,
+    DateTime? now,
+  }) async {
+    RefreshRecommendCache.instance.markCalendarSynced();
+    return instance.resolve(forceRefresh: true, userId: userId, now: now);
+  }
+
   /// 프리셋 없을 때 UI용 최소 fallback 모드.
   static RefreshMode fallbackMode() {
     return const RefreshMode(

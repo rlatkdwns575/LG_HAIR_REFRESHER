@@ -11,6 +11,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
+import '../../../../shared/recommendation/refresh_recommend_cache.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../../measure/data/api/measure_api.dart';
 import '../../../measure/data/api/measure_refresh_recommend_service.dart';
@@ -55,6 +56,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   RefreshMode? _recommendedRefreshMode;
   HomeQuickRefreshMode? _recommendedQuickMode;
   bool _useRecommendForQuickSlot = false;
+  int _lastCalendarSyncToken = 0;
   HomeQuickRefreshMode? get _favoriteMode =>
       HomeShortcutStore.instance.favoriteQuickMode;
 
@@ -114,6 +116,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void activate() {
     super.activate();
     unawaited(_refreshRecentDiagnosisFlag());
+    _refreshRecommendationIfCalendarSynced();
   }
 
   @override
@@ -172,6 +175,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _useRecommendForQuickSlot = useRecommendForQuickSlot;
       _isScentCartridgeAttached = cartridge.isAttached;
       _isLoading = false;
+      _lastCalendarSyncToken = RefreshRecommendCache.instance.calendarSyncToken;
     });
 
     final deviceId = dashboard.linkedDeviceId;
@@ -229,7 +233,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _refreshHomeIndicators() async {
-    await Future.wait([_refreshDeviceStatus(), _refreshRecentDiagnosisFlag()]);
+    await Future.wait([
+      _refreshDeviceStatus(),
+      _refreshRecentDiagnosisFlag(),
+      _refreshRecommendation(forceRefresh: true),
+    ]);
+  }
+
+  void _refreshRecommendationIfCalendarSynced() {
+    final token = RefreshRecommendCache.instance.calendarSyncToken;
+    if (token == _lastCalendarSyncToken) {
+      return;
+    }
+    _lastCalendarSyncToken = token;
+    unawaited(_refreshRecommendation(forceRefresh: true));
+  }
+
+  Future<void> _refreshRecommendation({bool forceRefresh = false}) async {
+    try {
+      final recommendation = await _recommendService.resolve(
+        forceRefresh: forceRefresh,
+      );
+      if (!mounted || recommendation == null) {
+        return;
+      }
+      setState(() {
+        _recommendMessage = recommendation.message;
+        _recommendedRefreshMode = recommendation.mode;
+        _recommendedQuickMode = recommendation.mode.toHomeQuickRefreshMode();
+        _useRecommendForQuickSlot = true;
+      });
+    } catch (_) {}
   }
 
   Future<void> _handleDiagnosisTap() async {

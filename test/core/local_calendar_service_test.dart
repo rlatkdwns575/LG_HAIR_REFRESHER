@@ -48,6 +48,7 @@ void main() {
     service = LocalCalendarService(
       store: store,
       calendarEventsApi: api,
+      onCalendarSynced: ({userId, now}) async {},
       calendarReader: DeviceCalendarReader(
         requestPermissionsOverride: () async => true,
         hasPermissionsOverride: () async => true,

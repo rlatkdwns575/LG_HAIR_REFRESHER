@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_text.dart';
@@ -14,6 +16,7 @@ import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/device_consumable_service.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../../shared/recommendation/refresh_recommend_basis.dart';
+import '../../../../shared/recommendation/refresh_recommend_cache.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
 import '../../data/api/custom_mode_api.dart';
 import '../../data/api/refresh_api.dart';
@@ -46,6 +49,7 @@ class _RefreshPageState extends State<RefreshPage> {
   ScentCartridgeStatus _scentCartridge = ScentCartridgeStatus.notAttached;
   bool _isLoading = true;
   int _selectedChipIndex = 0;
+  int _lastCalendarSyncToken = 0;
 
   List<RefreshMode> get _allModes => [
     ..._presetModes,
@@ -80,6 +84,37 @@ class _RefreshPageState extends State<RefreshPage> {
     _loadModes();
   }
 
+  @override
+  void activate() {
+    super.activate();
+    _refreshRecommendationIfCalendarSynced();
+  }
+
+  void _refreshRecommendationIfCalendarSynced() {
+    final token = RefreshRecommendCache.instance.calendarSyncToken;
+    if (token == _lastCalendarSyncToken) {
+      return;
+    }
+    _lastCalendarSyncToken = token;
+    unawaited(_refreshRecommendation(forceRefresh: true));
+  }
+
+  Future<void> _refreshRecommendation({bool forceRefresh = false}) async {
+    try {
+      final recommendation = await _recommendService.resolve(
+        forceRefresh: forceRefresh,
+      );
+      if (!mounted || recommendation == null) {
+        return;
+      }
+      setState(() {
+        _recommendedMode = recommendation.mode;
+        _recommendMessage = recommendation.message;
+        _recommendBasis = recommendation.basis;
+      });
+    } catch (_) {}
+  }
+
   Future<void> _loadModes() async {
     final userId = AuthSessionService.resolveUserId();
     final presets = await _refreshApi.fetchPresetModes();
@@ -112,6 +147,7 @@ class _RefreshPageState extends State<RefreshPage> {
       _recommendBasis = recommendBasis;
       _scentCartridge = cartridge;
       _isLoading = false;
+      _lastCalendarSyncToken = RefreshRecommendCache.instance.calendarSyncToken;
     });
   }
 
