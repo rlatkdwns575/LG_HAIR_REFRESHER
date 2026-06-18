@@ -100,7 +100,7 @@ class DeviceManageScentCartridgeGuide extends StatelessWidget {
       return '향 종류 정보를 확인할 수 없습니다. 카트리지를 다시 장착해 주세요.';
     }
 
-    return '${cartridge.categoryLabel} 향이 장착되어 있습니다. 교체 시 같은 향 또는 다른 향 종류를 선택할 수 있습니다.';
+    return '${cartridge.categoryLabel} 향이 장착되어 있습니다.\n교체 시 같은 향 또는 다른 향 종류를 선택할 수 있습니다.';
   }
 }
 

@@ -9,7 +9,6 @@ import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../data/api/settings_api.dart';
 import '../../data/model/settings_device_detail.dart';
-import '../../../../shared/models/scent_cartridge_status.dart';
 import '../widgets/device_manage_scent_guide.dart';
 import '../widgets/device_manage_status_panel.dart';
 import '../widgets/settings_section_card.dart';
@@ -66,13 +65,6 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
     return '···${deviceId.substring(deviceId.length - 8)}';
   }
 
-  String _scentCategoryDisplayValue(ScentCartridgeStatus cartridge) {
-    if (!cartridge.isAttached) {
-      return '카트리지 없음';
-    }
-    return cartridge.categoryLabel ?? '미등록';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,13 +119,6 @@ class _DeviceManagePageState extends State<DeviceManagePage> {
                       DeviceManageInfoRow(
                         label: '향 카트리지',
                         value: _device.scentCartridge.detailDisplayValue,
-                      ),
-                      const SettingsDivider(),
-                      DeviceManageInfoRow(
-                        label: '향 종류',
-                        value: _scentCategoryDisplayValue(
-                          _device.scentCartridge,
-                        ),
                       ),
                     ],
                   ),

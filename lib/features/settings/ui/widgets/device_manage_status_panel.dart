@@ -26,7 +26,19 @@ class DeviceManageStatusPanel extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.dry_cleaning_outlined, size: 96, color: AppColors.gray300),
+          Image.asset(
+            ImageAssets.deviceImageNoBackground,
+            width: 140,
+            height: 140,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(
+                Icons.dry_cleaning_outlined,
+                size: 96,
+                color: AppColors.gray300,
+              );
+            },
+          ),
           const SizedBox(height: AppSpacing.sm),
           AppText(
             device.modelName,

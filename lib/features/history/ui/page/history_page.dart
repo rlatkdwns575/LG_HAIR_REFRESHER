@@ -175,18 +175,6 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  void _onDayResultDetailTap() {
-    final selectedDate = _selectedDate;
-    if (selectedDate == null) {
-      return;
-    }
-    final group = _visibleMonthData.groupForDate(selectedDate);
-    if (group == null || group.records.isEmpty) {
-      return;
-    }
-    _onRecordDetailTap(group.records.first);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,7 +224,6 @@ class _HistoryPageState extends State<HistoryPage> {
             onCalendarIconTap: _onCalendarIconTap,
             onDateSelected: _onDateSelected,
             onToggleExpanded: _onToggleExpanded,
-            onDayResultDetailTap: _onDayResultDetailTap,
           ),
         ),
         const HistorySectionDivider(),

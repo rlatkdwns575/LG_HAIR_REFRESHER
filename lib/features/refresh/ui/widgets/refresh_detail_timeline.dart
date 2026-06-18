@@ -162,14 +162,17 @@ class _TimelineStepRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                AppText(
-                  step.description,
-                  style: AppTextStyles.bodyM1.copyWith(
-                    color: AppColors.gray500,
-                    height: 1.5,
+                if (step.description != null &&
+                    step.description!.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  AppText(
+                    step.description!,
+                    style: AppTextStyles.bodyM1.copyWith(
+                      color: AppColors.gray500,
+                      height: 1.5,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

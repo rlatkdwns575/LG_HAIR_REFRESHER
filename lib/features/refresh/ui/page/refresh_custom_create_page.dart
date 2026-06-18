@@ -17,6 +17,7 @@ import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/device_consumable_service.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../data/api/custom_mode_api.dart';
+import '../../data/api/refresh_mode_mapper.dart';
 import '../../data/care_duration_split.dart';
 import '../../data/custom_mode_cache.dart';
 import '../../data/model/refresh_mode.dart';
@@ -170,21 +171,30 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
 
     try {
       final userId = AuthSessionService.resolveUserId();
+      final dustYn = _enabled[_CareType.dust] == true;
+      final odorYn = _enabled[_CareType.odor] == true;
+      final scentYn = _enabled[_CareType.scent] == true;
       final mode = await _customModeApi.create(
         userId: userId,
         displayName: _nameController.text.trim(),
         category: _selectedCategory,
         durationMinutes: _durationMinutes,
-        dustYn: _enabled[_CareType.dust] == true,
-        odorYn: _enabled[_CareType.odor] == true,
-        scentYn: _enabled[_CareType.scent] == true,
-        dustStrength: _enabled[_CareType.dust] == true
+        dustYn: dustYn,
+        odorYn: odorYn,
+        scentYn: scentYn,
+        description: RefreshModeMapper.buildCareDescription(
+          dustYn: dustYn,
+          odorYn: odorYn,
+          scentYn: scentYn,
+          category: _selectedCategory,
+        ),
+        dustStrength: dustYn
             ? _strengthForLevel(_levels[_CareType.dust]!)
             : null,
-        odorStrength: _enabled[_CareType.odor] == true
+        odorStrength: odorYn
             ? _strengthForLevel(_levels[_CareType.odor]!)
             : null,
-        scentStrength: _enabled[_CareType.scent] == true
+        scentStrength: scentYn
             ? _strengthForLevel(_levels[_CareType.scent]!)
             : null,
       );
