@@ -1,3 +1,4 @@
+import '../../features/home/data/model/environment_snapshot.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
 import 'refresh_recommend_basis.dart';
 
@@ -7,6 +8,7 @@ class RefreshRecommendResult {
     required this.mode,
     required this.message,
     required this.basis,
+    required this.environment,
     required this.resolvedAt,
     required this.signature,
   });
@@ -14,6 +16,7 @@ class RefreshRecommendResult {
   final RefreshMode mode;
   final String message;
   final RefreshRecommendBasis basis;
+  final EnvironmentSnapshot environment;
   final DateTime resolvedAt;
   final String signature;
 }

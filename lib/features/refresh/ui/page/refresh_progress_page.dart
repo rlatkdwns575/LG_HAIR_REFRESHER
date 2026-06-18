@@ -22,7 +22,7 @@ import '../widgets/refresh_progress_ring.dart';
 import '../widgets/refresh_progress_status_section.dart';
 import '../widgets/refresh_progress_step_strip.dart';
 
-/// Figma Design `리프레시 > 모드 작동` (793:15950 · 823:25441).
+/// Figma Design `리프레시 > 모드 작동` (40000026:27208 · 793:15950).
 class RefreshProgressPage extends StatefulWidget {
   const RefreshProgressPage({this.mode, super.key});
 
@@ -44,9 +44,16 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   bool _navigated = false;
 
   static const Duration _completionHold = Duration(milliseconds: 500);
-  static const double _spacingBelowModeName = 40;
-  static const double _spacingBelowRing = 36;
-  static const double _spacingBelowStepStrip = 36;
+  static const double _spacingBelowModeName = 36;
+  static const double _spacingBelowRing = 32;
+  static const double _spacingBelowStepStrip = 28;
+  static const double _spacingAboveButton = 28;
+  static const double _phoneContentOffsetY = -20;
+
+  /// Figma 750×800 태블릿 프레임 — 본문 세로 중심보다 약간 위.
+  static const Alignment _tabletContentAlignment = Alignment(0, -0.12);
+
+  static const double _tabletBreakpoint = 600;
 
   @override
   void initState() {
@@ -184,6 +191,58 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     setState(() => _isPaused = !_isPaused);
   }
 
+  bool _isTabletLayout(BuildContext context) {
+    return MediaQuery.sizeOf(context).shortestSide >= _tabletBreakpoint;
+  }
+
+  Alignment _contentAlignment(BuildContext context) {
+    return _isTabletLayout(context)
+        ? _tabletContentAlignment
+        : Alignment.center;
+  }
+
+  double _contentOffsetY(BuildContext context) {
+    return _isTabletLayout(context) ? 0 : _phoneContentOffsetY;
+  }
+
+  Widget _buildProgressContent(RefreshProgressStep step) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AppText(
+          _session.modeName,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.headlineL.copyWith(
+            color: AppColors.primary700,
+            fontSize: 26,
+            height: 32 / 26,
+          ),
+        ),
+        const SizedBox(height: _spacingBelowModeName),
+        Center(
+          child: RefreshProgressRing(
+            progress: _progress,
+            remainingLabel: _formatClock(_totalRemainingSeconds),
+            dimmed: _isPaused,
+          ),
+        ),
+        const SizedBox(height: _spacingBelowRing),
+        RefreshProgressStepStrip(
+          steps: _session.steps,
+          activeIndex: _activeStepIndex,
+          dimmed: _isPaused,
+        ),
+        const SizedBox(height: _spacingBelowStepStrip),
+        RefreshProgressStatusSection(
+          isPaused: _isPaused,
+          step: step,
+          deviceGuide: _session.deviceGuide,
+          pausedHint: _pausedHint,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final step = _currentStep;
@@ -205,48 +264,15 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(15, AppSpacing.sm, 15, 0),
-              child: AppText(
-                _session.modeName,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.headlineL.copyWith(
-                  color: AppColors.primary700,
-                  fontSize: 26,
-                  height: 32 / 26,
-                ),
-              ),
-            ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  15,
-                  _spacingBelowModeName,
-                  15,
-                  AppSpacing.md,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RefreshProgressRing(
-                      progress: _progress,
-                      remainingLabel: _formatClock(_totalRemainingSeconds),
-                      dimmed: _isPaused,
-                    ),
-                    const SizedBox(height: _spacingBelowRing),
-                    RefreshProgressStepStrip(
-                      steps: _session.steps,
-                      activeIndex: _activeStepIndex,
-                      dimmed: _isPaused,
-                    ),
-                    const SizedBox(height: _spacingBelowStepStrip),
-                    RefreshProgressStatusSection(
-                      isPaused: _isPaused,
-                      step: step,
-                      deviceGuide: _session.deviceGuide,
-                      pausedHint: _pausedHint,
-                    ),
-                  ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Align(
+                  alignment: _contentAlignment(context),
+                  child: Transform.translate(
+                    offset: Offset(0, _contentOffsetY(context)),
+                    child: _buildProgressContent(step),
+                  ),
                 ),
               ),
             ),
@@ -255,7 +281,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   15,
-                  AppSpacing.sm,
+                  _spacingAboveButton,
                   15,
                   AppSpacing.sm,
                 ),
@@ -269,14 +295,10 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   }
 
   Widget _buildBottomAction() {
-    return SizedBox(
-      width: double.infinity,
-      child: AppBoxButton(
-        label: _isPaused ? '진행하기' : '일시 정지',
-        onPressed: _togglePause,
-        size: AppBoxButtonSize.small,
-        variant: AppBoxButtonVariant.line,
-      ),
+    return AppBoxButton(
+      label: _isPaused ? '진행하기' : '일시 정지',
+      onPressed: _togglePause,
+      variant: AppBoxButtonVariant.line,
     );
   }
 }

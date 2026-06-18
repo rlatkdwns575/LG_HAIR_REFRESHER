@@ -113,7 +113,12 @@ void main() {
 
       final suggestion = report.routineSuggestion;
       expect(suggestion, isNotNull);
-      expect(suggestion!.tags, ['외부 냄새 리프레시', '토요일', '오후 7시', '평균 시간 6분 소요']);
+      expect(suggestion!.modeName, '외부 냄새 리프레시');
+      expect(suggestion.durationMinutes, 6);
+      expect(suggestion.captionItems, ['향 케어 집중관리']);
+      expect(suggestion.subtitle, contains('외부 냄새 리프레시'));
+      expect(suggestion.subtitle, contains('오후 7시'));
+      expect(suggestion.subtitle, contains('루틴으로 등록하고 알림을 받아보시겠어요?'));
     });
     test('limits recent mode usages to top 5 within last month', () {
       final report = HistoryReportBuilder.build(

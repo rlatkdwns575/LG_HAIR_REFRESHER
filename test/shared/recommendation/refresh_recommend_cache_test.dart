@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lg_hair_refresher/features/home/data/model/environment_snapshot.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_cache.dart';
@@ -54,6 +55,12 @@ RefreshRecommendResult _sampleResult({required String signature}) {
     ),
     message: '오늘 날씨가 쾌적한 날이니,\n테스트 리프레시 모드를 추천해요.',
     basis: RefreshRecommendBasis.weatherOnly,
+    environment: const EnvironmentSnapshot(
+      temperatureCelsius: 22,
+      humidityPercent: 50,
+      isRaining: false,
+      isSnowing: false,
+    ),
     resolvedAt: DateTime(2026, 6, 15),
     signature: signature,
   );

@@ -18,6 +18,7 @@ export 'app_metric_help_icon.dart';
 export 'app_page_indicator.dart';
 export 'app_radio.dart';
 export 'app_recommend_card.dart';
+export 'app_recommend_featured_card.dart';
 export 'app_refresh_card.dart';
 export 'app_result_card.dart';
 export 'app_search_text_field.dart';
