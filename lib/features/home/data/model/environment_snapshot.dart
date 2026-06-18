@@ -12,13 +12,6 @@ class EnvironmentSnapshot {
   final bool isRaining;
   final bool isSnowing;
 
-  Map<String, dynamic> toPromptJson() => {
-    'temperature_celsius': temperatureCelsius,
-    'humidity_percent': humidityPercent,
-    'is_raining': isRaining,
-    'is_snowing': isSnowing,
-  };
-
   factory EnvironmentSnapshot.fromOpenWeather(
     Map<String, dynamic> weatherJson,
   ) {
@@ -73,5 +66,37 @@ class EnvironmentSnapshot {
     }
 
     return false;
+  }
+
+  Map<String, dynamic> toPromptJson() => {
+    'temperature_celsius': temperatureCelsius,
+    'humidity_percent': humidityPercent,
+    'is_raining': isRaining,
+    'is_snowing': isSnowing,
+  };
+
+  /// 맞춤 리프레시 카드 상단 — 오늘 날씨·환경 한 줄 요약.
+  String get dayEnvironmentHeadline {
+    final temp = temperatureCelsius.round();
+
+    if (isSnowing) {
+      return '눈이 내리는 하루에요.';
+    }
+    if (isRaining) {
+      return '비가 오는 하루에요.';
+    }
+    if (humidityPercent >= 70) {
+      return '습도가 높은 하루에요.';
+    }
+    if (humidityPercent <= 30) {
+      return '공기가 건조한 하루에요.';
+    }
+    if (temp >= 28) {
+      return '기온이 높은 하루에요.';
+    }
+    if (temp <= 5) {
+      return '쌀쌀한 날씨예요.';
+    }
+    return '오늘은 $temp°C, 습도 $humidityPercent%예요.';
   }
 }

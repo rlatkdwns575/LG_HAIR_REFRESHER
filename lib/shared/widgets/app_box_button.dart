@@ -14,6 +14,7 @@ class AppBoxButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.size = AppBoxButtonSize.large,
+    this.height = 48,
     this.variant = AppBoxButtonVariant.active,
     super.key,
   });
@@ -21,9 +22,8 @@ class AppBoxButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final AppBoxButtonSize size;
+  final double height;
   final AppBoxButtonVariant variant;
-
-  static const double _height = 48;
 
   bool get _isDisabled =>
       variant == AppBoxButtonVariant.disabled || onPressed == null;
@@ -36,7 +36,7 @@ class AppBoxButton extends StatelessWidget {
 
     return SizedBox(
       width: _widthForSize(size),
-      height: _height,
+      height: height,
       child: TextButton(
         onPressed: _isDisabled ? null : onPressed,
         style: _styleFor(resolvedVariant),
