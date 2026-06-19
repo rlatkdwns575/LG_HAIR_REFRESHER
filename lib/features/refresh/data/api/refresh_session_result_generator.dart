@@ -6,6 +6,7 @@ import '../model/refresh_pollution_level.dart';
 import '../model/refresh_result.dart';
 import '../model/refresh_result_change.dart';
 import '../model/refresh_session_outcome.dart';
+import '../refresh_result_headline_builder.dart';
 import '../refresh_mode_catalog.dart';
 
 /// 리프레시 완료 시 before/after 점수와 개선율을 생성합니다.
@@ -32,8 +33,9 @@ class RefreshSessionResultGenerator {
       final pollutionScore =
           baseline?.totalPollutionScore ??
           RefreshSessionResultGenerator.defaultScentPollutionScore;
+      final headline = RefreshResultHeadlineBuilder.forMode(mode);
       return RefreshSessionOutcome(
-        result: _buildScentOnlyResult(),
+        result: _buildScentOnlyResult(headline),
         scores: RefreshSessionScores(
           pollutionBefore: pollutionScore,
           pollutionAfter: pollutionScore,
@@ -93,13 +95,15 @@ class RefreshSessionResultGenerator {
       fallback: pollutionBefore,
     );
 
+    final headline = RefreshResultHeadlineBuilder.forMode(mode);
+
     final result = RefreshResult(
       dustRemovalPercent: dustRemoval ?? 0,
       odorRemovalPercent: odorRemoval ?? 0,
       overallImprovementPercent: overall,
-      headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
-      headlineAfter: '줄어들었어요.',
-      disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
+      headlineBefore: headline.before,
+      headlineAfter: headline.after,
+      disclaimer: '',
       dustChange: RefreshResultChange(
         label: '먼지',
         beforeLevel: pollutionLevelFromScore(dustBefore ?? dustBeforeMin),
@@ -205,13 +209,15 @@ class RefreshSessionResultGenerator {
     return min + random.nextInt(max - min + 1);
   }
 
-  static RefreshResult _buildScentOnlyResult() {
+  static RefreshResult _buildScentOnlyResult(
+    ({String before, String after}) headline,
+  ) {
     return RefreshResult(
       dustRemovalPercent: 0,
       odorRemovalPercent: 0,
       overallImprovementPercent: 100,
-      headlineBefore: '은은한 향기 케어가',
-      headlineAfter: '완료되었어요.',
+      headlineBefore: headline.before,
+      headlineAfter: headline.after,
       disclaimer: '향기는 시간이 지나면 희미해질 수 있어요.',
       dustChange: const RefreshResultChange(
         label: '먼지',

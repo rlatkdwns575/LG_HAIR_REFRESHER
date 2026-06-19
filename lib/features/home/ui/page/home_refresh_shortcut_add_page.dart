@@ -111,7 +111,9 @@ class _HomeRefreshShortcutAddPageState
     if (!mounted || created != true) {
       return;
     }
-    setState(() {});
+    setState(() {
+      _selectedChipIndex = RefreshModeTabs.customTabIndex;
+    });
   }
 
   void _confirmSelection() {

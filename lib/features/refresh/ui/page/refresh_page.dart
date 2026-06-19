@@ -155,7 +155,9 @@ class _RefreshPageState extends State<RefreshPage> {
     if (!mounted || created != true) {
       return;
     }
-    setState(() {});
+    setState(() {
+      _selectedChipIndex = RefreshModeTabs.customTabIndex;
+    });
   }
 
   bool _isModeEnabled(RefreshMode mode) {

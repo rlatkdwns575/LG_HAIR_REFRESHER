@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../refresh/data/model/refresh_mode.dart';
-import '../../../../app/theme/app_colors.dart';
 import 'measure_care_level.dart';
 import '../api/measure_result_mapper.dart';
+import '../measure_result_headline_builder.dart';
 import 'measure_result_headline.dart';
 import 'measure_result_record.dart';
 import 'measure_result_status_item.dart';
@@ -74,28 +74,29 @@ class MeasureResult {
   );
 
   /// 경고형 mock — Figma 621-12885 (냄새 집중 권장 + 먼지 집중 필요).
-  static const sampleActionRequired = MeasureResult(
+  static final sampleActionRequired = MeasureResult(
     odorLevel: MeasureCareLevel.intensiveRecommended,
     dustLevel: MeasureCareLevel.intensiveRequired,
-    headline: MeasureResultHeadline.highlighted(
-      before: '외출 후 남은 냄새와 먼지를 정리해 ',
-      highlight: '안심할 수 있는 상태',
-      after: '를 되찾아보세요.',
-      highlightColor: AppColors.orange700,
+    headline: MeasureResultHeadlineBuilder.forRecommendMode(
+      mode: _outdoorSafeRefresh,
+      needsAction: true,
     ),
     recommendedMode: _outdoorSafeRefresh,
     recommendReason: '냄새·먼지 상태가 집중 관리가 필요해 외출 후 안심 리프레시를 추천해요.',
   );
 
   /// 안정형 mock — Figma 621-12875 (냄새/먼지 보통).
-  static const sampleStable = MeasureResult(
+  static final sampleStable = MeasureResult(
     odorLevel: MeasureCareLevel.normal,
     dustLevel: MeasureCareLevel.normal,
-    headline: MeasureResultHeadline.plain('현재 헤어 상태는 안정적이에요.\n가벼운 관리만으로 충분해요.'),
+    headline: MeasureResultHeadlineBuilder.forRecommendMode(
+      mode: _dailyRefresh,
+      needsAction: false,
+    ),
     recommendedMode: _dailyRefresh,
     recommendReason: '현재 헤어 상태가 안정적이어서 가벼운 관리 모드를 추천해요.',
   );
 
   /// 화면 기본 mock. 개발 중 타입 확인 시 [sampleStable] 로 교체 가능.
-  static const sample = sampleActionRequired;
+  static final sample = sampleActionRequired;
 }

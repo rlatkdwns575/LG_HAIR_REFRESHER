@@ -52,53 +52,47 @@ class RefreshDetailTimeline extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: _contentIndent),
-            child: AppText(
-              totalDurationLabel,
-              style: AppTextStyles.labelM.copyWith(
-                color: AppColors.gray500,
-                height: 16 / 12,
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: _contentIndent),
+          child: AppText(
+            totalDurationLabel,
+            style: AppTextStyles.labelM.copyWith(
+              color: AppColors.gray500,
+              height: 16 / 12,
             ),
           ),
-          const SizedBox(height: _durationToStepsGap),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              if (steps.length > 1)
-                Positioned(
-                  left: (_railWidth - _lineWidth) / 2,
-                  top: _dotCenterYOffset - _lineEndExtension,
-                  height:
-                      (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
-                      (_lineEndExtension * 2),
-                  child: Container(
-                    width: _lineWidth,
-                    color: _timelineLineColor,
-                  ),
-                ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var i = 0; i < steps.length; i++)
-                    _TimelineStepRow(
-                      step: steps[i],
-                      isLast: i == steps.length - 1,
-                    ),
-                ],
+        ),
+        const SizedBox(height: _durationToStepsGap),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            if (steps.length > 1)
+              Positioned(
+                left: (_railWidth - _lineWidth) / 2,
+                top: _dotCenterYOffset - _lineEndExtension,
+                height:
+                    (_lastDotCenterY(steps.length) - _dotCenterYOffset) +
+                    (_lineEndExtension * 2),
+                child: Container(width: _lineWidth, color: _timelineLineColor),
               ),
-            ],
-          ),
-        ],
-      ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < steps.length; i++)
+                  _TimelineStepRow(
+                    step: steps[i],
+                    isLast: i == steps.length - 1,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -116,6 +110,7 @@ class _TimelineStepRow extends StatelessWidget {
         bottom: isLast ? 0 : RefreshDetailTimeline._stepGap,
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
@@ -137,40 +132,38 @@ class _TimelineStepRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: RefreshDetailTimeline._textGap),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: AppTextStyles.titleM.copyWith(
-                      fontWeight: FontWeight.w600,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: AppTextStyles.titleM.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '${step.durationLabel} '.softWrapWords(),
+                      style: const TextStyle(color: AppColors.primary700),
                     ),
-                    children: [
-                      TextSpan(
-                        text: '${step.durationLabel} '.softWrapWords(),
-                        style: const TextStyle(color: AppColors.primary700),
-                      ),
-                      TextSpan(
-                        text: step.title.softWrapWords(),
-                        style: const TextStyle(color: AppColors.gray900),
-                      ),
-                    ],
+                    TextSpan(
+                      text: step.title.softWrapWords(),
+                      style: const TextStyle(color: AppColors.gray900),
+                    ),
+                  ],
+                ),
+              ),
+              if (step.description != null && step.description!.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.xs),
+                AppText(
+                  step.description!,
+                  style: AppTextStyles.labelS.copyWith(
+                    color: AppColors.gray700,
+                    height: 14 / 11,
                   ),
                 ),
-                if (step.description != null &&
-                    step.description!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.xs),
-                  AppText(
-                    step.description!,
-                    style: AppTextStyles.labelS.copyWith(
-                      color: AppColors.gray700,
-                      height: 14 / 11,
-                    ),
-                  ),
-                ],
               ],
-            ),
+            ],
           ),
         ],
       ),

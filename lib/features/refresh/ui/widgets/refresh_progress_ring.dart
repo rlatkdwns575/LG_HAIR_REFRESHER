@@ -24,6 +24,11 @@ class RefreshProgressRing extends StatelessWidget {
 
   static const _ringSize = 160.0;
   static const _strokeWidth = 12.0;
+  static const double _innerDiameter = _ringSize - _strokeWidth * 2;
+  static const double _percentToTimerGap = 10;
+
+  /// '%' 기호 때문에 시각적으로 치우쳐 보이는 텍스트 블록 보정.
+  static const Offset _centerTextOffset = Offset(3, 2);
   static const Duration _animationDuration = Duration(milliseconds: 900);
 
   static const Color _activeStartColor = AppColors.primary300;
@@ -46,43 +51,59 @@ class RefreshProgressRing extends StatelessWidget {
         final progressColor =
             Color.lerp(startColor, endColor, animatedProgress) ?? endColor;
 
-        return SizedBox(
-          width: _ringSize,
-          height: _ringSize,
-          child: CustomPaint(
-            painter: _RefreshRingPainter(
-              progress: animatedProgress,
-              strokeWidth: _strokeWidth,
-              trackColor: AppColors.gray100,
-              progressColor: progressColor,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Transform.translate(
-                    offset: const Offset(6, 0),
-                    child: AppText(
-                      '$displayPercent%',
-                      style: AppTextStyles.headlineL.copyWith(
-                        color: dimmed
-                            ? AppColors.gray500
-                            : AppColors.primary400,
-                        fontSize: 36,
-                        height: 36 / 36,
-                        letterSpacing: -0.72,
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: SizedBox(
+            width: _ringSize,
+            height: _ringSize,
+            child: CustomPaint(
+              painter: _RefreshRingPainter(
+                progress: animatedProgress,
+                strokeWidth: _strokeWidth,
+                trackColor: AppColors.gray100,
+                progressColor: progressColor,
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: _innerDiameter,
+                  height: _innerDiameter,
+                  child: Center(
+                    child: Transform.translate(
+                      offset: _centerTextOffset,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          AppText(
+                            '$displayPercent%',
+                            textAlign: TextAlign.center,
+                            enableKoreanLineBreak: false,
+                            style: AppTextStyles.headlineL.copyWith(
+                              color: dimmed
+                                  ? AppColors.gray500
+                                  : AppColors.primary400,
+                              fontSize: 36,
+                              height: 1,
+                              letterSpacing: -0.72,
+                            ),
+                          ),
+                          const SizedBox(height: _percentToTimerGap),
+                          AppText(
+                            remainingLabel,
+                            textAlign: TextAlign.center,
+                            enableKoreanLineBreak: false,
+                            style: AppTextStyles.bodyM1.copyWith(
+                              color: AppColors.gray700,
+                              fontWeight: FontWeight.w500,
+                              height: 1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  AppText(
-                    remainingLabel,
-                    style: AppTextStyles.bodyM1.copyWith(
-                      color: AppColors.gray700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

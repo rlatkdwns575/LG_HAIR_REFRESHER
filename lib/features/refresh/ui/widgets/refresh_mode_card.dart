@@ -40,8 +40,6 @@ class RefreshModeCard extends StatelessWidget {
       ? descriptionOverride!.trim()
       : mode.description;
 
-  bool get _isUserCustomMode => mode.isCustom || mode.createdByUser;
-
   double get _contentOpacity => enabled ? 1 : 0.5;
 
   @override
@@ -77,10 +75,6 @@ class RefreshModeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (_isUserCustomMode) ...[
-                  const SizedBox(width: 6),
-                  _Badge(label: RefreshModeTabs.customModeTab),
-                ],
                 const SizedBox(width: AppSpacing.sm),
                 DurationBadge(totalSeconds: mode.durationSeconds),
               ],
@@ -166,10 +160,6 @@ class RefreshModeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (_isUserCustomMode) ...[
-                  const SizedBox(width: 6),
-                  _Badge(label: RefreshModeTabs.customModeTab),
-                ],
               ],
             ),
             const SizedBox(height: 6),

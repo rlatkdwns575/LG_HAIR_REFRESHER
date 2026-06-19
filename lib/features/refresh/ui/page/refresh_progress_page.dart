@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../core/services/device_consumable_service.dart';
-import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
@@ -44,10 +43,11 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   bool _navigated = false;
 
   static const Duration _completionHold = Duration(milliseconds: 500);
-  static const double _spacingBelowModeName = 36;
-  static const double _spacingBelowRing = 32;
-  static const double _spacingBelowStepStrip = 28;
+  static const double _spacingBelowModeName = 52;
+  static const double _spacingBelowRing = 52;
+  static const double _spacingBelowStepStrip = 44;
   static const double _spacingAboveButton = 28;
+  static const double _spacingBelowButton = 2;
   static const double _phoneContentOffsetY = -20;
 
   /// Figma 750×800 태블릿 프레임 — 본문 세로 중심보다 약간 위.
@@ -283,7 +283,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
                   15,
                   _spacingAboveButton,
                   15,
-                  AppSpacing.sm,
+                  _spacingBelowButton,
                 ),
                 child: _buildBottomAction(),
               ),

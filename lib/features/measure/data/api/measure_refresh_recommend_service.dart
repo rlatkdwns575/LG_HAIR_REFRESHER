@@ -1,11 +1,10 @@
-import '../../../../app/theme/app_colors.dart';
 import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
+import '../measure_result_headline_builder.dart';
 import 'measure_diagnosis_generator.dart';
 import '../model/measure_result.dart';
-import '../model/measure_result_headline.dart';
 import '../model/measure_result_record.dart';
 import 'measure_api.dart';
 import 'measure_result_mapper.dart';
@@ -56,30 +55,18 @@ class MeasureRefreshRecommendService {
     final recommendReason =
         recommendation?.message ??
         '현재 헤어 상태와 환경을 고려해 ${recommendedMode.name}을 추천해요.';
+    final needsAction = resolvedOdor.needsAction || resolvedDust.needsAction;
     return MeasureResult(
       odorLevel: resolvedOdor,
       dustLevel: resolvedDust,
-      headline: _headlineFor(resolvedOdor, resolvedDust),
+      headline: MeasureResultHeadlineBuilder.forRecommendMode(
+        mode: recommendedMode,
+        needsAction: needsAction,
+      ),
       recommendedMode: recommendedMode,
       recommendReason: recommendReason,
       sourceRecord: record,
     );
-  }
-
-  static MeasureResultHeadline _headlineFor(
-    MeasureCareLevel odorLevel,
-    MeasureCareLevel dustLevel,
-  ) {
-    if (odorLevel.needsAction || dustLevel.needsAction) {
-      return MeasureResultHeadline.highlighted(
-        before: '외출 후 남은 냄새와 먼지를 정리해 ',
-        highlight: '안심할 수 있는 상태',
-        after: '를 되찾아보세요.',
-        highlightColor: AppColors.orange700,
-      );
-    }
-
-    return MeasureResultHeadline.plain('현재 헤어 상태는 안정적이에요.\n가벼운 관리만으로 충분해요.');
   }
 
   static RefreshMode _fallbackMode(List<RefreshMode> presets) {

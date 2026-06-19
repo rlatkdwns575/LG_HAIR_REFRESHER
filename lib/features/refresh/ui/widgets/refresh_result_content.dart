@@ -26,8 +26,8 @@ class RefreshResultContent extends StatelessWidget {
 
   /// 헤더(리프레시 결과 / 2시간) 아래 콘텐츠를 내리기 위한 여백.
   static const _headerToHeadlineGap = 64.0;
-  static const _headlineToGraphGap = 32.0;
-  static const _graphToDetailGap = 44.0;
+  static const _headlineToGraphGap = 44.0;
+  static const _graphToDetailGap = 52.0;
   static const _detailToCardGap = 52.0;
 
   @override
