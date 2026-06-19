@@ -92,9 +92,9 @@ class RefreshResult {
       dustRemovalPercent: 87,
       odorRemovalPercent: 92,
       overallImprovementPercent: 40.9,
-      headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
+      headlineBefore: '외출 후 집중 리프레시 모드로 남아 있던 냄새와 먼지가',
       headlineAfter: '줄어들었어요.',
-      disclaimer: '외부 활동이 이어지면 냄새와 먼지가 다시 남을 수 있어요.',
+      disclaimer: '',
       dustChange: const RefreshResultChange(
         label: '먼지',
         beforeLevel: RefreshPollutionLevel.high,

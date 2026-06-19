@@ -8,7 +8,8 @@ class MeasurePrepareImageArea extends StatelessWidget {
 
   final MeasurePrepareStep step;
 
-  static const double height = 360;
+  /// Figma 40000052:24547 — 준비 화면 이미지 영역 높이.
+  static const double height = 320;
   static const double imageRadius = 10;
 
   @override

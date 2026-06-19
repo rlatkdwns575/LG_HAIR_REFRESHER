@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/theme/app_spacing.dart';
+import 'measure_prepare_body.dart';
 import 'measure_prepare_image_area.dart';
 import 'measure_prepare_instruction.dart';
 import 'measure_skeleton_box.dart';
@@ -8,9 +8,6 @@ import 'measure_step_indicator.dart';
 
 class MeasurePrepareSkeleton extends StatelessWidget {
   const MeasurePrepareSkeleton({super.key});
-
-  static const double _horizontalPadding = 15;
-  static const double _contentTopGap = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +19,12 @@ class MeasurePrepareSkeleton extends StatelessWidget {
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
+            padding: const EdgeInsets.symmetric(
+              horizontal: MeasurePrepareBody.horizontalPadding,
+            ),
             child: Column(
               children: [
-                const SizedBox(height: _contentTopGap),
+                const SizedBox(height: MeasurePrepareBody.indicatorToImageGap),
                 const SizedBox(
                   width: double.infinity,
                   child: MeasureSkeletonBox(
@@ -34,17 +33,18 @@ class MeasurePrepareSkeleton extends StatelessWidget {
                     borderRadius: MeasurePrepareImageArea.imageRadius,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: MeasurePrepareBody.imageToTextGap),
                 const MeasurePrepareInstruction(title: '', isLoading: true),
+                const Spacer(),
               ],
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
-            _horizontalPadding,
+            MeasurePrepareBody.horizontalPadding,
             10,
-            _horizontalPadding,
+            MeasurePrepareBody.horizontalPadding,
             20,
           ),
           child: const MeasureSkeletonBox(

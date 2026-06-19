@@ -46,20 +46,20 @@ class RefreshModeDetail {
 
   static const _defaultPreCheckItems = [
     '디바이스를 머리 가까이에 유지해 주세요.',
-    '케어 중에는 모발 전체를 따라 디바이스를 골고루 움직여주세요.',
+    '케어 중에는 디바이스를 모발 전체에 골고루 움직여주세요.',
   ];
 
   static const _intensityLabels = ['집중관리', '일반관리', '간편관리'];
 
   static const Map<String, Map<CareIntensity, String>> _stepDescriptions = {
     '먼지': {
-      CareIntensity.intensive: '모발 표면에 쌓인 먼지를 강한 바람으로 꼼꼼하게 제거해요.',
+      CareIntensity.intensive: '모발 표면에 붙은 먼지를 강력하게 제거해요.',
       CareIntensity.normal: '모발 표면에 묻은 먼지를 빠르게 제거해요.',
       CareIntensity.simple: '모발 표면의 먼지를 가볍게 털어내요.',
     },
     '냄새': {
       CareIntensity.intensive: '모발 깊숙이 밴 냄새까지 집중적으로 정리해요.',
-      CareIntensity.normal: '모발에 남은 냄새를 부드럽게 정리해요.',
+      CareIntensity.normal: '머리카락에 남은 외부 냄새를 줄여요.',
       CareIntensity.simple: '가벼운 생활 냄새를 산뜻하게 환기해요.',
     },
     '향기': {
@@ -307,9 +307,9 @@ class RefreshModeDetail {
     final minutes = totalSeconds ~/ 60;
     final seconds = totalSeconds % 60;
     if (seconds == 0) {
-      return '총 소요 시간 $minutes분';
+      return '총소요 시간 $minutes분';
     }
-    return '총 소요 시간 ${CareDurationSplit.formatKoreanTime(totalSeconds)}';
+    return '총소요 시간 ${CareDurationSplit.formatKoreanTime(totalSeconds)}';
   }
 }
 

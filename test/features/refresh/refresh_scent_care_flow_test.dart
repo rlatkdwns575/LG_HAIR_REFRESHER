@@ -62,6 +62,15 @@ void main() {
   });
 
   group('RefreshResult.fromProgressSession', () {
+    test('uses care-specific result headline', () {
+      final result = RefreshResult.fromProgressSession(
+        session: RefreshProgressSession.fromMode(dustMode),
+        mode: dustMode,
+      );
+
+      expect(result.headlineBefore, '먼지 케어로 남아 있던 먼지가');
+    });
+
     test('recommends cached scent care mode after non-scent refresh', () {
       RefreshPresetModeStore.instance.setPresets([scentCarePreset]);
 
@@ -85,7 +94,7 @@ void main() {
       expect(result.showChangeChart, isFalse);
       expect(result.showImprovementPercent, isFalse);
       expect(result.showScentCareRecommendation, isFalse);
-      expect(result.headlineBefore, '은은한 향기 케어가');
+      expect(result.headlineBefore, '향기 케어 모드로 은은한 향기 케어가');
       expect(result.headlineAfter, '완료되었어요.');
     });
 

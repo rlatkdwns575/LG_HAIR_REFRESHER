@@ -19,6 +19,8 @@ class RefreshModeTabs {
     etc,
   ];
 
+  static int get customTabIndex => all.indexOf(customModeTab);
+
   /// 커스텀 모드 기본 카테고리(내부·DB).
   static const customMode = '커스텀 모드';
   static const beforeOuting = '외출 전';

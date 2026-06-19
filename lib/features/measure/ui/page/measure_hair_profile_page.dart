@@ -46,7 +46,9 @@ class _MeasureHairProfilePageState extends State<MeasureHairProfilePage> {
         return;
       }
       setState(() {
-        _selectedHairType = profile?.hairType;
+        _selectedHairType = HairProfileOptions.normalizeHairType(
+          profile?.hairType,
+        );
         _isLoading = false;
       });
     } catch (_) {

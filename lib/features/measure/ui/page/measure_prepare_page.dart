@@ -9,7 +9,6 @@ import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../data/model/measure_prepare_step.dart';
 import '../widgets/measure_prepare_body.dart';
 import '../widgets/measure_prepare_bottom_bar.dart';
-import '../widgets/measure_prepare_skeleton.dart';
 import '../widgets/measure_step_indicator.dart';
 
 class MeasurePreparePage extends StatefulWidget {
@@ -20,36 +19,21 @@ class MeasurePreparePage extends StatefulWidget {
 }
 
 class _MeasurePreparePageState extends State<MeasurePreparePage> {
-  static const Duration _initialLoadDelay = Duration(milliseconds: 1500);
   static const Duration _stepAdvanceDelay = Duration(seconds: 2);
 
-  MeasurePrepareViewState _viewState = MeasurePrepareViewState.loading;
   MeasurePrepareStep _currentStep = MeasurePrepareStep.devicePower;
   Timer? _mockTimer;
 
   @override
   void initState() {
     super.initState();
-    _startInitialLoad();
+    _scheduleStepAdvance();
   }
 
   @override
   void dispose() {
     _mockTimer?.cancel();
     super.dispose();
-  }
-
-  void _startInitialLoad() {
-    _mockTimer = Timer(_initialLoadDelay, () {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _viewState = MeasurePrepareViewState.loaded;
-        _currentStep = MeasurePrepareStep.devicePower;
-      });
-      _scheduleStepAdvance();
-    });
   }
 
   void _scheduleStepAdvance() {
@@ -83,8 +67,6 @@ class _MeasurePreparePageState extends State<MeasurePreparePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = _viewState == MeasurePrepareViewState.loading;
-
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppCommonTopHeader(
@@ -92,24 +74,22 @@ class _MeasurePreparePageState extends State<MeasurePreparePage> {
         title: '헤어 상태 진단하기',
         onBack: () => context.pop(),
       ),
-      body: isLoading
-          ? const MeasurePrepareSkeleton()
-          : Column(
-              children: [
-                MeasureStepIndicator(
-                  currentStep:
-                      _currentStep.index +
-                      MeasureIntroStepIndicator.prepareStepOffset,
-                  totalSteps: MeasureIntroStepIndicator.totalSteps,
-                ),
-                Expanded(child: MeasurePrepareBody(step: _currentStep)),
-                MeasurePrepareBottomBar(
-                  label: '진단 시작',
-                  enabled: _isStartEnabled,
-                  onPressed: _onStartPressed,
-                ),
-              ],
-            ),
+      body: Column(
+        children: [
+          MeasureStepIndicator(
+            currentStep:
+                _currentStep.index +
+                MeasureIntroStepIndicator.prepareStepOffset,
+            totalSteps: MeasureIntroStepIndicator.totalSteps,
+          ),
+          Expanded(child: MeasurePrepareBody(step: _currentStep)),
+          MeasurePrepareBottomBar(
+            label: '진단 시작',
+            enabled: _isStartEnabled,
+            onPressed: _onStartPressed,
+          ),
+        ],
+      ),
     );
   }
 }
