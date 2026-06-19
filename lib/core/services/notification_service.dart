@@ -5,6 +5,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../utils/notification_schedule_utils.dart';
+
 /// 로컬 알림(예약 포함) 초기화·권한·스케줄링을 담당하는 전역 서비스.
 ///
 /// 특정 feature 모델에 의존하지 않도록 원시 파라미터만 받습니다.
@@ -48,10 +50,34 @@ class NotificationService {
       ),
     );
 
+    if (Platform.isAndroid) {
+      await _createAndroidChannel();
+    }
+
     _initialized = true;
   }
 
-  /// 알림 권한을 요청합니다. 허용되면 true.
+  static Future<void> _createAndroidChannel() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android == null) {
+      return;
+    }
+
+    const channel = AndroidNotificationChannel(
+      _channelId,
+      _channelName,
+      description: _channelDescription,
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+    await android.createNotificationChannel(channel);
+  }
+
+  /// 알림·정확한 예약 권한을 요청합니다. 허용되면 true.
   static Future<bool> requestPermission() async {
     await initialize();
 
@@ -70,7 +96,15 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin
           >();
       final granted = await android?.requestNotificationsPermission();
-      return granted ?? true;
+      if (granted == false) {
+        return false;
+      }
+
+      final canExact = await android?.canScheduleExactNotifications();
+      if (canExact == false) {
+        await android?.requestExactAlarmsPermission();
+      }
+      return true;
     }
 
     return true;
@@ -87,22 +121,20 @@ class NotificationService {
   }) async {
     await initialize();
 
+    final scheduledDate = _nextInstanceOf(weekday, hour, minute);
+    if (kDebugMode) {
+      debugPrint(
+        'NotificationService: weekly #$id weekday=$weekday at $scheduledDate',
+      );
+    }
+
     await _plugin.zonedSchedule(
       id: id,
       title: title,
       body: body,
-      scheduledDate: _nextInstanceOf(weekday, hour, minute),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: _channelDescription,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      scheduledDate: scheduledDate,
+      notificationDetails: _notificationDetails,
+      androidScheduleMode: await _resolveAndroidScheduleMode(),
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
   }
@@ -118,22 +150,20 @@ class NotificationService {
   }) async {
     await initialize();
 
+    final scheduledDate = _nextInstanceOf(weekday, hour, minute);
+    if (kDebugMode) {
+      debugPrint(
+        'NotificationService: once #$id weekday=$weekday at $scheduledDate',
+      );
+    }
+
     await _plugin.zonedSchedule(
       id: id,
       title: title,
       body: body,
-      scheduledDate: _nextInstanceOf(weekday, hour, minute),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: _channelDescription,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      scheduledDate: scheduledDate,
+      notificationDetails: _notificationDetails,
+      androidScheduleMode: await _resolveAndroidScheduleMode(),
     );
   }
 
@@ -147,25 +177,46 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
+  static const NotificationDetails _notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      channelDescription: _channelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+      category: AndroidNotificationCategory.reminder,
+      playSound: true,
+      enableVibration: true,
+    ),
+    iOS: DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    ),
+  );
+
+  static Future<AndroidScheduleMode> _resolveAndroidScheduleMode() async {
+    if (!Platform.isAndroid) {
+      return AndroidScheduleMode.exactAllowWhileIdle;
+    }
+
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final canExact = await android?.canScheduleExactNotifications();
+    if (canExact ?? true) {
+      return AndroidScheduleMode.exactAllowWhileIdle;
+    }
+    return AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
   static tz.TZDateTime _nextInstanceOf(int weekday, int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
+    return nextZonedNotificationTime(
+      location: tz.local,
+      weekday: weekday,
+      hour: hour,
+      minute: minute,
     );
-
-    while (scheduled.weekday != weekday || !scheduled.isAfter(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-
-    if (kDebugMode) {
-      debugPrint('NotificationService: scheduled #$weekday at $scheduled');
-    }
-
-    return scheduled;
   }
 }

@@ -220,7 +220,7 @@ class _TodayRecordTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AppText('청결도', style: HistoryTextStyles.kvLabel),
+                AppText('헤어 청결도', style: HistoryTextStyles.kvLabel),
                 const SizedBox(height: 2),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -229,9 +229,16 @@ class _TodayRecordTile extends StatelessWidget {
                   children: [
                     AppText(
                       record.cleanlinessIncreasePercentLabel!,
-                      style: HistoryTextStyles.percentValue,
+                      style: HistoryTextStyles.percentValue.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    AppText(' 증가', style: HistoryTextStyles.labelPrimary),
+                    AppText(
+                      ' 증가',
+                      style: HistoryTextStyles.labelPrimary.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ],

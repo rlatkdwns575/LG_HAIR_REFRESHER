@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
-import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_badge.dart';
 import '../../data/model/care_status.dart';
 import 'history_common.dart';
 
-/// 단일 케어 상태 배지 (예: 집중권장 / 좋음).
+/// 단일 케어 상태 배지 — Figma `badge_small` ([AppBadge]).
 class HistoryCareBadge extends StatelessWidget {
   const HistoryCareBadge({
     required this.status,
@@ -20,24 +19,11 @@ class HistoryCareBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 6 : 8,
-        vertical: compact ? 2 : 3,
-      ),
-      decoration: BoxDecoration(
-        color: status.backgroundColor,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: AppText(
-        status.label,
-        maxLines: 1,
-        softWrap: false,
-        style: AppTextStyles.labelS.copyWith(
-          color: status.textColor,
-          fontSize: compact ? 10 : null,
-        ),
-      ),
+    return AppBadge(
+      label: status.label,
+      compact: compact,
+      smallVariant: status.badgeVariant,
+      style: AppBadgeStyle.text,
     );
   }
 }

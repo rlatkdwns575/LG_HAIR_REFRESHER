@@ -73,7 +73,9 @@ class AppColors {
   static const red800 = Color(0xFFCA1D13);
   static const red900 = Color(0xFF921708);
 
-  // Yellow
+  // Yellow — Figma badge_small Medium (532:18430)
+  static const yellow100 = Color(0xFFFFECB2);
+  static const yellow600 = Color(0xFFC48300);
   static const yellow700 = Color(0xFFEFB300);
 
   // Presentation

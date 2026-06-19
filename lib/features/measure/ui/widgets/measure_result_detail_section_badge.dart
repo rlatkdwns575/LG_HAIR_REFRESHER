@@ -43,7 +43,11 @@ class MeasureResultDetailSectionBadge extends StatelessWidget {
     return switch (variant) {
       AppBadgeSmallVariant.veryHigh => (AppColors.red800, AppColors.red900),
       AppBadgeSmallVariant.high => (AppColors.orange600, AppColors.orange700),
-      AppBadgeSmallVariant.medium => (AppColors.green800, AppColors.green900),
+      AppBadgeSmallVariant.medium => (AppColors.yellow700, AppColors.yellow600),
+      AppBadgeSmallVariant.careNormal => (
+        AppColors.green700,
+        AppColors.green700,
+      ),
       AppBadgeSmallVariant.low => (AppColors.blue800, AppColors.blue900),
       AppBadgeSmallVariant.primary => (
         AppColors.primary700,

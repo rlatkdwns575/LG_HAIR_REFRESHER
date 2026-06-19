@@ -1,9 +1,9 @@
-import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_component_colors.dart';
 import 'measure_result_status_item.dart';
 
 /// 항목별 케어 필요도 (냄새/먼지).
 ///
-/// 화면설계서 상태별 컬러 가이드와 매핑됩니다.
+/// 화면설계서 · Figma `badge_small` (532:18430) 상태별 컬러와 매핑됩니다.
 enum MeasureCareLevel {
   notRequired('불필요'),
   normal('보통'),
@@ -38,37 +38,37 @@ enum MeasureCareLevel {
       MeasureCareLevel.notRequired => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
         badgeLabel: resolvedBadgeLabel,
-        dotColor: AppColors.blue700,
-        badgeBackgroundColor: AppColors.blue100,
-        badgeTextColor: AppColors.blue700,
+        dotColor: AppComponentColors.badgeSmallLowText,
+        badgeBackgroundColor: AppComponentColors.badgeSmallLowBackground,
+        badgeTextColor: AppComponentColors.badgeSmallLowText,
       ),
       MeasureCareLevel.normal => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
         badgeLabel: resolvedBadgeLabel,
-        dotColor: AppColors.blue700,
-        badgeBackgroundColor: AppColors.green100,
-        badgeTextColor: AppColors.green700,
+        dotColor: AppComponentColors.badgeSmallCareNormalText,
+        badgeBackgroundColor: AppComponentColors.badgeSmallCareNormalBackground,
+        badgeTextColor: AppComponentColors.badgeSmallCareNormalText,
       ),
       MeasureCareLevel.recommended => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
         badgeLabel: resolvedBadgeLabel,
-        dotColor: AppColors.yellow700,
-        badgeBackgroundColor: AppColors.orange100,
-        badgeTextColor: AppColors.yellow700,
+        dotColor: AppComponentColors.badgeSmallMediumFilledBackground,
+        badgeBackgroundColor: AppComponentColors.badgeSmallMediumBackground,
+        badgeTextColor: AppComponentColors.badgeSmallMediumText,
       ),
       MeasureCareLevel.intensiveRecommended => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
         badgeLabel: resolvedBadgeLabel,
-        dotColor: AppColors.orange700,
-        badgeBackgroundColor: AppColors.orange100,
-        badgeTextColor: AppColors.orange700,
+        dotColor: AppComponentColors.badgeSmallHighText,
+        badgeBackgroundColor: AppComponentColors.badgeSmallHighBackground,
+        badgeTextColor: AppComponentColors.badgeSmallHighText,
       ),
       MeasureCareLevel.intensiveRequired => MeasureResultStatusItem(
         categoryLabel: categoryLabel,
         badgeLabel: resolvedBadgeLabel,
-        dotColor: AppColors.red700,
-        badgeBackgroundColor: AppColors.red100,
-        badgeTextColor: AppColors.red700,
+        dotColor: AppComponentColors.badgeSmallVeryHighText,
+        badgeBackgroundColor: AppComponentColors.badgeSmallVeryHighBackground,
+        badgeTextColor: AppComponentColors.badgeSmallVeryHighText,
       ),
     };
   }

@@ -109,9 +109,15 @@ class AppComponentColors {
   static const badgeSmallLowText = Color(0xFF0B4596);
   static const badgeSmallLowFilledBackground = Color(0xFF135FCD);
   static const badgeSmallLowFilledText = Color(0xFFEFF6FF);
-  static const badgeSmallMediumBackground = Color(0xFFD9F6E9);
-  static const badgeSmallMediumText = Color(0xFF075445);
-  static const badgeSmallMediumFilledBackground = Color(0xFF00745F);
+  // Figma badge_small — Low (보통)
+  static const badgeSmallCareNormalBackground = Color(0xFFD9F6E9);
+  static const badgeSmallCareNormalText = Color(0xFF075445);
+  static const badgeSmallCareNormalFilledBackground = Color(0xFF00745F);
+  static const badgeSmallCareNormalFilledText = Color(0xFFEDFAF6);
+  // Figma badge_small — Medium (권장)
+  static const badgeSmallMediumBackground = Color(0xFFFFECB2);
+  static const badgeSmallMediumText = Color(0xFFC48300);
+  static const badgeSmallMediumFilledBackground = Color(0xFFEFB300);
   static const badgeSmallMediumFilledText = Color(0xFFEDFAF6);
   static const badgeSmallHighBackground = Color(0xFFFFE8DB);
   static const badgeSmallHighText = Color(0xFFFF5700);

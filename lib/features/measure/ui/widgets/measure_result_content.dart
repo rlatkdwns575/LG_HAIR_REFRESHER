@@ -8,6 +8,7 @@ import 'measure_result_headline.dart';
 import 'measure_result_header.dart';
 import 'measure_result_refresh_need_summary.dart';
 import 'measure_result_status_row.dart';
+import 'measure_result_visual.dart';
 
 /// 진단 결과 본문 — 안정형/경고형 공통 레이아웃.
 class MeasureResultContent extends StatelessWidget {
@@ -18,9 +19,6 @@ class MeasureResultContent extends StatelessWidget {
     this.isRecommendEnabled = true,
     super.key,
   });
-
-  /// Figma 40000056:18420 — img area 160×160.
-  static const double visualAreaHeight = 160;
 
   /// Figma 40000056:18411 — Title ↔ card_result, card_result ↔ card_refresh.
   static const double _sectionGap = 20;
@@ -45,7 +43,10 @@ class MeasureResultContent extends StatelessWidget {
         const SizedBox(height: _sectionGap),
         MeasureResultHeadline(headline: result.headline),
         const SizedBox(height: _cardInnerGap),
-        const SizedBox(height: visualAreaHeight),
+        MeasureResultVisual(
+          odorLevel: result.odorLevel,
+          dustLevel: result.dustLevel,
+        ),
         const SizedBox(height: _cardInnerGap),
         Column(
           children: [

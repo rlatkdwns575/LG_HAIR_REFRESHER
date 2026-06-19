@@ -17,7 +17,7 @@ class MeasureResultDetailContent extends StatelessWidget {
   });
 
   /// Figma 40000056:19034 — Title ↔ 요약 블록.
-  static const double _headerToSummaryGap = 40;
+  static const double _headerToSummaryGap = 28;
 
   /// Figma divider — 섹션 구분 상·하 여백.
   static const double _sectionDividerSpacing = 12;

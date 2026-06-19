@@ -4,6 +4,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'app/app.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
+import 'features/routine/data/api/routine_alarm_scheduler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,7 @@ Future<void> main() async {
   DeviceCalendarPlugin();
   await SupabaseService.initialize();
   await NotificationService.initialize();
+  await RoutineAlarmScheduler.rescheduleAll();
 
   runApp(const LgHairRefresherApp());
 }

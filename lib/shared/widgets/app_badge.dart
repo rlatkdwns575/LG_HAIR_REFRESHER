@@ -12,6 +12,7 @@ enum AppBadgeSmallVariant {
   primary,
   primaryLight,
   low,
+  careNormal,
   medium,
   high,
   veryHigh,
@@ -118,6 +119,10 @@ class AppBadge extends StatelessWidget {
           AppComponentColors.badgeSmallLowFilledBackground,
           AppComponentColors.badgeSmallLowFilledText,
         ),
+        AppBadgeSmallVariant.careNormal => (
+          AppComponentColors.badgeSmallCareNormalFilledBackground,
+          AppComponentColors.badgeSmallCareNormalFilledText,
+        ),
         AppBadgeSmallVariant.medium => (
           AppComponentColors.badgeSmallMediumFilledBackground,
           AppComponentColors.badgeSmallMediumFilledText,
@@ -149,6 +154,10 @@ class AppBadge extends StatelessWidget {
       AppBadgeSmallVariant.low => (
         AppComponentColors.badgeSmallLowBackground,
         AppComponentColors.badgeSmallLowText,
+      ),
+      AppBadgeSmallVariant.careNormal => (
+        AppComponentColors.badgeSmallCareNormalBackground,
+        AppComponentColors.badgeSmallCareNormalText,
       ),
       AppBadgeSmallVariant.medium => (
         AppComponentColors.badgeSmallMediumBackground,

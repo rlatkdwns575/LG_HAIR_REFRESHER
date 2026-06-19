@@ -34,6 +34,7 @@ class MeasureRefreshRecommendService {
     MeasureCareLevel? odorLevel,
     MeasureCareLevel? dustLevel,
     DateTime? now,
+    DateTime? historyCompletedAt,
   }) async {
     final record = sourceRecord ?? await measureApi.fetchLatestResult();
     if (record == null) {
@@ -66,6 +67,7 @@ class MeasureRefreshRecommendService {
       recommendedMode: recommendedMode,
       recommendReason: recommendReason,
       sourceRecord: record,
+      historyCompletedAt: historyCompletedAt,
     );
   }
 

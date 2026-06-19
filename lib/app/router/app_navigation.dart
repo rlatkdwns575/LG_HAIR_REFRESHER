@@ -39,7 +39,7 @@ extension AppNavigation on BuildContext {
   void pushMeasureHistoryRecordDetail({required MeasureResultRecord record}) {
     push(
       AppRoutePaths.measureResultDetail,
-      extra: MeasureResultMapper.toMeasureResult(record),
+      extra: MeasureResultMapper.toHistoryDetailEntry(record),
     );
   }
 
