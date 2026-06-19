@@ -253,6 +253,7 @@ class _RefreshPageState extends State<RefreshPage> {
           child: modes.isEmpty
               ? _buildEmptyState()
               : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     for (var i = 0; i < modes.length; i++) ...[
                       if (i > 0) const SizedBox(height: AppSpacing.md),

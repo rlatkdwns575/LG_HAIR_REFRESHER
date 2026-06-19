@@ -39,7 +39,9 @@ class MeasureResultDetailContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const MeasureResultDetailHeader(),
+              MeasureResultDetailHeader(
+                historyCompletedAt: detail.historyCompletedAt,
+              ),
               const SizedBox(height: _headerToSummaryGap),
               Padding(
                 padding: const EdgeInsets.symmetric(

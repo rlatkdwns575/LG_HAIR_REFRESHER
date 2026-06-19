@@ -39,7 +39,7 @@ class HistoryTotalSection extends StatelessWidget {
         AppText(
           summary.introMessage,
           textAlign: TextAlign.center,
-          style: AppTextStyles.titleS.copyWith(color: AppColors.gray800),
+          style: HistoryTextStyles.cardTitle,
         ),
         const SizedBox(height: AppSpacing.lg),
         Row(
@@ -63,7 +63,6 @@ class HistoryTotalSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         _InsightCard(
           insight: summary.preStatePattern,
-          titleColor: AppColors.primary500,
           firstDescriptionBoldPhrase: '냄새 높음 상태',
           child: _StackedBar(
             bars: summary.preStatePattern.bars,
@@ -75,20 +74,17 @@ class HistoryTotalSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         _InsightCard(
           insight: summary.timeUsageInsight,
-          titleColor: AppColors.primary500,
           child: _TimeUsageChart(usages: summary.timeUsage),
         ),
         const SizedBox(height: AppSpacing.md),
         _InsightCard(
           insight: summary.careRatio,
-          titleColor: AppColors.primary500,
           firstDescriptionBoldPhrase: '냄새 중심의 케어',
           child: _GradientStackedBar(bars: summary.careRatio.bars),
         ),
         const SizedBox(height: AppSpacing.md),
         _InsightCard(
           title: '주요 리프레시 모드',
-          titleColor: AppColors.primary500,
           firstDescriptionBoldPhrase: summary.modeUsages.isEmpty
               ? null
               : summary.modeUsages.first.modeName,
@@ -137,20 +133,14 @@ class _StatCard extends StatelessWidget {
             AppText(
               labelLines[i],
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyS.copyWith(
-                color: AppColors.gray900,
-                fontWeight: FontWeight.w700,
-              ),
+              style: HistoryTextStyles.statLabel,
             ),
           const SizedBox(height: 10),
           if (valueLeading == null)
             AppText(
               value,
               textAlign: TextAlign.center,
-              style: AppTextStyles.titleS.copyWith(
-                color: AppColors.gray900,
-                fontWeight: FontWeight.w700,
-              ),
+              style: HistoryTextStyles.statValue,
             )
           else
             Row(
@@ -158,20 +148,8 @@ class _StatCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                AppText(
-                  valueLeading!,
-                  style: AppTextStyles.bodyS.copyWith(
-                    color: AppColors.gray900,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                AppText(
-                  value,
-                  style: AppTextStyles.titleS.copyWith(
-                    color: AppColors.gray900,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                AppText(valueLeading!, style: HistoryTextStyles.statLabel),
+                AppText(value, style: HistoryTextStyles.statValue),
               ],
             ),
         ],
@@ -187,14 +165,12 @@ class _InsightCard extends StatelessWidget {
     this.insight,
     this.title,
     this.descriptions = const [],
-    this.titleColor,
     this.firstDescriptionBoldPhrase,
   }) : assert(insight != null || title != null);
 
   final HistoryInsight? insight;
   final String? title;
   final List<String> descriptions;
-  final Color? titleColor;
   final String? firstDescriptionBoldPhrase;
   final Widget child;
 
@@ -208,12 +184,7 @@ class _InsightCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AppText(
-            _title,
-            style: AppTextStyles.labelM.copyWith(
-              color: titleColor ?? AppColors.gray500,
-            ),
-          ),
+          AppText(_title, style: HistoryTextStyles.insightTitle),
           const SizedBox(height: 8),
           for (var i = 0; i < _descriptions.length; i++)
             Padding(
@@ -224,9 +195,7 @@ class _InsightCard extends StatelessWidget {
                   ? _buildFirstDescription(_descriptions[i])
                   : AppText(
                       _descriptions[i],
-                      style: AppTextStyles.bodyS.copyWith(
-                        color: AppColors.gray600,
-                      ),
+                      style: HistoryTextStyles.insightCaption,
                     ),
             ),
           const SizedBox(height: AppSpacing.md),
@@ -237,7 +206,7 @@ class _InsightCard extends StatelessWidget {
   }
 
   Widget _buildFirstDescription(String text) {
-    final baseStyle = AppTextStyles.bodyM2.copyWith(color: AppColors.gray900);
+    final baseStyle = HistoryTextStyles.insightBody;
     final phrase = firstDescriptionBoldPhrase;
 
     if (phrase == null || !text.contains(phrase)) {
@@ -342,10 +311,7 @@ class _StackedBar extends StatelessWidget {
     bool alignRight = false,
   }) {
     final percentText = _format(bar.percent);
-    final labelStyle = AppTextStyles.labelM.copyWith(
-      color: AppColors.gray900,
-      fontWeight: FontWeight.w600,
-    );
+    final labelStyle = HistoryTextStyles.barLabel;
 
     if (usePrimaryPalette && highlightPrimaryPercentOnly) {
       if (index == 0) {
@@ -455,10 +421,7 @@ class _GradientStackedBar extends StatelessWidget {
 
   Widget _buildCareLabel(HistoryBarStat bar, {bool highlightPercent = false}) {
     final percentText = _format(bar.percent);
-    final labelStyle = AppTextStyles.labelM.copyWith(
-      color: AppColors.gray900,
-      fontWeight: FontWeight.w600,
-    );
+    final labelStyle = HistoryTextStyles.barLabel;
 
     if (highlightPercent) {
       return Text.rich(
@@ -597,11 +560,9 @@ class _LegendRow extends StatelessWidget {
         ),
         AppText(
           usage.label,
-          style: AppTextStyles.bodyS.copyWith(
-            color: highlight ? AppColors.primary500 : AppColors.gray900,
-            fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
-            height: 1.3,
-          ),
+          style: highlight
+              ? HistoryTextStyles.legendLabelHighlight
+              : HistoryTextStyles.legendLabel,
         ),
       ],
     );
@@ -626,7 +587,6 @@ class _CountChip extends StatelessWidget {
         style: AppTextStyles.labelS.copyWith(
           color: AppColors.primary500,
           fontWeight: FontWeight.w600,
-          height: 1.2,
         ),
       ),
     );
@@ -708,14 +668,12 @@ class _ModeUsageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nameStyle = AppTextStyles.bodyS.copyWith(
-      color: usage.isMostUsed ? AppColors.primary500 : AppColors.gray700,
-      fontWeight: usage.isMostUsed ? FontWeight.w700 : FontWeight.w400,
-    );
-    final improvementStyle = AppTextStyles.labelM.copyWith(
-      color: usage.isBestImprovement ? AppColors.primary500 : AppColors.gray500,
-      fontWeight: usage.isBestImprovement ? FontWeight.w700 : FontWeight.w400,
-    );
+    final nameStyle = usage.isMostUsed
+        ? HistoryTextStyles.modeUsageNameHighlight
+        : HistoryTextStyles.modeUsageName;
+    final improvementStyle = usage.isBestImprovement
+        ? HistoryTextStyles.modeUsageImprovementHighlight
+        : HistoryTextStyles.modeUsageImprovement;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -736,7 +694,7 @@ class _ModeUsageRow extends StatelessWidget {
         ),
         SizedBox(
           width: 72,
-          child: Text(
+          child: AppText(
             '$improvementPercentText 개선',
             style: improvementStyle,
             textAlign: TextAlign.right,

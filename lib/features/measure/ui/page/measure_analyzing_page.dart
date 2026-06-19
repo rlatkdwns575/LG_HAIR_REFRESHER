@@ -86,7 +86,7 @@ class _MeasureAnalyzingPageState extends State<MeasureAnalyzingPage> {
             const MeasureAnalyzingIllustration(),
             const SizedBox(height: AppSpacing.lg),
             const MeasurePrepareInstruction(
-              title: '결과를 분석 중이에요',
+              title: '결과를 분석 중이에요.',
               subtitle: '냄새, 먼지, 모발 상태를 종합해\n맞춤 리프레시를 준비하고 있어요.',
             ),
           ],

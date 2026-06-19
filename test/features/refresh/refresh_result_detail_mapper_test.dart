@@ -17,6 +17,7 @@ void main() {
       expect(detail.odorSection.changes, hasLength(3));
       expect(detail.shareSummaryText, contains('리프레시 결과'));
       expect(detail.shareSummaryText, contains(detail.summaryMessage));
+      expect(detail.historyCompletedAt, isNull);
     });
 
     test('uses fallback mode name when recommendedMode is null', () {
@@ -49,6 +50,17 @@ void main() {
       expect(detail.modeName, '외부 냄새 리프레시');
       expect(detail.metrics.first.beforePercent, 80);
       expect(detail.metrics.first.afterPercent, 26);
+    });
+
+    test('maps record summary completedAt for history detail', () {
+      final completedAt = DateTime(2026, 6, 10, 19, 38);
+
+      final detail = RefreshResultDetailMapper.fromRecordSummary(
+        modeName: '외부 냄새 리프레시',
+        completedAt: completedAt,
+      );
+
+      expect(detail.historyCompletedAt, completedAt);
     });
 
     test('maps odor section to figma display labels', () {

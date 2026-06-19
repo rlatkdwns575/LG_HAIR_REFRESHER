@@ -30,7 +30,7 @@ class MeasureResultDetailMetricTile extends StatelessWidget {
                       color: AppColors.gray800,
                     ),
                     tooltipMessage: metric.helpMessage!,
-                    placement: AppMetricHelpTooltipPlacement.belowEnd,
+                    placement: AppMetricHelpTooltipPlacement.belowStart,
                   )
                 : AppText(
                     metric.label,

@@ -10,6 +10,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
@@ -46,8 +47,6 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   static const double _spacingBelowModeName = 52;
   static const double _spacingBelowRing = 52;
   static const double _spacingBelowStepStrip = 44;
-  static const double _spacingAboveButton = 28;
-  static const double _spacingBelowButton = 2;
   static const double _phoneContentOffsetY = -20;
 
   /// Figma 750×800 태블릿 프레임 — 본문 세로 중심보다 약간 위.
@@ -276,18 +275,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
                 ),
               ),
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  15,
-                  _spacingAboveButton,
-                  15,
-                  _spacingBelowButton,
-                ),
-                child: _buildBottomAction(),
-              ),
-            ),
+            AppFixedBottomButtonArea(child: _buildBottomAction()),
           ],
         ),
       ),

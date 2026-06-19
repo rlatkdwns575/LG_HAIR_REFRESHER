@@ -56,14 +56,11 @@ class HistoryTodaySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppText(
-            '오늘의 리프레시 내역이 없어요.',
-            style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
-          ),
+          AppText('오늘의 리프레시 내역이 없어요.', style: HistoryTextStyles.cardTitle),
           const SizedBox(height: 6),
           AppText(
             '리프레시를 통해 외출 후 컨디션을 가볍게 정리해보세요.',
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
+            style: HistoryTextStyles.labelSecondary,
           ),
         ],
       ),
@@ -129,15 +126,9 @@ class _TodaySummaryCardState extends State<_TodaySummaryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppText(
-            widget.title,
-            style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
-          ),
+          AppText(widget.title, style: HistoryTextStyles.cardTitle),
           const SizedBox(height: 4),
-          AppText(
-            widget.subtitle,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
-          ),
+          AppText(widget.subtitle, style: HistoryTextStyles.labelSecondary),
           for (var i = 0; i < visibleRecords.length; i++) ...[
             const SizedBox(height: AppSpacing.md),
             const Divider(height: 1, color: AppColors.gray100),
@@ -182,18 +173,14 @@ class _TodayRecordTile extends StatelessWidget {
                   Flexible(
                     child: AppText(
                       record.modeName,
-                      style: AppTextStyles.bodyM2.copyWith(
-                        color: AppColors.gray900,
-                      ),
+                      style: HistoryTextStyles.recordMode,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
                   AppText(
                     formatKoreanTime(record.dateTime),
-                    style: AppTextStyles.bodyS.copyWith(
-                      color: AppColors.gray500,
-                    ),
+                    style: HistoryTextStyles.recordTime,
                   ),
                 ],
               ),
@@ -233,10 +220,7 @@ class _TodayRecordTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AppText(
-                  '청결도',
-                  style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
-                ),
+                AppText('청결도', style: HistoryTextStyles.kvLabel),
                 const SizedBox(height: 2),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -245,17 +229,9 @@ class _TodayRecordTile extends StatelessWidget {
                   children: [
                     AppText(
                       record.cleanlinessIncreasePercentLabel!,
-                      style: AppTextStyles.titleM.copyWith(
-                        color: AppColors.gray900,
-                      ),
+                      style: HistoryTextStyles.percentValue,
                     ),
-                    AppText(
-                      ' 증가',
-                      style: AppTextStyles.labelM.copyWith(
-                        color: AppColors.gray900,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    AppText(' 증가', style: HistoryTextStyles.labelPrimary),
                   ],
                 ),
               ],
@@ -285,12 +261,9 @@ class _RoutineCard extends StatelessWidget {
   final RoutineSuggestion suggestion;
   final VoidCallback? onRegisterTap;
 
-  static const _tagStyle = TextStyle(
-    fontFamily: AppTextStyles.fontFamily,
-    fontSize: 10,
-    height: 1,
-    fontWeight: FontWeight.w500,
+  static final _tagStyle = AppTextStyles.labelS.copyWith(
     color: AppColors.primary700,
+    fontWeight: FontWeight.w500,
   );
 
   @override
@@ -319,16 +292,12 @@ class _RoutineCard extends StatelessWidget {
                   children: [
                     AppText(
                       suggestion.title,
-                      style: AppTextStyles.bodyM2.copyWith(
-                        color: AppColors.gray900,
-                      ),
+                      style: HistoryTextStyles.labelPrimary,
                     ),
                     const SizedBox(height: 3),
                     AppText(
                       suggestion.subtitle,
-                      style: AppTextStyles.titleXs.copyWith(
-                        color: AppColors.gray900,
-                      ),
+                      style: HistoryTextStyles.cardTitle,
                     ),
                   ],
                 ),

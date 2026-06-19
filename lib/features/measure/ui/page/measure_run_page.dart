@@ -4,7 +4,6 @@ import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
@@ -13,6 +12,7 @@ import '../../data/model/measure_run_stage.dart';
 import '../widgets/measure_prepare_instruction.dart';
 import '../widgets/measure_progress_ring.dart';
 
+/// Figma `진단_진단 중` (40000056:17484 · phone), 태블릿 (40000056:17581).
 class MeasureRunPage extends StatefulWidget {
   const MeasureRunPage({super.key});
 
@@ -22,9 +22,26 @@ class MeasureRunPage extends StatefulWidget {
 
 class _MeasureRunPageState extends State<MeasureRunPage>
     with SingleTickerProviderStateMixin {
-  // 화면설계서 기준 진단 소요 시간 10~15초.
   static const Duration _totalDuration = Duration(seconds: 12);
   static const Duration _completionHold = Duration(milliseconds: 700);
+
+  /// Figma phone — 헤더 하단(76) → 원 상단(204) = 128.
+  static const double _phoneRingTopFromBody = 128;
+
+  /// Figma tablet — 화면 상단 기준 원 상단 350.
+  static const double _tabletRingTopFromScreen = 350;
+
+  /// Figma GNB 헤더 높이.
+  static const double _gnbHeaderHeight = 52;
+
+  /// Figma — 원(220)과 안내 문구 사이 40.
+  static const double _ringToTextGap = 40;
+
+  static const double _horizontalPadding =
+      AppCommonTopHeader.pageHorizontalInset;
+
+  static const double _stopButtonBottom = 56;
+  static const double _tabletBreakpoint = 600;
 
   late final AnimationController _controller =
       AnimationController(vsync: this, duration: _totalDuration)
@@ -59,7 +76,6 @@ class _MeasureRunPageState extends State<MeasureRunPage>
       return;
     }
     _navigated = true;
-    // 100% 완료 메시지를 잠깐 보여준 뒤 결과 화면으로 전환.
     Future<void>.delayed(_completionHold, () {
       if (mounted) {
         context.pushReplacementNamed(AppRouteNames.measureAnalyzing);
@@ -94,8 +110,22 @@ class _MeasureRunPageState extends State<MeasureRunPage>
     }
   }
 
+  bool _isTabletLayout(BuildContext context) {
+    return MediaQuery.sizeOf(context).shortestSide >= _tabletBreakpoint;
+  }
+
+  double _ringTopFromBody(BuildContext context) {
+    if (_isTabletLayout(context)) {
+      final appBarBottom = MediaQuery.paddingOf(context).top + _gnbHeaderHeight;
+      return _tabletRingTopFromScreen - appBarBottom;
+    }
+    return _phoneRingTopFromBody;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppCommonTopHeader(
@@ -103,53 +133,46 @@ class _MeasureRunPageState extends State<MeasureRunPage>
         title: '헤어 상태 진단하기',
         onBack: _requestStop,
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // 진행률 + 안내 문구를 화면 전체 기준 중앙에 배치.
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Center(
-                child: Transform.translate(
-                  offset: const Offset(0, -44),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      MeasureProgressRing(progress: _progress),
-                      const SizedBox(height: AppSpacing.xl),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: MeasurePrepareInstruction(
-                          key: ValueKey(_stage),
-                          title: _stage.title,
-                          subtitle: _stage.subtitle,
-                        ),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          Positioned(
+            top: _ringTopFromBody(context),
+            left: _horizontalPadding,
+            right: _horizontalPadding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(child: MeasureProgressRing(progress: _progress)),
+                const SizedBox(height: _ringToTextGap),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: MeasurePrepareInstruction(
+                    key: ValueKey(_stage),
+                    title: _stage.title,
+                    subtitle: _stage.subtitle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: _stopButtonBottom + bottomInset,
+            child: Center(
+              child: TextButton(
+                onPressed: _navigated ? null : _requestStop,
+                child: AppText(
+                  '중단하기',
+                  style: AppTextStyles.labelM.copyWith(
+                    color: AppColors.gray500,
                   ),
                 ),
               ),
             ),
-            // 중단하기는 하단에 고정 (중앙 정렬에 영향 주지 않도록 Stack 사용).
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 56,
-              child: Center(
-                child: TextButton(
-                  onPressed: _navigated ? null : _requestStop,
-                  child: AppText(
-                    '중단하기',
-                    style: AppTextStyles.labelL.copyWith(
-                      color: AppColors.gray500,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

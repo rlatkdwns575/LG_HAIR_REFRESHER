@@ -14,19 +14,16 @@ class MeasureResultMapper {
   static const recommendedThresholdPercent = 60;
 
   static const pollutionRetentionHelpMessage =
-      '손상도, 유분량, 수분감을 바탕으로\n'
-      '냄새와 먼지가 모발에 얼마나 오래 남기\n'
+      '손상도, 유분량, 수분감을 바탕으로 냄새와 먼지가 모발에 얼마나 오래 남기 '
       '쉬운지 분석한 값이에요.';
 
   static const refreshNeedHelpMessage =
-      '냄새, 먼지, 모발 컨디션을 종합해 리프레시가\n'
-      '얼마나 필요한지 보여줘요. 60% 이상이면\n'
-      '케어 권장 구간으로 표시돼요.';
+      '냄새, 먼지, 모발 컨디션을 종합해 리프레시가 얼마나 필요한지 보여줘요. '
+      '60% 이상이면 케어 권장 구간으로 표시돼요.';
 
   static const odorPerceptionHelpMessage =
-      '가까운 거리에서 잔여 냄새나 외부 흔적이\n'
-      '느껴질 가능성을 나타내요. 대면 전 케어\n'
-      '필요성을 판단하는 데 활용돼요.';
+      '가까운 거리에서 잔여 냄새나 외부 흔적이 느껴질 가능성을 나타내요. '
+      '대면 전 케어 필요성을 판단하는 데 활용돼요.';
 
   static int refreshNeedPercent(MeasureResultRecord record) {
     return record.totalPollutionScore.clamp(0, 100);
@@ -81,6 +78,7 @@ class MeasureResultMapper {
       recommendedMode: template.recommendedMode,
       recommendReason: template.recommendReason,
       sourceRecord: record,
+      historyCompletedAt: record.createdAt.toLocal(),
     );
   }
 

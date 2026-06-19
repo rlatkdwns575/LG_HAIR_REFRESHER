@@ -130,47 +130,40 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
                 ),
               ),
             )
-          : Column(
+          : ListView(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                AppSpacing.lg,
+                0,
+                MediaQuery.paddingOf(context).bottom + 20,
+              ),
               children: [
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(0, AppSpacing.lg, 0, 0),
-                    children: [
-                      MeasureResultDetailContent(
-                        detail: detail,
-                        isRecommendEnabled: RefreshModeAvailability.isEnabled(
-                          result.recommendedMode,
-                          ScentCartridgeStatus(
-                            isAttached: _isScentCartridgeAttached,
-                          ),
-                        ),
-                        onRecommendTap: () {
-                          if (!RefreshModeAvailability.isEnabled(
-                            result.recommendedMode,
-                            ScentCartridgeStatus(
-                              isAttached: _isScentCartridgeAttached,
-                            ),
-                          )) {
-                            showRefreshScentUnavailableSnackBar(context);
-                            return;
-                          }
-                          context.pushRefreshDetail(
-                            mode: result.recommendedMode,
-                          );
-                        },
-                      ),
-                    ],
+                MeasureResultDetailContent(
+                  detail: detail,
+                  isRecommendEnabled: RefreshModeAvailability.isEnabled(
+                    result.recommendedMode,
+                    ScentCartridgeStatus(isAttached: _isScentCartridgeAttached),
                   ),
+                  onRecommendTap: () {
+                    if (!RefreshModeAvailability.isEnabled(
+                      result.recommendedMode,
+                      ScentCartridgeStatus(
+                        isAttached: _isScentCartridgeAttached,
+                      ),
+                    )) {
+                      showRefreshScentUnavailableSnackBar(context);
+                      return;
+                    }
+                    context.pushRefreshDetail(mode: result.recommendedMode);
+                  },
                 ),
-                SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                    child: AppBoxButton(
-                      label: '재진단 하기',
-                      variant: AppBoxButtonVariant.line,
-                      onPressed: () => context.pushMeasure(),
-                    ),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: AppBoxButton(
+                    label: '재진단 하기',
+                    variant: AppBoxButtonVariant.line,
+                    onPressed: () => context.pushMeasure(),
                   ),
                 ),
               ],

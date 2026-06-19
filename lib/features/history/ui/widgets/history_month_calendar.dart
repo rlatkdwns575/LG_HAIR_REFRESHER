@@ -143,50 +143,28 @@ class HistoryMonthCalendar extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 28,
-              height: 28,
-              alignment: Alignment.center,
-              decoration: isSelected
-                  ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.primary500),
-                    )
-                  : null,
-              child: AppText(
-                '${date.day}',
-                style: AppTextStyles.bodyS.copyWith(color: textColor),
+            if (isSelected)
+              _SelectedDayChip(
+                day: date.day,
+                count: count,
+                textColor: textColor,
+              )
+            else ...[
+              Container(
+                width: 28,
+                height: 28,
+                alignment: Alignment.center,
+                child: AppText(
+                  '${date.day}',
+                  style: AppTextStyles.bodyS.copyWith(color: textColor),
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            SizedBox(
-              height: 10,
-              child: count != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 4,
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary500,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        AppText(
-                          '$count',
-                          style: AppTextStyles.labelS.copyWith(
-                            color: AppColors.primary500,
-                            fontSize: 9,
-                            height: 1,
-                          ),
-                        ),
-                      ],
-                    )
-                  : null,
-            ),
+              const SizedBox(height: 2),
+              SizedBox(
+                height: 10,
+                child: count != null ? _DayCountIndicator(count: count) : null,
+              ),
+            ],
           ],
         ),
       ),
@@ -205,6 +183,91 @@ class _DayCell {
 
   final DateTime date;
   final bool inMonth;
+}
+
+/// 선택된 날짜 — 날짜·횟수를 파란 테두리 영역 안에 함께 표시.
+class _SelectedDayChip extends StatelessWidget {
+  const _SelectedDayChip({
+    required this.day,
+    required this.textColor,
+    this.count,
+  });
+
+  final int day;
+  final int? count;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    if (count == null) {
+      return Container(
+        width: 28,
+        height: 28,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primary500),
+        ),
+        child: AppText(
+          '$day',
+          style: AppTextStyles.bodyS.copyWith(color: textColor),
+        ),
+      );
+    }
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.primary500),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppText(
+            '$day',
+            style: AppTextStyles.bodyS.copyWith(color: textColor),
+          ),
+          const SizedBox(height: 2),
+          _DayCountIndicator(count: count!),
+        ],
+      ),
+    );
+  }
+}
+
+class _DayCountIndicator extends StatelessWidget {
+  const _DayCountIndicator({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 4,
+          height: 4,
+          decoration: const BoxDecoration(
+            color: AppColors.primary500,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 2),
+        AppText(
+          '$count',
+          style: AppTextStyles.labelS.copyWith(
+            color: AppColors.primary500,
+            fontSize: 9,
+            height: 1,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _ExpandToggle extends StatelessWidget {

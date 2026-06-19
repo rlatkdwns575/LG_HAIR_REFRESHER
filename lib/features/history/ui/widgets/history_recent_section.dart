@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_title.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/history_assets.dart';
@@ -129,10 +128,7 @@ class _MonthNavRow extends StatelessWidget {
           onTap: onPrevious,
         ),
         const SizedBox(width: 4),
-        AppText(
-          _label,
-          style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
-        ),
+        AppText(_label, style: HistoryTextStyles.cardTitle),
         const SizedBox(width: 4),
         _NavIconButton(
           icon: Icons.chevron_right,
@@ -205,42 +201,39 @@ class _MonthlySummaryCard extends StatelessWidget {
     return HistoryWhiteCard(
       backgroundColor: AppColors.gray50,
       borderColor: null,
+      padding: const EdgeInsets.all(15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppText(
-            '${summary.month.month}월 총 리프레시 횟수 : ${summary.totalCount}회',
-            style: AppTextStyles.titleS.copyWith(color: AppColors.gray900),
+            '${summary.month.month}월 간 총 ${summary.totalCount}회 리프레시 했어요.',
+            style: HistoryTextStyles.cardTitle,
           ),
           const SizedBox(height: 4),
           Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AppText(
                 '지난 $_previousMonthLabel보다 ',
-                style: AppTextStyles.bodyS.copyWith(color: AppColors.gray900),
+                style: HistoryTextStyles.labelSecondary,
               ),
-              AppText(
-                '↑${summary.vsLastMonthDelta}회',
-                style: AppTextStyles.bodyS.copyWith(
-                  color: AppColors.primary500,
-                ),
-              ),
+              HistoryDeltaText(delta: '${summary.vsLastMonthDelta}회'),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: 20),
           HistoryKeyValueRow(
-            label: '리프레시 개선도',
+            label: '헤어 청결 개선율',
             value: _formatPercent(summary.improvementPercent),
-            valueColor: AppColors.gray900,
-            trailingDelta:
-                '↑${_formatPercent(summary.improvementDeltaPercent)}',
+            trailingDelta: _formatPercent(summary.improvementDeltaPercent),
+            isPercentValue: true,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           HistoryKeyValueRow(
             label: '가장 많이 사용한 모드',
             value: summary.mostUsedMode,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           HistoryKeyValueRow(
             label: '가장 자주 사용한 시간',
             value: summary.mostUsedTimeRange,
@@ -293,25 +286,25 @@ class _SelectedDayCardState extends State<_SelectedDayCard> {
         children: [
           AppText(
             formatKoreanDateWithWeekday(group.date),
-            style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            style: HistoryTextStyles.labelPrimary,
           ),
           const SizedBox(height: AppSpacing.sm),
           if (group.refreshCount > 0)
             AppText(
               '리프레시를 총 ${group.refreshCount}번 완료했어요.',
-              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+              style: HistoryTextStyles.labelPrimary,
             ),
           if (group.diagnosisCount > 0) ...[
             if (group.refreshCount > 0) const SizedBox(height: 2),
             AppText(
               '헤어 상태 진단을 총 ${group.diagnosisCount}번 완료했어요.',
-              style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+              style: HistoryTextStyles.labelPrimary,
             ),
           ],
           const SizedBox(height: 2),
           AppText(
             group.summaryMessage,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
+            style: HistoryTextStyles.insightCaption,
           ),
           const SizedBox(height: AppSpacing.md),
           for (var i = 0; i < visibleRecords.length; i++) ...[
@@ -350,13 +343,13 @@ class _DayRecordTile extends StatelessWidget {
         children: [
           AppText(
             formatKoreanTime(record.dateTime),
-            style: AppTextStyles.bodyM2.copyWith(color: AppColors.gray900),
+            style: HistoryTextStyles.labelPrimary,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: AppText(
               record.modeName,
-              style: AppTextStyles.bodyS.copyWith(color: AppColors.gray600),
+              style: HistoryTextStyles.labelSecondary,
               overflow: TextOverflow.ellipsis,
             ),
           ),

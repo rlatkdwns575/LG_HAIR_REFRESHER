@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -23,7 +24,7 @@ import '../../data/refresh_mode_availability.dart';
 import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_detail_timeline.dart';
 
-/// Figma Design `리프레시 상세` (40000026:25012).
+/// Figma Design `리프레시 상세` (40000026:25130).
 class RefreshDetailPage extends StatefulWidget {
   const RefreshDetailPage({required this.mode, super.key});
 
@@ -39,18 +40,10 @@ class RefreshDetailPage extends StatefulWidget {
   static const double _gapHeaderTitleToTags = 18;
 
   /// 태그 행 ↔ 타임라인 블록.
-  static const double _gapHeaderToTimeline = 24;
-
-  /// 타임라인 블록이 차지하는 최소 세로 영역 (가용 높이 비율로 계산).
-  static const double _timelineZoneHeightRatio = 0.52;
-  static const double _timelineZoneMinHeight = 260;
-  static const double _timelineZoneMaxHeight = 390;
-
-  /// 시각적 중앙 보정 — 타임라인을 살짝 왼쪽으로.
-  static const double _timelineLeftShift = 18;
+  static const double _gapHeaderToTimeline = 32;
 
   /// 타임라인 블록 ↔ 확인사항.
-  static const double _gapTimelineToPreCheck = 28;
+  static const double _gapTimelineToPreCheck = 56;
 
   /// Figma 40000026:25012 — 확인사항 ↔ 다른 모드 링크.
   static const double _gapPreCheckToLink = 48;
@@ -169,114 +162,72 @@ class _RefreshDetailPageState extends State<RefreshDetailPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    RefreshDetailPage._horizontalPadding,
-                    RefreshDetailPage._gapAppBarToHeader,
-                    RefreshDetailPage._horizontalPadding,
-                    0,
-                  ),
-                  child: _HeaderSection(
-                    modeName: mode.name,
-                    careTags: detail.careTags,
-                  ),
-                ),
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final timelineZoneHeight =
-                          (constraints.maxHeight *
-                                  RefreshDetailPage._timelineZoneHeightRatio)
-                              .clamp(
-                                RefreshDetailPage._timelineZoneMinHeight,
-                                RefreshDetailPage._timelineZoneMaxHeight,
-                              );
-
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const SizedBox(
-                                height: RefreshDetailPage._gapHeaderToTimeline,
-                              ),
-                              _CenteredTimelineSection(
-                                zoneHeight: timelineZoneHeight,
-                                totalDurationLabel: detail.totalDurationLabel,
-                                steps: detail.steps,
-                              ),
-                              const SizedBox(
-                                height:
-                                    RefreshDetailPage._gapTimelineToPreCheck,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      RefreshDetailPage._horizontalPadding,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Center(
-                                      child: ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                          maxWidth: RefreshDetailPage
-                                              ._preCheckMaxWidth,
-                                        ),
-                                        child: _PreCheckSection(
-                                          items: detail.preCheckItems,
-                                        ),
-                                      ),
-                                    ),
-                                    if (!_isModeEnabled) ...[
-                                      const SizedBox(height: AppSpacing.md),
-                                      AppText(
-                                        RefreshModeAvailability
-                                            .unavailableReason,
-                                        textAlign: TextAlign.center,
-                                        style: AppTextStyles.bodyS.copyWith(
-                                          color: AppColors.gray500,
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(
-                                      height:
-                                          RefreshDetailPage._gapPreCheckToLink,
-                                    ),
-                                    _SelectOtherModeLink(
-                                      onPressed: () =>
-                                          context.pushReplacementNamed(
-                                            AppRouteNames.refresh,
-                                          ),
-                                    ),
-                                    const SizedBox(
-                                      height:
-                                          RefreshDetailPage._gapLinkToButton,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      RefreshDetailPage._horizontalPadding,
+                      RefreshDetailPage._gapAppBarToHeader,
+                      RefreshDetailPage._horizontalPadding,
+                      0,
+                    ),
+                    children: [
+                      _HeaderSection(
+                        modeName: mode.name,
+                        careTags: detail.careTags,
+                      ),
+                      const SizedBox(
+                        height: RefreshDetailPage._gapHeaderToTimeline,
+                      ),
+                      RefreshDetailTimeline(
+                        totalDurationLabel: detail.totalDurationLabel,
+                        steps: detail.steps,
+                      ),
+                      const SizedBox(
+                        height: RefreshDetailPage._gapTimelineToPreCheck,
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: RefreshDetailPage._preCheckMaxWidth,
+                          child: _PreCheckSection(items: detail.preCheckItems),
+                        ),
+                      ),
+                      if (!_isModeEnabled) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        AppText(
+                          RefreshModeAvailability.unavailableReason,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.bodyS.copyWith(
+                            color: AppColors.gray500,
                           ),
                         ),
-                      );
-                    },
+                      ],
+                      const SizedBox(
+                        height: RefreshDetailPage._gapPreCheckToLink,
+                      ),
+                      _SelectOtherModeLink(
+                        onPressed: () =>
+                            context.pushReplacementNamed(AppRouteNames.refresh),
+                      ),
+                      const SizedBox(
+                        height: RefreshDetailPage._gapLinkToButton,
+                      ),
+                    ],
                   ),
                 ),
-                SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 20),
-                    child: AppBoxButton(
-                      label: '시작하기',
-                      variant: _isModeEnabled
-                          ? AppBoxButtonVariant.active
-                          : AppBoxButtonVariant.disabled,
-                      onPressed: _onStartPressed,
-                    ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    15,
+                    10,
+                    15,
+                    20 + AppSystemInsets.bottomOf(context),
+                  ),
+                  child: AppBoxButton(
+                    label: '시작하기',
+                    variant: _isModeEnabled
+                        ? AppBoxButtonVariant.active
+                        : AppBoxButtonVariant.disabled,
+                    onPressed: _onStartPressed,
                   ),
                 ),
               ],
@@ -298,34 +249,6 @@ class RefreshDetailPageFallback extends StatelessWidget {
         onBack: () => context.pop(),
       ),
       body: Center(child: AppText('모드 정보를 불러올 수 없어요.')),
-    );
-  }
-}
-
-class _CenteredTimelineSection extends StatelessWidget {
-  const _CenteredTimelineSection({
-    required this.zoneHeight,
-    required this.totalDurationLabel,
-    required this.steps,
-  });
-
-  final double zoneHeight;
-  final String totalDurationLabel;
-  final List<RefreshModeDetailStep> steps;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: zoneHeight,
-      child: Center(
-        child: Transform.translate(
-          offset: const Offset(-RefreshDetailPage._timelineLeftShift, 0),
-          child: RefreshDetailTimeline(
-            totalDurationLabel: totalDurationLabel,
-            steps: steps,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -365,7 +288,7 @@ class _CareTagRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: AppSpacing.md,
+      spacing: 16,
       runSpacing: AppSpacing.sm,
       children: [
         for (final tag in tags)
@@ -473,12 +396,18 @@ class _SelectOtherModeLink extends StatelessWidget {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           foregroundColor: AppColors.gray500,
         ),
-        child: AppText(
-          '다른 모드 선택하기',
-          style: AppTextStyles.labelM.copyWith(
-            color: AppColors.gray500,
-            height: 16 / 12,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppText(
+              '다른 모드 선택하기',
+              style: AppTextStyles.labelM.copyWith(
+                color: AppColors.gray500,
+                height: 16 / 12,
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 20, color: AppColors.gray500),
+          ],
         ),
       ),
     );
