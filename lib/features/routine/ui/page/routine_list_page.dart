@@ -297,10 +297,7 @@ class _RoutineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final weekdays = routine.weekdaysLabel;
-    final subtitle = weekdays.isEmpty
-        ? routine.timeLabel
-        : '$weekdays · ${routine.timeLabel}';
+    final subtitle = routine.scheduleLabel;
 
     return GestureDetector(
       onTap: onTap,

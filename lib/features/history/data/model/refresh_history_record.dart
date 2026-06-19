@@ -75,16 +75,16 @@ class RefreshHistoryRecord {
     return '${value.toStringAsFixed(1)}% 감소';
   }
 
-  /// 기록 오늘 요약 — "청결도 76% 증가" 형태.
-  String? get cleanlinessIncreaseLabel {
+  /// 기록 오늘 요약 — "76%" (증가 문구는 UI에서 별도 스타일).
+  String? get cleanlinessIncreasePercentLabel {
     final value = necessityReductionPercent;
     if (value == null) {
       return null;
     }
     if (value == value.roundToDouble()) {
-      return '${value.toInt()}% 증가';
+      return '${value.toInt()}%';
     }
-    return '${value.toStringAsFixed(1)}% 증가';
+    return '${value.toStringAsFixed(1)}%';
   }
 
   factory RefreshHistoryRecord.fromJson(Map<String, dynamic> json) {

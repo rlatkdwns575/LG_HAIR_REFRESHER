@@ -3,38 +3,59 @@ import 'package:lg_hair_refresher/features/routine/data/model/routine.dart';
 
 void main() {
   group('Routine', () {
-    test('toJson maps to REFRESH_RECOMMEND_ALARMS columns', () {
+    test('toJson maps local storage fields', () {
       const routine = Routine(
+        id: 'local-id',
         modeId: 'mode-uuid',
+        modeName: '외부 냄새 리프레시',
         weekdays: {5, 1, 3},
         hour: 9,
         minute: 5,
+        isRepeating: false,
       );
 
       final json = routine.toJson();
 
+      expect(json['id'], 'local-id');
       expect(json['mode_id'], 'mode-uuid');
+      expect(json['mode_name'], '외부 냄새 리프레시');
       expect(json['alarm_time'], '09:05:00');
       expect(json['repeat_days'], [1, 3, 5]);
       expect(json['is_enabled'], isTrue);
-      expect(json.containsKey('alarm_id'), isFalse);
+      expect(json['is_repeating'], isFalse);
     });
 
-    test('fromJson parses alarm columns and repeat_days', () {
+    test('fromJson parses local storage json', () {
       final routine = Routine.fromJson({
-        'alarm_id': 'abc',
+        'id': 'abc',
         'mode_id': 'mode-uuid',
+        'mode_name': '먼지 케어',
         'alarm_time': '07:30:00',
         'repeat_days': [2, 4],
         'is_enabled': false,
+        'is_repeating': false,
       });
 
       expect(routine.id, 'abc');
       expect(routine.modeId, 'mode-uuid');
+      expect(routine.modeName, '먼지 케어');
       expect(routine.weekdays, {2, 4});
       expect(routine.hour, 7);
       expect(routine.minute, 30);
       expect(routine.enabled, isFalse);
+      expect(routine.isRepeating, isFalse);
+    });
+
+    test('scheduleLabel shows one-time suffix', () {
+      const routine = Routine(
+        modeId: 'm',
+        weekdays: {6},
+        hour: 19,
+        minute: 0,
+        isRepeating: false,
+      );
+
+      expect(routine.scheduleLabel, '토 · 오후 7시 · 1회');
     });
 
     test('weekdaysLabel renders Korean short labels in order', () {

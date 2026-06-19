@@ -114,7 +114,7 @@ void main() {
       final suggestion = report.routineSuggestion;
       expect(suggestion, isNotNull);
       expect(suggestion!.modeName, '외부 냄새 리프레시');
-      expect(suggestion.tags, ['외부 냄새 리프레시', '토요일', '오후 7시', '평균 시간 6분 소요']);
+      expect(suggestion.tags, ['외부 냄새 리프레시', '토요일', '오후 7시']);
       expect(suggestion.weekdays, [DateTime.saturday]);
       expect(suggestion.hour, 19);
       expect(suggestion.minute, 0);

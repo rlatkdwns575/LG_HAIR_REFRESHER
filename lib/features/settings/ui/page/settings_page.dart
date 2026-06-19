@@ -38,9 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isLoading = true;
   bool _isSigningOut = false;
 
-  bool _refreshReminderEnabled = true;
   bool _consumableAlertEnabled = true;
-  bool _recommendPushEnabled = false;
 
   @override
   void initState() {
@@ -174,13 +172,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: '알림',
                     children: [
                       SettingsListTile(
-                        title: '리프레시 알림',
-                        caption: '측정 결과 기반 리마인더',
-                        variant: AppListItemVariant.toggle,
-                        toggleValue: _refreshReminderEnabled,
-                        onChanged: (value) {
-                          setState(() => _refreshReminderEnabled = value);
-                        },
+                        title: '추천 알림 관리',
+                        caption: '리프레시 추천 알림을 추가·관리해요',
+                        leadingIcon: Icons.notifications_active_outlined,
+                        onTap: context.pushRoutineList,
                       ),
                       const SettingsDivider(),
                       SettingsListTile(
@@ -191,23 +186,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         onChanged: (value) {
                           setState(() => _consumableAlertEnabled = value);
                         },
-                      ),
-                      const SettingsDivider(),
-                      SettingsListTile(
-                        title: '맞춤 추천 푸시',
-                        caption: '일정 기반 리프레시 추천',
-                        variant: AppListItemVariant.toggle,
-                        toggleValue: _recommendPushEnabled,
-                        onChanged: (value) {
-                          setState(() => _recommendPushEnabled = value);
-                        },
-                      ),
-                      const SettingsDivider(),
-                      SettingsListTile(
-                        title: '추천 알림 관리',
-                        caption: '리프레시 추천 알림을 추가·관리해요',
-                        leadingIcon: Icons.notifications_active_outlined,
-                        onTap: context.pushRoutineList,
                       ),
                     ],
                   ),

@@ -1,29 +1,27 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/supabase_tables.dart';
-import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../model/routine.dart';
+import 'routine_local_store.dart';
 
-/// `REFRESH_RECOMMEND_ALARMS` 테이블 CRUD.
-///
-/// RLS 전제: `user_id = auth.uid()` 행만 접근 가능.
+/// 추천 알림 CRUD — 루틴 데이터는 [RoutineLocalStore], 모드 목록만 Supabase.
 class RoutineApi {
-  const RoutineApi();
+  const RoutineApi({RoutineLocalStore? localStore})
+    : _localStore = localStore ?? const RoutineLocalStore();
 
-  Future<List<Routine>> fetchAll({String? userId}) async {
-    final resolvedUserId = _resolveUserId(userId);
+  final RoutineLocalStore _localStore;
 
-    final rows = await SupabaseService.client
-        .from(SupabaseTables.refreshRecommendAlarms)
-        .select()
-        .eq('user_id', resolvedUserId)
-        .order('created_at', ascending: false);
-
-    return [
-      for (final row in rows) Routine.fromJson(Map<String, dynamic>.from(row)),
-    ];
+  Future<List<Routine>> fetchAll() async {
+    final routines = await _localStore.loadAll();
+    routines.sort((a, b) {
+      final aTime = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bTime = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return bTime.compareTo(aTime);
+    });
+    return routines;
   }
 
   /// 모드 선택 드롭다운용 프리셋 모드 목록(`REFRESH_MODE`).
@@ -49,29 +47,21 @@ class RoutineApi {
     }
   }
 
-  Future<Routine> create(Routine routine, {String? userId}) async {
-    final resolvedUserId = _resolveUserId(userId);
-
+  Future<Routine> create(Routine routine) async {
     if (routine.modeId == null) {
       throw const RoutineApiException('리프레시 모드를 선택해주세요.');
     }
 
-    final payload = routine.toJson()..['user_id'] = resolvedUserId;
+    final now = DateTime.now().toUtc();
+    final toSave = routine.copyWith(
+      id: _newId(),
+      createdAt: now,
+      updatedAt: now,
+    );
 
-    try {
-      final row = await SupabaseService.client
-          .from(SupabaseTables.refreshRecommendAlarms)
-          .insert(payload)
-          .select()
-          .single();
-      return Routine.fromJson(Map<String, dynamic>.from(row));
-    } on PostgrestException catch (error, stackTrace) {
-      debugPrint('RoutineApi.create failed: $error\n$stackTrace');
-      throw RoutineApiException(_messageFromPostgrest(error));
-    } catch (error, stackTrace) {
-      debugPrint('RoutineApi.create failed: $error\n$stackTrace');
-      throw const RoutineApiException('루틴을 저장하지 못했어요. 잠시 후 다시 시도해주세요.');
-    }
+    final routines = await _localStore.loadAll();
+    await _localStore.saveAll([toSave, ...routines]);
+    return toSave;
   }
 
   Future<Routine> update(Routine routine) async {
@@ -80,61 +70,48 @@ class RoutineApi {
       throw const RoutineApiException('수정할 루틴 정보가 없어요.');
     }
 
-    final payload = routine.toJson()
-      ..['updated_at'] = DateTime.now().toUtc().toIso8601String();
+    final now = DateTime.now().toUtc();
+    final toSave = routine.copyWith(
+      updatedAt: now,
+      createdAt: routine.createdAt ?? now,
+    );
 
-    try {
-      final row = await SupabaseService.client
-          .from(SupabaseTables.refreshRecommendAlarms)
-          .update(payload)
-          .eq('alarm_id', id)
-          .select()
-          .single();
-      return Routine.fromJson(Map<String, dynamic>.from(row));
-    } on PostgrestException catch (error, stackTrace) {
-      debugPrint('RoutineApi.update failed: $error\n$stackTrace');
-      throw RoutineApiException(_messageFromPostgrest(error));
-    } catch (error, stackTrace) {
-      debugPrint('RoutineApi.update failed: $error\n$stackTrace');
-      throw const RoutineApiException('루틴을 수정하지 못했어요. 잠시 후 다시 시도해주세요.');
+    final routines = await _localStore.loadAll();
+    var found = false;
+    final next = routines.map((item) {
+      if (item.id == id) {
+        found = true;
+        return toSave;
+      }
+      return item;
+    }).toList();
+    if (!found) {
+      throw const RoutineApiException('수정할 루틴을 찾지 못했어요.');
     }
+
+    await _localStore.saveAll(next);
+    return toSave;
   }
 
   Future<void> delete(String id) async {
-    try {
-      await SupabaseService.client
-          .from(SupabaseTables.refreshRecommendAlarms)
-          .delete()
-          .eq('alarm_id', id);
-    } on PostgrestException catch (error, stackTrace) {
-      debugPrint('RoutineApi.delete failed: $error\n$stackTrace');
-      throw RoutineApiException(_messageFromPostgrest(error));
-    } catch (error, stackTrace) {
-      debugPrint('RoutineApi.delete failed: $error\n$stackTrace');
-      throw const RoutineApiException('루틴을 삭제하지 못했어요.');
+    final routines = await _localStore.loadAll();
+    final next = routines.where((routine) => routine.id != id).toList();
+    if (next.length == routines.length) {
+      throw const RoutineApiException('삭제할 루틴을 찾지 못했어요.');
     }
+    await _localStore.saveAll(next);
   }
 
-  /// RLS 테이블은 Supabase Auth 세션(`auth.uid()`)과 동일한 user_id만 허용합니다.
-  String _resolveUserId(String? override) {
-    final sessionUserId = AuthSessionService.currentUserId;
-    if (override != null && override.trim().isNotEmpty) {
-      return override.trim();
-    }
-    if (sessionUserId != null && sessionUserId.trim().isNotEmpty) {
-      return sessionUserId.trim();
-    }
-    throw const RoutineApiException('로그인이 필요해요. 이메일 로그인 후 다시 시도해주세요.');
-  }
-
-  static String _messageFromPostgrest(PostgrestException error) {
-    final message = error.message.toLowerCase();
-    if (error.code == '42501' || message.contains('row-level security')) {
-      return '추천 알림 저장 권한이 없어요. '
-          'Supabase에서 REFRESH_RECOMMEND_ALARMS RLS 정책을 확인하거나 '
-          '이메일 로그인 후 다시 시도해주세요.';
-    }
-    return '루틴을 저장하지 못했어요. (${error.message})';
+  static String _newId() {
+    final random = Random();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    String hex(int value) => value.toRadixString(16).padLeft(2, '0');
+    final chars = bytes.map(hex).join();
+    return '${chars.substring(0, 8)}-${chars.substring(8, 12)}-'
+        '${chars.substring(12, 16)}-${chars.substring(16, 20)}-'
+        '${chars.substring(20, 32)}';
   }
 }
 

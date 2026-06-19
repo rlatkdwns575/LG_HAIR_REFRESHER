@@ -100,25 +100,10 @@ class HistoryReportBuilder {
       return null;
     }
 
-    final avgDuration = records
-        .where((record) => record.duration != null)
-        .map((record) => record.duration!.inMinutes)
-        .fold<int>(0, (sum, minutes) => sum + minutes);
-    final durationCount = records
-        .where((record) => record.duration != null)
-        .length;
-    final durationMinutes = durationCount == 0
-        ? null
-        : (avgDuration / durationCount).round();
-    final durationLabel = durationMinutes == null
-        ? null
-        : '평균 시간 $durationMinutes분 소요';
-
     final tags = <String>[
       topMode.modeName,
       if (topWeekday.isNotEmpty) topWeekday,
       RoutineWeekday.formatTime(topTime.hour, topTime.minute),
-      ?durationLabel,
     ];
 
     return RoutineSuggestion(
@@ -130,7 +115,6 @@ class HistoryReportBuilder {
       weekdays: topWeekdayValue == null ? const [] : [topWeekdayValue],
       hour: topTime.hour,
       minute: topTime.minute,
-      durationMinutes: durationMinutes,
     );
   }
 
