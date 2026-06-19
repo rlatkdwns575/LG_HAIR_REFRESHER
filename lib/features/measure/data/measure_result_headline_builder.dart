@@ -26,7 +26,7 @@ class MeasureResultHeadlineBuilder {
     }
 
     return MeasureResultHeadline.highlighted(
-      before: '${mode.name}로 남은 ${_careTargetNoun(mode)}를 정리해 ',
+      before: '${mode.name}로\n남은 ${_careTargetNoun(mode)}를 정리해 ',
       highlight: '안심할 수 있는 상태',
       after: '를 되찾아보세요.',
       highlightColor: AppColors.orange700,
@@ -35,7 +35,7 @@ class MeasureResultHeadlineBuilder {
 
   static MeasureResultHeadline _stableHeadline(RefreshMode mode) {
     if (mode.isScentOnlyCare) {
-      return MeasureResultHeadline.plain('${mode.name}로 은은한 향기 케어를\n시작해 보세요.');
+      return MeasureResultHeadline.plain('${mode.name}로\n은은한 향기 케어를\n시작해 보세요.');
     }
 
     return MeasureResultHeadline.plain(

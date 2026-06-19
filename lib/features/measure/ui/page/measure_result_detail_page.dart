@@ -55,9 +55,21 @@ class _MeasureResultDetailPageState extends State<MeasureResultDetailPage> {
 
   Future<void> _resolveResult() async {
     try {
-      MeasureResult resolved = widget.result;
-      if (resolved.sourceRecord == null) {
-        resolved = await _recommendService.buildMeasureResult();
+      final initial = widget.result;
+      final record = initial.sourceRecord;
+      final MeasureResult resolved;
+      if (record != null && initial.historyCompletedAt != null) {
+        resolved = await _recommendService.buildMeasureResult(
+          sourceRecord: record,
+          now: initial.historyCompletedAt,
+          historyCompletedAt: initial.historyCompletedAt,
+        );
+      } else if (record != null) {
+        resolved = initial;
+      } else {
+        resolved = await _recommendService.buildMeasureResult(
+          historyCompletedAt: initial.historyCompletedAt,
+        );
       }
       final detail = MeasureResultDetail.fromMeasureResult(resolved);
       if (!mounted) {

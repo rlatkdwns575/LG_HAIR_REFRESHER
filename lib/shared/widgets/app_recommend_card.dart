@@ -43,7 +43,7 @@ class AppRecommendCard extends StatelessWidget {
               AppComponentColors.recommendCardBorderEnd,
             ],
           ),
-          width: 1,
+          width: 1.5,
         ),
       ),
       child: Padding(
@@ -98,12 +98,22 @@ class GradientBoxBorder extends BoxBorder {
     BoxShape shape = BoxShape.rectangle,
     BorderRadius? borderRadius,
   }) {
+    if (width <= 0) {
+      return;
+    }
+
+    // Stroke is centered on the path — inset so the full width stays inside bounds.
+    final inset = width / 2;
+    final innerRect = rect.deflate(inset);
+    final resolvedRadius =
+        borderRadius?.resolve(textDirection) ?? BorderRadius.zero;
+    final rrect = resolvedRadius.toRRect(innerRect);
+
     final paint = Paint()
       ..shader = gradient.createShader(rect)
       ..style = PaintingStyle.stroke
       ..strokeWidth = width;
 
-    final rrect = (borderRadius ?? BorderRadius.zero).toRRect(rect);
     canvas.drawRRect(rrect, paint);
   }
 

@@ -41,16 +41,16 @@ class RefreshResultDetailContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildSummaryHeader(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               _buildHeadline(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               RefreshResultDetailMetricBars(metrics: detail.metrics),
               const SizedBox(height: 20),
               const _NecessityHelpRow(),
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.xl),
+        const SizedBox(height: 18),
         const AppSectionDivider(),
         DetailPageHorizontalPadding(
           child: RefreshResultDetailStatusSection(section: detail.odorSection),
@@ -121,7 +121,7 @@ class RefreshResultDetailContent extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 0),
           AppText(
             '헤어 청결도가',
             style: AppTextStyles.titleS.copyWith(
@@ -130,7 +130,7 @@ class RefreshResultDetailContent extends StatelessWidget {
               height: 22 / 16,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 16),
           Text.rich(
             TextSpan(
               children: [
@@ -154,7 +154,7 @@ class RefreshResultDetailContent extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text.rich(
             TextSpan(
               children: [

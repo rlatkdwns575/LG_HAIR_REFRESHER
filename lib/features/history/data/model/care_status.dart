@@ -1,24 +1,29 @@
-import 'package:flutter/material.dart';
-
-import '../../../../app/theme/app_colors.dart';
+import '../../../../shared/widgets/app_badge.dart';
 
 /// 냄새/먼지 케어 상태 단계.
 ///
-/// 배지 색은 Figma 리프레시 기록 리포트 기준이며, 추후 API 의 상태 코드와
-/// 매핑하기 쉽도록 [fromCode] 를 제공합니다.
+/// 배지는 Figma `badge_small` (532:18430) → [AppBadge] 와 매핑됩니다.
 enum CareStatus {
-  focusedRecommend('집중권장', AppColors.orange100, AppColors.orange700),
-  focusedRequired('집중필요', AppColors.red200, AppColors.red700),
-  recommend('권장', AppColors.green200, AppColors.green700),
-  good('좋음', AppColors.blue200, AppColors.blue700),
-  normal('보통', AppColors.safe100, AppColors.safe500),
-  notNeeded('불필요', AppColors.blue100, AppColors.blue800);
+  focusedRecommend('집중권장'),
+  focusedRequired('집중필요'),
+  recommend('권장'),
+  good('좋음'),
+  normal('보통'),
+  notNeeded('불필요');
 
-  const CareStatus(this.label, this.backgroundColor, this.textColor);
+  const CareStatus(this.label);
 
   final String label;
-  final Color backgroundColor;
-  final Color textColor;
+
+  /// Figma badge_small variant (text 스타일).
+  AppBadgeSmallVariant get badgeVariant => switch (this) {
+    CareStatus.good => AppBadgeSmallVariant.low,
+    CareStatus.normal => AppBadgeSmallVariant.careNormal,
+    CareStatus.recommend => AppBadgeSmallVariant.medium,
+    CareStatus.focusedRecommend => AppBadgeSmallVariant.high,
+    CareStatus.focusedRequired => AppBadgeSmallVariant.veryHigh,
+    CareStatus.notNeeded => AppBadgeSmallVariant.primaryLight,
+  };
 
   /// API/Supabase 의 문자열 코드 → enum 매핑. 미매칭 시 [normal] 반환.
   static CareStatus fromCode(String? code) {

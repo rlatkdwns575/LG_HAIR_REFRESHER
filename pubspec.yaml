@@ -76,6 +76,7 @@ flutter:
     - assets/images/home/
     - assets/images/home/battery/
     - assets/images/measure/
+    - assets/images/measure/result/
     - assets/images/refresh/
     - assets/images/history/
 

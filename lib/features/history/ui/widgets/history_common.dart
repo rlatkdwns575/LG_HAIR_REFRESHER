@@ -41,13 +41,15 @@ abstract final class HistoryTextStyles {
 
   static final percentValue = AppTextStyles.labelL.copyWith(
     color: AppColors.gray900,
+    fontSize: 18,
+    height: 24 / 18,
   );
 
   static const percentUnit = TextStyle(
     fontFamily: AppTextStyles.fontFamily,
-    fontSize: 10,
+    fontSize: 18,
     fontWeight: FontWeight.w500,
-    height: 1,
+    height: 24 / 18,
     color: AppColors.gray900,
   );
 

@@ -60,10 +60,11 @@ class MeasureResultMapper {
     return odorScore > dustScore ? odorScore : dustScore;
   }
 
-  /// 저장된 측정 데이터를 진단 상세 화면용 [MeasureResult]로 변환합니다.
+  /// 기록(히스토리) → 진단 상세 진입용 shell.
   ///
-  /// 기록(히스토리)에서 과거 진단 결과를 다시 열 때 사용합니다.
-  static MeasureResult toMeasureResult(MeasureResultRecord record) {
+  /// 추천 모드·문구는 상세 페이지에서 [MeasureRefreshRecommendService.buildMeasureResult]
+  /// 로 조합합니다.
+  static MeasureResult toHistoryDetailEntry(MeasureResultRecord record) {
     final odor = odorLevel(record);
     final dust = dustLevel(record);
     final needsAction = odor.needsAction || dust.needsAction;
@@ -76,7 +77,6 @@ class MeasureResultMapper {
       dustLevel: dust,
       headline: template.headline,
       recommendedMode: template.recommendedMode,
-      recommendReason: template.recommendReason,
       sourceRecord: record,
       historyCompletedAt: record.createdAt.toLocal(),
     );

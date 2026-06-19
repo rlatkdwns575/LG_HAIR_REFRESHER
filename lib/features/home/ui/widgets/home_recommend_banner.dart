@@ -15,6 +15,7 @@ class HomeRecommendBanner extends StatelessWidget {
 
   static const bannerHeight = 62.0;
   static const _sparkleSize = 24.0;
+  static const _borderWidth = 1.5;
 
   final String message;
   final VoidCallback? onTap;
@@ -42,7 +43,7 @@ class HomeRecommendBanner extends StatelessWidget {
                     AppComponentColors.recommendCardBorderEnd,
                   ],
                 ),
-                width: 1,
+                width: _borderWidth,
               ),
             ),
             child: Padding(

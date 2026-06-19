@@ -22,6 +22,19 @@ class ImageAssets {
   static const measureAnalyzingIllustration = '$measureDir/analyzing.png';
   static const measurePrepareDevice = '$measureDir/machine.png';
   static const measurePrepareHair = '$measureDir/hair.png';
+  static const measureResultDir = '$measureDir/result';
+
+  /// Figma 진단 결과 간편보기 — `{냄새}-{먼지}` 배지 조합별 그래픽.
+  static const measureResultOdorNormalDustGood =
+      '$measureResultDir/odor_normal_dust_good.png';
+  static const measureResultOdorBadDustGood =
+      '$measureResultDir/odor_bad_dust_good.png';
+  static const measureResultOdorBadDustNormal =
+      '$measureResultDir/odor_bad_dust_normal.png';
+  static const measureResultOdorVeryBadDustNormal =
+      '$measureResultDir/odor_very_bad_dust_normal.png';
+  static const measureResultOdorVeryBadDustBad =
+      '$measureResultDir/odor_very_bad_dust_bad.png';
   static const refreshTrashIcon = '$refreshDir/trash.png';
   static const refreshShareIcon = '$refreshDir/wifi.png';
   static const refreshCollectingIllustration = '$refreshDir/refresh.png';

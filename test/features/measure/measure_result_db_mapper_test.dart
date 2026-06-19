@@ -39,10 +39,11 @@ void main() {
       expect(MeasureResultMapper.focusLabel(sampleRecord), '먼지 중심의 집중 리프레시');
     });
 
-    test('toMeasureResult sets historyCompletedAt from createdAt', () {
-      final result = MeasureResultMapper.toMeasureResult(sampleRecord);
+    test('toHistoryDetailEntry sets historyCompletedAt from createdAt', () {
+      final result = MeasureResultMapper.toHistoryDetailEntry(sampleRecord);
 
       expect(result.historyCompletedAt, sampleRecord.createdAt.toLocal());
+      expect(result.recommendReason, isNull);
     });
 
     test('maps pollution score labels to five-step scale', () {

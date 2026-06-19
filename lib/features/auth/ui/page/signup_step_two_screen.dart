@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/layout/app_layout.dart';
@@ -283,64 +284,86 @@ class _SignUpStepTwoScreenState extends State<SignUpStepTwoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AuthScreenStyles.horizontalPadding,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const AuthCloseHeader(title: '회원가입'),
-              const SizedBox(height: 12),
-              const AuthSignupProgressLine(step: 2),
-              const SizedBox(height: 36),
-              Expanded(
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      buildAuthFieldLabel('이름(닉네임)을 입력해주세요.', fontSize: 18),
-                      const SizedBox(height: AuthScreenStyles.fieldLabelGap),
-                      buildAuthTextField(
-                        controller: _nameController,
-                        hintText: '이름 입력 (20자 이내)',
-                        maxLength: 20,
-                      ),
-                      const SizedBox(height: 32),
-                      buildAuthFieldLabel('나이를 입력해주세요.', fontSize: 18),
-                      const SizedBox(height: AuthScreenStyles.fieldLabelGap),
-                      _buildAgePickerField(),
-                      const SizedBox(height: 32),
-                      buildAuthFieldLabel('성별을 선택해주세요.', fontSize: 18),
-                      const SizedBox(height: AuthScreenStyles.fieldLabelGap),
-                      Row(
-                        children: [
-                          for (
-                            var i = 0;
-                            i < HairProfileOptions.genders.length;
-                            i++
-                          ) ...[
-                            if (i > 0) const SizedBox(width: 12),
-                            _buildGenderButton(HairProfileOptions.genders[i]),
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AuthScreenStyles.horizontalPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const AuthCloseHeader(title: '회원가입'),
+                    const SizedBox(height: 12),
+                    const AuthSignupProgressLine(step: 2),
+                    const SizedBox(height: 36),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            buildAuthFieldLabel(
+                              '이름(닉네임)을 입력해주세요.',
+                              fontSize: 18,
+                            ),
+                            const SizedBox(
+                              height: AuthScreenStyles.fieldLabelGap,
+                            ),
+                            buildAuthTextField(
+                              controller: _nameController,
+                              hintText: '이름 입력 (20자 이내)',
+                              maxLength: 20,
+                            ),
+                            const SizedBox(height: 32),
+                            buildAuthFieldLabel('나이를 입력해주세요.', fontSize: 18),
+                            const SizedBox(
+                              height: AuthScreenStyles.fieldLabelGap,
+                            ),
+                            _buildAgePickerField(),
+                            const SizedBox(height: 32),
+                            buildAuthFieldLabel('성별을 선택해주세요.', fontSize: 18),
+                            const SizedBox(
+                              height: AuthScreenStyles.fieldLabelGap,
+                            ),
+                            Row(
+                              children: [
+                                for (
+                                  var i = 0;
+                                  i < HairProfileOptions.genders.length;
+                                  i++
+                                ) ...[
+                                  if (i > 0) const SizedBox(width: 12),
+                                  _buildGenderButton(
+                                    HairProfileOptions.genders[i],
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 24),
                           ],
-                        ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              AuthPrimaryButton(
+            ),
+            AppFixedBottomButtonArea(
+              backgroundColor: Colors.white,
+              child: AuthPrimaryButton(
                 label: _isSubmitting ? '가입 중...' : '확인',
                 enabled: _isFormValid && !_isSubmitting,
                 onPressed: _handleSignUpComplete,
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,9 +1,46 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../../core/services/notification_service.dart';
 import '../model/routine.dart';
+import 'routine_local_store.dart';
 
 /// [Routine] → 로컬 알림 예약 변환 담당.
 class RoutineAlarmScheduler {
   const RoutineAlarmScheduler._();
+
+  /// 저장된 모든 루틴 알림을 OS에 다시 등록합니다.
+  ///
+  /// 앱 cold start·재부팅 후에도 설정한 시간에 알림이 뜨도록 합니다.
+  static Future<void> rescheduleAll({RoutineLocalStore? localStore}) async {
+    final store = localStore ?? const RoutineLocalStore();
+    final routines = await store.loadAll();
+    if (routines.isEmpty) {
+      return;
+    }
+
+    final granted = await NotificationService.requestPermission();
+    if (!granted) {
+      if (kDebugMode) {
+        debugPrint('RoutineAlarmScheduler: notification permission denied');
+      }
+      return;
+    }
+
+    for (final routine in routines) {
+      try {
+        if (routine.enabled) {
+          await schedule(routine);
+        } else {
+          await cancel(routine);
+        }
+      } catch (error, stackTrace) {
+        debugPrint(
+          'RoutineAlarmScheduler: failed to schedule ${routine.id}: '
+          '$error\n$stackTrace',
+        );
+      }
+    }
+  }
 
   static Future<bool> schedule(Routine routine) async {
     final id = routine.id;

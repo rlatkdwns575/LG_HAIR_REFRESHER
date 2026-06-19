@@ -139,7 +139,7 @@ class RefreshModeMapper {
       cares.add('냄새');
     }
     if (scentYn) {
-      cares.add('향');
+      cares.add('향기');
     }
 
     if (cares.isEmpty) {
@@ -159,13 +159,13 @@ class RefreshModeMapper {
   }) {
     final tags = <String>[];
     if (dustYn) {
-      tags.add('먼지 제거 ${strengthLabel(dustStrength)}');
+      tags.add('먼지 ${strengthLabel(dustStrength)}');
     }
     if (odorYn) {
-      tags.add('냄새 제거 ${strengthLabel(odorStrength)}');
+      tags.add('냄새 ${strengthLabel(odorStrength)}');
     }
     if (scentYn) {
-      tags.add('향 케어 ${strengthLabel(scentStrength)}');
+      tags.add('향기 ${strengthLabel(scentStrength)}');
     }
     return tags;
   }
