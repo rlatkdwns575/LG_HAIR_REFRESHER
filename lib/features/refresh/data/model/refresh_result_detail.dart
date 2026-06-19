@@ -111,6 +111,7 @@ class RefreshResultDetail {
     required this.odorSection,
     required this.dustSection,
     required this.hairSection,
+    this.historyCompletedAt,
   });
 
   final String modeName;
@@ -121,6 +122,9 @@ class RefreshResultDetail {
   final RefreshResultStatusSection odorSection;
   final RefreshResultStatusSection dustSection;
   final RefreshResultStatusSection hairSection;
+
+  /// 기록(히스토리)에서 상세를 열 때 표시할 완료 시각.
+  final DateTime? historyCompletedAt;
 
   /// 냄새 상태 — 인지 가능도 ? 툴팁.
   static const odorPerceptionHelpTooltip =
@@ -153,8 +157,8 @@ class RefreshResultDetail {
   String get shareSummaryText => [
     '리프레시 결과',
     modeName,
-    '리프레시 필요도 $necessityReductionLabel 낮아짐',
-    '현재 케어 필요도 $currentCareNeedLabel',
+    '청결도 $necessityReductionLabel 높아짐',
+    '현재 리프레시 필요도 $currentCareNeedLabel',
     summaryMessage.replaceAll('\n', ' '),
   ].join('\n');
 
@@ -165,17 +169,17 @@ class RefreshResultDetail {
     currentCareNeedPercent: 35,
     metrics: [
       RefreshResultMetricPair(
-        label: '냄새 케어 필요도',
+        label: '냄새 감지 수준',
         beforePercent: 66,
         afterPercent: 26,
       ),
       RefreshResultMetricPair(
-        label: '먼지 케어 필요도',
+        label: '먼지 감지 수준',
         beforePercent: 76,
         afterPercent: 36,
       ),
       RefreshResultMetricPair(
-        label: '모발 컨디션 영향도',
+        label: '모발 컨디션 수준',
         beforePercent: 30,
         afterPercent: 30,
         highlightAfter: false,

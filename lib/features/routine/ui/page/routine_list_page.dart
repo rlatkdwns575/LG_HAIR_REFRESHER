@@ -9,6 +9,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
+import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_toggle.dart';
 import '../../data/api/routine_alarm_scheduler.dart';
 import '../../data/api/routine_api.dart';
@@ -177,26 +178,17 @@ class _RoutineListPageState extends State<RoutineListPage> {
         title: '추천 알림 관리',
         onBack: () => Navigator.of(context).pop(),
       ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            Expanded(child: _buildBody()),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                15,
-                AppSpacing.sm,
-                15,
-                AppSpacing.md + AppSystemInsets.bottomOf(context),
-              ),
-              child: AppBoxButton(
-                label: '알림 추가',
-                variant: AppBoxButtonVariant.active,
-                onPressed: _addRoutine,
-              ),
+      body: Column(
+        children: [
+          Expanded(child: _buildBody()),
+          AppFixedBottomButtonArea(
+            child: AppBoxButton(
+              label: '알림 추가',
+              variant: AppBoxButtonVariant.active,
+              onPressed: _addRoutine,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

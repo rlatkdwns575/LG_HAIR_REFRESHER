@@ -7,6 +7,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
+import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_toggle.dart';
 import '../../data/api/routine_alarm_scheduler.dart';
 import '../../data/api/routine_api.dart';
@@ -212,112 +213,103 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
         title: _isEdit ? '루틴 알림 수정' : '루틴 알림 등록',
         onBack: () => Navigator.of(context).pop(),
       ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                padding: AppSystemInsets.pageHorizontal(
-                  context,
-                  top: AppSpacing.lg,
-                  extraBottom: AppSpacing.lg,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: AppSystemInsets.pageHorizontal(
+                context,
+                top: AppSpacing.lg,
+                extraBottom: AppSpacing.lg,
+              ),
+              children: [
+                Text(
+                  '반복되는 케어를 루틴으로 등록하면\n선택한 요일·시간에 알림을 보내드려요.',
+                  style: AppTextStyles.bodyM2.copyWith(
+                    color: AppColors.gray600,
+                    height: 1.5,
+                  ),
                 ),
-                children: [
-                  Text(
-                    '반복되는 케어를 루틴으로 등록하면\n선택한 요일·시간에 알림을 보내드려요.',
-                    style: AppTextStyles.bodyM2.copyWith(
-                      color: AppColors.gray600,
-                      height: 1.5,
-                    ),
+                const SizedBox(height: AppSpacing.lg),
+                _Section(
+                  title: '리프레시 모드',
+                  child: _ModeRow(
+                    label: _selectedModeName,
+                    isLoading: _isLoadingModes,
+                    isEmpty: !_isLoadingModes && _modeOptions.isEmpty,
+                    onTap: _isLoadingModes || _modeOptions.isEmpty
+                        ? null
+                        : _pickMode,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _Section(
-                    title: '리프레시 모드',
-                    child: _ModeRow(
-                      label: _selectedModeName,
-                      isLoading: _isLoadingModes,
-                      isEmpty: !_isLoadingModes && _modeOptions.isEmpty,
-                      onTap: _isLoadingModes || _modeOptions.isEmpty
-                          ? null
-                          : _pickMode,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _Section(
-                    title: '요일',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        RoutineWeekdayPicker(
-                          selected: _weekdays,
-                          onToggle: _toggleWeekday,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _isRepeating ? '매주 반복' : '한 번만',
-                                style: AppTextStyles.bodyS.copyWith(
-                                  color: AppColors.gray600,
-                                ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _Section(
+                  title: '요일',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      RoutineWeekdayPicker(
+                        selected: _weekdays,
+                        onToggle: _toggleWeekday,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _isRepeating ? '매주 반복' : '한 번만',
+                              style: AppTextStyles.bodyS.copyWith(
+                                color: AppColors.gray600,
                               ),
-                              const SizedBox(width: AppSpacing.sm),
-                              AppToggle(
-                                value: _isRepeating,
-                                onChanged: _setRepeating,
-                                size: AppToggleSize.large,
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            AppToggle(
+                              value: _isRepeating,
+                              onChanged: _setRepeating,
+                              size: AppToggleSize.large,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _Section(
-                    title: '알림 시간',
-                    child: _TimeRow(
-                      label: RoutineWeekday.formatTime(_hour, _minute),
-                      onTap: _pickTime,
-                    ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _Section(
+                  title: '알림 시간',
+                  child: _TimeRow(
+                    label: RoutineWeekday.formatTime(_hour, _minute),
+                    onTap: _pickTime,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _ToggleRow(
-                    title: '알림 받기',
-                    caption: _isRepeating
-                        ? '선택한 요일·시간에 매주 리프레시 알림을 보내요.'
-                        : '선택한 요일·시간에 한 번만 리프레시 알림을 보내요.',
-                    value: _enabled,
-                    onChanged: (value) => setState(() => _enabled = value),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _ToggleRow(
+                  title: '알림 받기',
+                  caption: _isRepeating
+                      ? '선택한 요일·시간에 매주 리프레시 알림을 보내요.'
+                      : '선택한 요일·시간에 한 번만 리프레시 알림을 보내요.',
+                  value: _enabled,
+                  onChanged: (value) => setState(() => _enabled = value),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                15,
-                0,
-                15,
-                AppSpacing.md + AppSystemInsets.bottomOf(context),
-              ),
-              child: AppBoxButton(
-                label: _isSaving
-                    ? '저장 중...'
-                    : _isEdit
-                    ? '수정 완료'
-                    : '루틴 등록',
-                variant: _canSave
-                    ? AppBoxButtonVariant.active
-                    : AppBoxButtonVariant.disabled,
-                onPressed: _canSave ? _save : null,
-              ),
+          ),
+          AppFixedBottomButtonArea(
+            child: AppBoxButton(
+              label: _isSaving
+                  ? '저장 중...'
+                  : _isEdit
+                  ? '수정 완료'
+                  : '루틴 등록',
+              variant: _canSave
+                  ? AppBoxButtonVariant.active
+                  : AppBoxButtonVariant.disabled,
+              onPressed: _canSave ? _save : null,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

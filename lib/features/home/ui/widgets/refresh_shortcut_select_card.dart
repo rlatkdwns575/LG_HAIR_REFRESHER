@@ -34,87 +34,58 @@ class RefreshShortcutSelectCard extends StatelessWidget {
     final titleColor = _isDimmed ? AppColors.gray500 : AppColors.primary900;
     final bodyColor = _isDimmed ? AppColors.gray400 : AppColors.gray700;
     final borderColor = _isSelected ? AppColors.primary500 : AppColors.gray100;
-    final badgeBackground = _isDimmed
-        ? AppColors.gray200
-        : AppColors.primary100;
-    final badgeTextColor = _isDimmed ? AppColors.gray600 : AppColors.primary700;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Material(
-        color: AppColors.gray0,
-        shape: RoundedRectangleBorder(
+    return SizedBox(
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          side: BorderSide(color: borderColor, width: _isSelected ? 1.5 : 1),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: _isDisabled ? null : onTap,
-          child: Opacity(
-            opacity: _isDisabled ? 0.5 : 1,
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: badgeBackground,
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 3,
-                        ),
-                        child: AppText(
-                          mode.category,
-                          style: AppTextStyles.labelXs.copyWith(
-                            color: badgeTextColor,
-                          ),
-                        ),
-                      ),
+        child: Material(
+          color: AppColors.gray0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            side: BorderSide(color: borderColor, width: _isSelected ? 1.5 : 1),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: _isDisabled ? null : onTap,
+            child: Opacity(
+              opacity: _isDisabled ? 0.5 : 1,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: DurationBadge(totalSeconds: mode.durationSeconds),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: AppText(
-                          mode.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.titleS.copyWith(
-                            color: titleColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      DurationBadge(totalSeconds: mode.durationSeconds),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  AppText(
-                    mode.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodyS.copyWith(color: bodyColor),
-                  ),
-                  if (_isDisabled) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    AppText(
+                      mode.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.titleS.copyWith(color: titleColor),
+                    ),
                     const SizedBox(height: 6),
                     AppText(
-                      '향 카트리지가 없어 사용할 수 없어요',
-                      style: AppTextStyles.labelS.copyWith(
-                        color: AppColors.gray500,
-                      ),
+                      mode.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyS.copyWith(color: bodyColor),
                     ),
+                    if (_isDisabled) ...[
+                      const SizedBox(height: 6),
+                      AppText(
+                        '향 카트리지가 없어 사용할 수 없어요',
+                        style: AppTextStyles.labelS.copyWith(
+                          color: AppColors.gray500,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),

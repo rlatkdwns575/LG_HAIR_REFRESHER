@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_component_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import 'app_box_button.dart';
+import 'app_fixed_bottom_button_area.dart';
 
 enum AppBottomButtonBarType { oneButton, twoButtons }
 
@@ -25,45 +26,34 @@ class AppBottomButtonBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppComponentColors.bottomBarBackground,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            AppSpacing.sm,
-            AppSpacing.md,
-            AppSpacing.sm,
-          ),
-          child: type == AppBottomButtonBarType.oneButton
-              ? AppBoxButton(
-                  label: primaryLabel,
-                  onPressed: onPrimaryPressed,
-                  size: AppBoxButtonSize.large,
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: AppBoxButton(
-                        label: secondaryLabel ?? '버튼명',
-                        onPressed: onSecondaryPressed,
-                        size: AppBoxButtonSize.medium,
-                        variant: AppBoxButtonVariant.disabled,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: AppBoxButton(
-                        label: primaryLabel,
-                        onPressed: onPrimaryPressed,
-                        size: AppBoxButtonSize.medium,
-                      ),
-                    ),
-                  ],
+    return AppFixedBottomButtonArea(
+      backgroundColor: AppComponentColors.bottomBarBackground,
+      child: type == AppBottomButtonBarType.oneButton
+          ? AppBoxButton(
+              label: primaryLabel,
+              onPressed: onPrimaryPressed,
+              size: AppBoxButtonSize.large,
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: AppBoxButton(
+                    label: secondaryLabel ?? '버튼명',
+                    onPressed: onSecondaryPressed,
+                    size: AppBoxButtonSize.medium,
+                    variant: AppBoxButtonVariant.disabled,
+                  ),
                 ),
-        ),
-      ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: AppBoxButton(
+                    label: primaryLabel,
+                    onPressed: onPrimaryPressed,
+                    size: AppBoxButtonSize.medium,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

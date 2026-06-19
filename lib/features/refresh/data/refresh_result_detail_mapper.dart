@@ -32,17 +32,17 @@ class RefreshResultDetailMapper {
       currentCareNeedPercent: _average([odorAfter, dustAfter]),
       metrics: [
         RefreshResultMetricPair(
-          label: '냄새 케어 필요도',
+          label: '냄새 감지 수준',
           beforePercent: odorBefore,
           afterPercent: odorAfter,
         ),
         RefreshResultMetricPair(
-          label: '먼지 케어 필요도',
+          label: '먼지 감지 수준',
           beforePercent: dustBefore,
           afterPercent: dustAfter,
         ),
         const RefreshResultMetricPair(
-          label: '모발 컨디션 영향도',
+          label: '모발 컨디션 수준',
           beforePercent: 30,
           afterPercent: 30,
           highlightAfter: false,
@@ -72,6 +72,7 @@ class RefreshResultDetailMapper {
     String? odorAfterLabel,
     String? dustBeforeLabel,
     String? dustAfterLabel,
+    DateTime? completedAt,
   }) {
     final odorBefore = _percentFromLabel(odorBeforeLabel) ?? 66;
     final odorAfter = _percentFromLabel(odorAfterLabel) ?? 26;
@@ -84,17 +85,17 @@ class RefreshResultDetailMapper {
       currentCareNeedPercent: _average([odorAfter, dustAfter]),
       metrics: [
         RefreshResultMetricPair(
-          label: '냄새 케어 필요도',
+          label: '냄새 감지 수준',
           beforePercent: odorBefore,
           afterPercent: odorAfter,
         ),
         RefreshResultMetricPair(
-          label: '먼지 케어 필요도',
+          label: '먼지 감지 수준',
           beforePercent: dustBefore,
           afterPercent: dustAfter,
         ),
         const RefreshResultMetricPair(
-          label: '모발 컨디션 영향도',
+          label: '모발 컨디션 수준',
           beforePercent: 30,
           afterPercent: 30,
           highlightAfter: false,
@@ -110,6 +111,7 @@ class RefreshResultDetailMapper {
         dustAfterLabel: dustAfterLabel,
       ),
       hairSection: RefreshResultDetail.sample.hairSection,
+      historyCompletedAt: completedAt?.toLocal(),
     );
   }
 

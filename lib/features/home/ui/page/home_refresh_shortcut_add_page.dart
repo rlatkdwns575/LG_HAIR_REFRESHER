@@ -160,7 +160,7 @@ class _HomeRefreshShortcutAddPageState
                         subtitle: _isEditing
                             ? '변경할 모드를 선택하세요'
                             : '홈 바로가기에 추가할 모드를 선택하세요',
-                        trailingLabel: '커스텀하기',
+                        trailingLabel: '커스텀 모드 생성',
                         onTrailingTap: _openCustomCreate,
                       ),
                       _buildChipTabBar(),
@@ -174,6 +174,7 @@ class _HomeRefreshShortcutAddPageState
                         child: modes.isEmpty
                             ? _buildEmptyState()
                             : Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   for (var i = 0; i < modes.length; i++) ...[
                                     if (i > 0)

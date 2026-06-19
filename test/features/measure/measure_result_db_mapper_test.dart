@@ -38,6 +38,13 @@ void main() {
     test('builds focus label from DB scores', () {
       expect(MeasureResultMapper.focusLabel(sampleRecord), '먼지 중심의 집중 리프레시');
     });
+
+    test('toMeasureResult sets historyCompletedAt from createdAt', () {
+      final result = MeasureResultMapper.toMeasureResult(sampleRecord);
+
+      expect(result.historyCompletedAt, sampleRecord.createdAt.toLocal());
+    });
+
     test('maps pollution score labels to five-step scale', () {
       expect(MeasureResultMapper.pollutionScoreLabel(10), '매우낮음');
       expect(MeasureResultMapper.pollutionScoreLabel(35), '낮음');
@@ -90,6 +97,22 @@ void main() {
       expect(detail.odorSection.metrics.last.label, '냄새 유형');
       expect(detail.odorSection.metrics.last.tagLabels, ['땀']);
       expect(detail.odorSection.metrics.last.badgeLabel, '음식');
+    });
+
+    test('passes historyCompletedAt from measure result', () {
+      final completedAt = DateTime(2026, 6, 10, 19, 38);
+      final result = MeasureResult(
+        odorLevel: MeasureCareLevel.intensiveRecommended,
+        dustLevel: MeasureCareLevel.intensiveRequired,
+        headline: MeasureResult.sample.headline,
+        recommendedMode: MeasureResult.sample.recommendedMode,
+        sourceRecord: sampleRecord,
+        historyCompletedAt: completedAt,
+      );
+
+      final detail = MeasureResultDetail.fromMeasureResult(result);
+
+      expect(detail.historyCompletedAt, completedAt);
     });
   });
 

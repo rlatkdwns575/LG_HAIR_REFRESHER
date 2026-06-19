@@ -1,24 +1,198 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/app_text.dart';
 
+export '../../../../core/utils/korean_date_time_format.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_divider.dart';
 
-const _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+/// Figma 리프레시 기록 리포트 — 공통 텍스트 스타일 (40000026:25686).
+abstract final class HistoryTextStyles {
+  static final pageTitle = AppTextStyles.titleL.copyWith(
+    color: AppColors.gray900,
+  );
 
-/// `오전/오후 h:mm` 형식.
-String formatKoreanTime(DateTime time) {
-  final isAm = time.hour < 12;
-  final hour12 = time.hour % 12 == 0 ? 12 : time.hour % 12;
-  final minute = time.minute.toString().padLeft(2, '0');
-  return '${isAm ? '오전' : '오후'} $hour12:$minute';
+  static final pageAsOf = AppTextStyles.bodyS.copyWith(
+    color: AppColors.gray500,
+  );
+
+  /// Title_XS — 카드 제목.
+  static final cardTitle = AppTextStyles.titleXs.copyWith(
+    color: AppColors.gray900,
+  );
+
+  /// Label_M gray700 — 보조 라벨·설명.
+  static final labelSecondary = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray700,
+  );
+
+  /// Label_M gray900 — 본문·값.
+  static final labelPrimary = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray900,
+  );
+
+  /// Label_S primary700 — 증감 수치.
+  static final delta = AppTextStyles.labelS.copyWith(
+    color: AppColors.primary700,
+  );
+
+  static final kvLabel = labelSecondary;
+  static final kvValue = labelPrimary;
+
+  static final percentValue = AppTextStyles.labelL.copyWith(
+    color: AppColors.gray900,
+  );
+
+  static const percentUnit = TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    height: 1,
+    color: AppColors.gray900,
+  );
+
+  static const percentDelta = TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    height: 1,
+    color: AppColors.primary700,
+  );
+
+  static final insightTitle = AppTextStyles.labelM.copyWith(
+    color: AppColors.primary500,
+  );
+
+  static final insightBody = labelPrimary;
+
+  static final insightCaption = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray600,
+  );
+
+  static final statLabel = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray900,
+    fontWeight: FontWeight.w700,
+  );
+
+  static final statValue = AppTextStyles.titleXs.copyWith(
+    color: AppColors.gray900,
+    fontWeight: FontWeight.w700,
+  );
+
+  static final recordMode = labelPrimary;
+
+  static final recordTime = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray500,
+  );
+
+  static final detailLink = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray500,
+  );
+
+  static final barLabel = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray900,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final legendLabel = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray900,
+  );
+
+  static final legendLabelHighlight = AppTextStyles.labelM.copyWith(
+    color: AppColors.primary500,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final modeUsageName = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray700,
+  );
+
+  static final modeUsageNameHighlight = AppTextStyles.labelM.copyWith(
+    color: AppColors.primary500,
+    fontWeight: FontWeight.w700,
+  );
+
+  static final modeUsageImprovement = AppTextStyles.labelM.copyWith(
+    color: AppColors.gray500,
+  );
+
+  static final modeUsageImprovementHighlight = AppTextStyles.labelM.copyWith(
+    color: AppColors.primary500,
+    fontWeight: FontWeight.w700,
+  );
 }
 
-/// `M월 d일 요일` 형식.
-String formatKoreanDateWithWeekday(DateTime date) {
-  final weekday = _weekdayLabels[date.weekday - 1];
-  return '${date.month}월 ${date.day}일 $weekday요일';
+/// Figma — ↑ 아이콘 + 증감 텍스트.
+class HistoryDeltaText extends StatelessWidget {
+  const HistoryDeltaText({required this.delta, this.iconSize = 16, super.key});
+
+  final String delta;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(Icons.arrow_upward, size: iconSize, color: AppColors.primary700),
+        AppText(delta, style: HistoryTextStyles.delta),
+      ],
+    );
+  }
+}
+
+/// Figma — `67` + `%` + ↑`4%`.
+class HistoryPercentWithDelta extends StatelessWidget {
+  const HistoryPercentWithDelta({
+    required this.percentText,
+    required this.deltaText,
+    super.key,
+  });
+
+  final String percentText;
+  final String deltaText;
+
+  @override
+  Widget build(BuildContext context) {
+    final number = percentText.endsWith('%')
+        ? percentText.substring(0, percentText.length - 1)
+        : percentText;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(number, style: HistoryTextStyles.percentValue),
+            Text('%', style: HistoryTextStyles.percentUnit),
+          ],
+        ),
+        const SizedBox(width: 2),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 1),
+              child: Icon(
+                Icons.arrow_upward,
+                size: 12,
+                color: AppColors.primary700,
+              ),
+            ),
+            Text(deltaText, style: HistoryTextStyles.percentDelta),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 /// `yyyy년 M월 d일 기준` 형식.
@@ -68,55 +242,42 @@ class HistoryWhiteCard extends StatelessWidget {
   }
 }
 
-/// `라벨 ... 값` 한 줄 (좌측 회색 라벨, 우측 강조 값).
+/// `라벨 ... 값` 한 줄 (Figma Label_M 좌·우 정렬).
 class HistoryKeyValueRow extends StatelessWidget {
   const HistoryKeyValueRow({
     required this.label,
     required this.value,
-    this.valueColor = AppColors.gray900,
     this.trailingDelta,
+    this.isPercentValue = false,
     super.key,
   });
 
   final String label;
   final String value;
-  final Color valueColor;
   final String? trailingDelta;
+  final bool isPercentValue;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       children: [
-        Expanded(
-          child: AppText(
-            label,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
-          ),
-        ),
-        const SizedBox(width: 12),
-        if (trailingDelta != null)
+        Expanded(child: AppText(label, style: HistoryTextStyles.kvLabel)),
+        if (trailingDelta != null && isPercentValue)
+          HistoryPercentWithDelta(percentText: value, deltaText: trailingDelta!)
+        else if (trailingDelta != null)
           Row(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              AppText(
-                value,
-                style: AppTextStyles.bodyM2.copyWith(color: valueColor),
-              ),
+              AppText(value, style: HistoryTextStyles.kvValue),
               const SizedBox(width: 2),
-              AppText(
-                trailingDelta!,
-                style: AppTextStyles.labelM.copyWith(
-                  color: AppColors.primary500,
-                ),
-              ),
+              HistoryDeltaText(delta: trailingDelta!, iconSize: 12),
             ],
           )
         else
-          AppText(
-            value,
-            style: AppTextStyles.bodyM2.copyWith(color: valueColor),
-          ),
+          AppText(value, style: HistoryTextStyles.kvValue),
       ],
     );
   }
@@ -170,10 +331,7 @@ class HistoryDetailLink extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppText(
-            label,
-            style: AppTextStyles.labelM.copyWith(color: AppColors.gray500),
-          ),
+          AppText(label, style: HistoryTextStyles.detailLink),
           const Icon(Icons.chevron_right, size: 14, color: AppColors.gray400),
         ],
       ),

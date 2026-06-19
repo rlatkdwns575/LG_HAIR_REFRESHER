@@ -277,7 +277,7 @@ class _MetricLabel extends StatelessWidget {
         label: label,
         labelStyle: labelStyle,
         tooltipMessage: helpTooltipMessage!,
-        placement: AppMetricHelpTooltipPlacement.belowEnd,
+        placement: AppMetricHelpTooltipPlacement.belowStart,
       );
     }
 

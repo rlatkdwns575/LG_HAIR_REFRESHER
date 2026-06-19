@@ -18,6 +18,7 @@ class MeasureResultDetail {
     required this.odorSection,
     required this.dustSection,
     required this.hairSection,
+    this.historyCompletedAt,
   });
 
   final int refreshNeedPercent;
@@ -31,6 +32,7 @@ class MeasureResultDetail {
   final MeasureResultDetailSection odorSection;
   final MeasureResultDetailSection dustSection;
   final MeasureResultDetailSection hairSection;
+  final DateTime? historyCompletedAt;
 
   bool get exceedsThreshold => refreshNeedPercent > recommendedThresholdPercent;
 
@@ -154,6 +156,7 @@ class MeasureResultDetail {
           ),
         ],
       ),
+      historyCompletedAt: result.historyCompletedAt,
     );
   }
 }

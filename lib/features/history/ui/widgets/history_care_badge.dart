@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../data/model/care_status.dart';
+import 'history_common.dart';
 
 /// 단일 케어 상태 배지 (예: 집중권장 / 좋음).
 class HistoryCareBadge extends StatelessWidget {
@@ -99,10 +100,7 @@ class HistoryCareStatusRow extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodyS.copyWith(
-              color: AppColors.gray700,
-              fontSize: compact ? 11 : null,
-            ),
+            style: HistoryTextStyles.kvLabel,
           ),
         ),
         SizedBox(width: gap),

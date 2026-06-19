@@ -23,7 +23,7 @@ class RefreshResultHeader extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         AppText(
-          '리프레시 결과는 2시간 동안 확인하실 수 있습니다.',
+          '리프레시 결과는 리프레시 기록에서 확인할 수 있습니다.',
           style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
         ),
       ],

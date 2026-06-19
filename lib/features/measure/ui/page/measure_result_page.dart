@@ -172,16 +172,17 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                   ),
                 ),
               )
-            : Column(
+            : ListView(
+                padding: EdgeInsets.fromLTRB(
+                  15,
+                  AppSpacing.lg,
+                  15,
+                  MediaQuery.paddingOf(context).bottom + 20,
+                ),
                 children: [
                   if (_loadError != null)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        15,
-                        AppSpacing.sm,
-                        15,
-                        0,
-                      ),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                       child: AppText(
                         _loadError!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -189,34 +190,17 @@ class _MeasureResultPageState extends State<MeasureResultPage> {
                         ),
                       ),
                     ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(
-                        15,
-                        AppSpacing.lg,
-                        15,
-                        0,
-                      ),
-                      children: [
-                        MeasureResultContent(
-                          result: result,
-                          onDetailTap: _onDetailTap,
-                          onRecommendTap: _onRecommendTap,
-                          isRecommendEnabled: _isRecommendEnabled,
-                        ),
-                      ],
-                    ),
+                  MeasureResultContent(
+                    result: result,
+                    onDetailTap: _onDetailTap,
+                    onRecommendTap: _onRecommendTap,
+                    isRecommendEnabled: _isRecommendEnabled,
                   ),
-                  SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                      child: AppBoxButton(
-                        label: '재진단 하기',
-                        variant: AppBoxButtonVariant.line,
-                        onPressed: _onRediagnose,
-                      ),
-                    ),
+                  const SizedBox(height: 30),
+                  AppBoxButton(
+                    label: '재진단 하기',
+                    variant: AppBoxButtonVariant.line,
+                    onPressed: _onRediagnose,
                   ),
                 ],
               ),

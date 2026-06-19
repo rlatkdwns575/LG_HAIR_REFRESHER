@@ -218,7 +218,7 @@ class RefreshSessionResultGenerator {
       overallImprovementPercent: 100,
       headlineBefore: headline.before,
       headlineAfter: headline.after,
-      disclaimer: '향기는 시간이 지나면 희미해질 수 있어요.',
+      disclaimer: '',
       dustChange: const RefreshResultChange(
         label: '먼지',
         beforeLevel: RefreshPollutionLevel.good,

@@ -22,6 +22,7 @@ class MeasureResult {
     this.recommendReason,
     this.detailLinkLabel = '상세 결과 보기',
     this.sourceRecord,
+    this.historyCompletedAt,
   });
 
   final MeasureCareLevel odorLevel;
@@ -33,6 +34,9 @@ class MeasureResult {
 
   /// Supabase `MEASURE_RESULTS` 원본 행 (상세 화면 퍼센트·문구 매핑용).
   final MeasureResultRecord? sourceRecord;
+
+  /// 기록(히스토리)에서 상세를 열 때 표시할 완료 시각.
+  final DateTime? historyCompletedAt;
 
   MeasureResultViewType get viewType =>
       odorLevel.needsAction || dustLevel.needsAction

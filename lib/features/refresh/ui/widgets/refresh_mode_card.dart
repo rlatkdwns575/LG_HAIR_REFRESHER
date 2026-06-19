@@ -148,19 +148,13 @@ class RefreshModeCard extends StatelessWidget {
           children: [
             DurationBadge(totalSeconds: mode.durationSeconds),
             const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Flexible(
-                  child: AppText(
-                    mode.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.titleS.copyWith(
-                      color: enabled ? AppColors.primary900 : AppColors.gray500,
-                    ),
-                  ),
-                ),
-              ],
+            AppText(
+              mode.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.titleS.copyWith(
+                color: enabled ? AppColors.primary900 : AppColors.gray500,
+              ),
             ),
             const SizedBox(height: 6),
             AppText(
@@ -202,21 +196,24 @@ class _CardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: boxShadow,
-      ),
-      child: Material(
-        color: backgroundColor,
-        shape: RoundedRectangleBorder(
+    return SizedBox(
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          side: BorderSide(color: borderColor),
+          boxShadow: boxShadow,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(padding: const EdgeInsets.all(15), child: child),
+        child: Material(
+          color: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            side: BorderSide(color: borderColor),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(padding: const EdgeInsets.all(15), child: child),
+          ),
         ),
       ),
     );

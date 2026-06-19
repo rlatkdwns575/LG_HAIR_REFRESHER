@@ -12,6 +12,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_toggle.dart';
 import '../../../../core/services/auth_session_service.dart';
 import '../../../../core/services/device_consumable_service.dart';
@@ -471,17 +472,13 @@ class _RefreshCustomCreatePageState extends State<RefreshCustomCreatePage> {
   }
 
   Widget _buildSubmitBar() {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 10, 15, 20),
-        child: AppBoxButton(
-          label: _isSaving ? '저장 중...' : '리프레시 저장',
-          onPressed: _canSave && !_isSaving ? _onSave : null,
-          variant: _canSave && !_isSaving
-              ? AppBoxButtonVariant.active
-              : AppBoxButtonVariant.disabled,
-        ),
+    return AppFixedBottomButtonArea(
+      child: AppBoxButton(
+        label: _isSaving ? '저장 중...' : '리프레시 저장',
+        onPressed: _canSave && !_isSaving ? _onSave : null,
+        variant: _canSave && !_isSaving
+            ? AppBoxButtonVariant.active
+            : AppBoxButtonVariant.disabled,
       ),
     );
   }

@@ -1,6 +1,7 @@
 export 'app_badge.dart';
 export 'app_battery_status.dart';
 export 'app_bottom_button_bar.dart';
+export 'app_fixed_bottom_button_area.dart';
 export 'app_box_button.dart';
 export 'app_box_mini_button.dart';
 export 'app_calendar_day_strip.dart';

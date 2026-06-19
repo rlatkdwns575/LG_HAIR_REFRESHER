@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result_record.dart';
 import 'package:lg_hair_refresher/features/refresh/data/api/refresh_session_result_generator.dart';
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
+import 'package:lg_hair_refresher/features/refresh/data/refresh_result_headline_builder.dart';
 
 void main() {
   const generator = RefreshSessionResultGenerator();
@@ -194,6 +195,51 @@ void main() {
         expect(overall, lessThanOrEqualTo(40.0));
         expect(_hasSingleDecimal(overall), isTrue);
       }
+    });
+
+    test('headline reflects mode category and care type', () {
+      const beforeMode = RefreshMode(
+        id: 'before',
+        name: '외출 전',
+        description: '',
+        category: RefreshModeTabs.beforeOuting,
+        durationSeconds: 120,
+        icon: Icons.directions_walk_outlined,
+        odorYn: true,
+        dustYn: true,
+      );
+      const weatherMode = RefreshMode(
+        id: 'weather',
+        name: '날씨',
+        description: '',
+        category: RefreshModeTabs.weather,
+        durationSeconds: 120,
+        icon: Icons.wb_sunny_outlined,
+        dustYn: true,
+      );
+
+      expect(
+        RefreshResultHeadlineBuilder.forMode(odorDustMode).before,
+        '외출 후 남아 있던 냄새와 먼지가',
+      );
+      expect(
+        RefreshResultHeadlineBuilder.forMode(beforeMode).before,
+        '외출 전에 쌓인 냄새와 먼지가',
+      );
+      expect(
+        RefreshResultHeadlineBuilder.forMode(weatherMode).before,
+        '날씨에 쌓인 먼지가',
+      );
+      expect(
+        RefreshResultHeadlineBuilder.forMode(odorOnlyMode).before,
+        '외출 후 남아 있던 냄새가',
+      );
+    });
+
+    test('result has no disclaimer on simple view', () {
+      final outcome = generator.generate(mode: odorDustMode, random: Random(1));
+
+      expect(outcome.result.disclaimer, isEmpty);
     });
 
     test('after scores never drop below minimum', () {

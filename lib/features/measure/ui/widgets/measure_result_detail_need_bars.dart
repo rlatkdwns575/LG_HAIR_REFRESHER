@@ -40,9 +40,6 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
   /// Figma 40000056:19052 — 라벨 | 막대 | % 열 간격.
   static const double columnGap = 20;
 
-  /// Figma — 라벨 열 너비.
-  static const double labelWidth = 82;
-
   static const double _barRadius = 10;
   static const double _horizontalInset = 15;
 
@@ -80,39 +77,30 @@ class MeasureResultDetailNeedBars extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
         horizontal: MeasureResultDetailNeedBars._horizontalInset,
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return SizedBox(
-            height: _thresholdOverlayHeight + chartBodyHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: labelWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: _thresholdOverlayHeight,
-                    ),
-                    child: _LabelColumn(items: items),
-                  ),
-                ),
-                const SizedBox(width: columnGap),
-                Expanded(
-                  child: _BarChartArea(
-                    items: items,
-                    thresholdPercent: thresholdPercent,
-                    chartBodyHeight: chartBodyHeight,
-                  ),
-                ),
-                const SizedBox(width: columnGap),
-                Padding(
-                  padding: const EdgeInsets.only(top: _thresholdOverlayHeight),
-                  child: _PercentColumn(items: items),
-                ),
-              ],
+      child: SizedBox(
+        height: _thresholdOverlayHeight + chartBodyHeight,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: _thresholdOverlayHeight),
+              child: _LabelColumn(items: items),
             ),
-          );
-        },
+            const SizedBox(width: columnGap),
+            Expanded(
+              child: _BarChartArea(
+                items: items,
+                thresholdPercent: thresholdPercent,
+                chartBodyHeight: chartBodyHeight,
+              ),
+            ),
+            const SizedBox(width: columnGap),
+            Padding(
+              padding: const EdgeInsets.only(top: _thresholdOverlayHeight),
+              child: _PercentColumn(items: items),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -137,6 +125,9 @@ class _LabelColumn extends StatelessWidget {
               child: AppText(
                 items[i].label,
                 style: MeasureResultDetailNeedBars._labelStyle,
+                maxLines: 1,
+                softWrap: false,
+                enableKoreanLineBreak: false,
               ),
             ),
           ),
@@ -172,6 +163,9 @@ class _PercentColumn extends StatelessWidget {
               child: AppText(
                 '${items[i].percent}%',
                 style: _percentStyle(items[i]),
+                maxLines: 1,
+                softWrap: false,
+                enableKoreanLineBreak: false,
               ),
             ),
           ),

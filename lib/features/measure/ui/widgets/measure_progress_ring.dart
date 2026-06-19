@@ -54,7 +54,9 @@ class MeasureProgressRing extends StatelessWidget {
             child: AppText(
               '$percent%',
               style: AppTextStyles.headlineL.copyWith(
-                fontSize: 40,
+                fontSize: 48,
+                height: 48 / 48,
+                letterSpacing: -0.96,
                 color: AppColors.gray900,
               ),
             ),

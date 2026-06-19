@@ -63,7 +63,7 @@ class RefreshProgressSession {
 
   static const _dustStep = (
     label: '먼지 케어',
-    statusMessage: '모발 표면에 외부 먼지를 정리하고 있어요.',
+    statusMessage: '모발 표면의 외부 먼지를 정리하고 있어요.',
   );
   static const _odorStep = (
     label: '냄새 케어',

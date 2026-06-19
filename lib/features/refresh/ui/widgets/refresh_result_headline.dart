@@ -55,14 +55,6 @@ class RefreshResultHeadline extends StatelessWidget {
             style: _messageStyle,
           ),
         ],
-        if (result.disclaimer.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.lg),
-          AppText(
-            result.disclaimer,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
-          ),
-        ],
       ],
     );
   }

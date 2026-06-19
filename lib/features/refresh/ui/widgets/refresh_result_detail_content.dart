@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../shared/widgets/app_text.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/app_radius.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_section_divider.dart';
+import '../../../../core/utils/korean_date_time_format.dart';
 import '../../data/model/refresh_result_detail.dart';
 import 'refresh_result_detail_metric_bars.dart';
 import 'refresh_result_detail_status_section.dart';
@@ -45,9 +45,7 @@ class RefreshResultDetailContent extends StatelessWidget {
               _buildHeadline(),
               const SizedBox(height: 20),
               RefreshResultDetailMetricBars(metrics: detail.metrics),
-              const SizedBox(height: 8),
-              _SummaryMessageCard(message: detail.summaryMessage),
-              const SizedBox(height: 6),
+              const SizedBox(height: 20),
               const _NecessityHelpRow(),
             ],
           ),
@@ -70,6 +68,11 @@ class RefreshResultDetailContent extends StatelessWidget {
   }
 
   Widget _buildSummaryHeader() {
+    final completedAt = detail.historyCompletedAt;
+    final subtitle = completedAt != null
+        ? formatKoreanCompletionLabel(completedAt)
+        : '리프레시 결과는 리프레시 기록에서 확인할 수 있어요.';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -82,10 +85,10 @@ class RefreshResultDetailContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         AppText(
-          '리프레시 결과는 리프레시 기록에서 확인할 수 있어요.',
-          style: AppTextStyles.bodyS.copyWith(
+          subtitle,
+          style: AppTextStyles.labelM.copyWith(
             color: AppColors.gray500,
-            height: 1.45,
+            height: 16 / 12,
           ),
         ),
       ],
@@ -94,9 +97,9 @@ class RefreshResultDetailContent extends StatelessWidget {
 
   Widget _buildHeadline() {
     final (modeBlueText, modeBlackSuffix) = _modeHeadlineParts;
-    final modeLineStyle = AppTextStyles.bodyM2.copyWith(
+    final modeLineStyle = AppTextStyles.titleS.copyWith(
       fontWeight: FontWeight.w600,
-      height: 1.4,
+      height: 22 / 16,
     );
 
     return Padding(
@@ -120,10 +123,11 @@ class RefreshResultDetailContent extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           AppText(
-            '리프레시 필요도가',
-            style: AppTextStyles.titleM.copyWith(
+            '헤어 청결도가',
+            style: AppTextStyles.titleS.copyWith(
               color: AppColors.gray900,
               fontWeight: FontWeight.w600,
+              height: 22 / 16,
             ),
           ),
           const SizedBox(height: 4),
@@ -134,56 +138,45 @@ class RefreshResultDetailContent extends StatelessWidget {
                   text: detail.necessityReductionLabel.softWrapWords(),
                   style: AppTextStyles.headlineL.copyWith(
                     color: AppColors.gray900,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 44,
-                    height: 1.1,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 48,
+                    height: 40 / 48,
                   ),
                 ),
                 TextSpan(
-                  text: ' 낮아졌어요.'.softWrapWords(),
-                  style: AppTextStyles.titleM.copyWith(
+                  text: ' 높아졌어요.'.softWrapWords(),
+                  style: AppTextStyles.titleS.copyWith(
                     color: AppColors.gray900,
                     fontWeight: FontWeight.w600,
+                    height: 22 / 16,
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          AppText(
-            '현재 케어 필요도 ${detail.currentCareNeedLabel}',
-            style: AppTextStyles.bodyS.copyWith(
-              color: AppColors.gray600,
-              fontWeight: FontWeight.w500,
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '리프레시 필요도 ',
+                  style: AppTextStyles.bodyM1.copyWith(
+                    color: AppColors.gray600,
+                    height: 20 / 14,
+                  ),
+                ),
+                TextSpan(
+                  text: detail.currentCareNeedLabel,
+                  style: AppTextStyles.bodyM1.copyWith(
+                    color: AppColors.gray600,
+                    fontWeight: FontWeight.w600,
+                    height: 20 / 14,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SummaryMessageCard extends StatelessWidget {
-  const _SummaryMessageCard({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.gray50,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: AppText(
-        message,
-        textAlign: TextAlign.center,
-        style: AppTextStyles.bodyXs.copyWith(
-          color: AppColors.gray900,
-          height: 1.55,
-        ),
       ),
     );
   }
@@ -198,15 +191,10 @@ class _NecessityHelpRow extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: AppMetricHelpIcon(
         label: '리프레시 필요도',
-        labelStyle: AppTextStyles.bodyS.copyWith(
-          color: AppColors.gray600,
-          fontWeight: FontWeight.w500,
-        ),
+        labelStyle: AppTextStyles.labelS.copyWith(color: AppColors.gray500),
         tooltipMessage: RefreshResultDetail.necessityHelpTooltip,
-        size: 16,
-        placement: AppMetricHelpTooltipPlacement.belowStart,
+        placement: AppMetricHelpTooltipPlacement.belowEnd,
         tooltipMaxWidth: 240,
-        labelIconGap: 3,
       ),
     );
   }

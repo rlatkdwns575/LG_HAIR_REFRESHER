@@ -78,6 +78,7 @@ extension AppNavigation on BuildContext {
     String? odorAfterLabel,
     String? dustBeforeLabel,
     String? dustAfterLabel,
+    DateTime? completedAt,
   }) {
     push(
       AppRoutePaths.refreshResultDetail,
@@ -88,6 +89,7 @@ extension AppNavigation on BuildContext {
         odorAfterLabel: odorAfterLabel,
         dustBeforeLabel: dustBeforeLabel,
         dustAfterLabel: dustAfterLabel,
+        completedAt: completedAt,
       ),
     );
   }

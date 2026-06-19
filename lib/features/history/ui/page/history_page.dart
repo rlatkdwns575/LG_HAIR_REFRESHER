@@ -181,6 +181,7 @@ class _HistoryPageState extends State<HistoryPage> {
       odorAfterLabel: record.odorAfterStatus?.label,
       dustBeforeLabel: record.dustBeforeStatus?.label,
       dustAfterLabel: record.dustAfterStatus?.label,
+      completedAt: record.dateTime,
     );
   }
 
@@ -294,14 +295,11 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppText(
-            '나의 리프레시 기록 리포트',
-            style: AppTextStyles.titleL.copyWith(color: AppColors.gray900),
-          ),
+          AppText('나의 리프레시 기록 리포트', style: HistoryTextStyles.pageTitle),
           const SizedBox(height: 6),
           AppText(
             formatKoreanAsOf(report.asOfDate),
-            style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
+            style: HistoryTextStyles.pageAsOf,
           ),
         ],
       ),

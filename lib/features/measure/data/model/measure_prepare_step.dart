@@ -1,7 +1,5 @@
 enum MeasurePrepareStep { devicePower, sensorAlign, ready }
 
-enum MeasurePrepareViewState { loading, loaded }
-
 extension MeasurePrepareStepIndex on MeasurePrepareStep {
   int get index => switch (this) {
     MeasurePrepareStep.devicePower => 0,

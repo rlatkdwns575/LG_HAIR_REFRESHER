@@ -95,11 +95,9 @@ class _MetricGroup extends StatelessWidget {
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: AppTextStyles.bodyXs.copyWith(
+          style: AppTextStyles.labelS.copyWith(
             color: AppColors.gray900,
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-            height: 1.3,
+            height: 14 / 11,
           ),
         ),
       ],
@@ -138,11 +136,10 @@ class _BarColumn extends StatelessWidget {
                 child: AppText(
                   percentText,
                   maxLines: 1,
-                  style: AppTextStyles.labelM.copyWith(
+                  style: AppTextStyles.labelS.copyWith(
                     color: isAfter ? AppColors.gray900 : AppColors.gray500,
                     fontWeight: isAfter ? FontWeight.w700 : FontWeight.w400,
-                    fontSize: 15,
-                    height: 1,
+                    height: 14 / 11,
                   ),
                 ),
               ),
