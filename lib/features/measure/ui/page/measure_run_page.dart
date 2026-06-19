@@ -100,7 +100,7 @@ class _MeasureRunPageState extends State<MeasureRunPage>
       backgroundColor: AppColors.surface,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '헤어 상태 진단',
+        title: '헤어 상태 진단하기',
         onBack: _requestStop,
       ),
       body: SafeArea(

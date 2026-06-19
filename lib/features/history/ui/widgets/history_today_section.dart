@@ -238,11 +238,25 @@ class _TodayRecordTile extends StatelessWidget {
                   style: AppTextStyles.bodyS.copyWith(color: AppColors.gray500),
                 ),
                 const SizedBox(height: 2),
-                AppText(
-                  record.cleanlinessIncreaseLabel!,
-                  style: AppTextStyles.titleM.copyWith(
-                    color: AppColors.gray900,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    AppText(
+                      record.cleanlinessIncreasePercentLabel!,
+                      style: AppTextStyles.titleM.copyWith(
+                        color: AppColors.gray900,
+                      ),
+                    ),
+                    AppText(
+                      ' 증가',
+                      style: AppTextStyles.labelM.copyWith(
+                        color: AppColors.gray900,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ],
             ),

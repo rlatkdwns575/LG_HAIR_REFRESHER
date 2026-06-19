@@ -141,7 +141,7 @@ class _MeasureHairProfilePageState extends State<MeasureHairProfilePage> {
       backgroundColor: AppColors.surface,
       appBar: AppCommonTopHeader(
         variant: AppCommonTopHeaderVariant.gnb,
-        title: '헤어 상태 진단',
+        title: '헤어 상태 진단하기',
         onBack: () => context.pop(),
       ),
       body: _isLoading

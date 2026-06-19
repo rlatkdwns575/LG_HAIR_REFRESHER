@@ -15,7 +15,6 @@ class RoutineSuggestion {
     this.weekdays = const [],
     this.hour,
     this.minute,
-    this.durationMinutes,
   });
 
   final String title;
@@ -34,7 +33,6 @@ class RoutineSuggestion {
   /// 추천 시작 시각 (0–23).
   final int? hour;
   final int? minute;
-  final int? durationMinutes;
 }
 
 /// 하루 단위로 묶은 리프레시 기록 + 요약 메시지.
@@ -341,12 +339,11 @@ class RefreshHistoryReport {
     routineSuggestion: const RoutineSuggestion(
       title: '반복적인 사용 패턴이 발견되었어요.',
       subtitle: '새로운 루틴으로 등록할까요?',
-      tags: ['외부 냄새 리프레시', '금요일', '오후 7시', '평균 시간 5분 소요'],
+      tags: ['외부 냄새 리프레시', '금요일', '오후 7시'],
       modeName: '리프레시 모드 이름',
       weekdays: [5],
       hour: 19,
       minute: 0,
-      durationMinutes: 5,
     ),
     monthHistory: [
       RefreshHistoryMonthData(

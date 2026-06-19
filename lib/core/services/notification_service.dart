@@ -107,6 +107,36 @@ class NotificationService {
     );
   }
 
+  /// 다음 [weekday](1=월~7=일) [hour]:[minute]에 한 번만 알림을 예약합니다.
+  static Future<void> scheduleOnce({
+    required int id,
+    required String title,
+    required String body,
+    required int weekday,
+    required int hour,
+    required int minute,
+  }) async {
+    await initialize();
+
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: _nextInstanceOf(weekday, hour, minute),
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          channelDescription: _channelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
   static Future<void> cancel(int id) async {
     await initialize();
     await _plugin.cancel(id: id);

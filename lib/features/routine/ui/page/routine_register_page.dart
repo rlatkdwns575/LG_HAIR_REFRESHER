@@ -37,6 +37,7 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
   late Set<int> _weekdays;
   late int _hour;
   late int _minute;
+  late bool _isRepeating;
   bool _enabled = true;
   bool _isSaving = false;
 
@@ -49,6 +50,7 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
     _weekdays = {...?initial?.weekdays};
     _hour = initial?.hour ?? 19;
     _minute = initial?.minute ?? 0;
+    _isRepeating = initial?.isRepeating ?? true;
     _enabled = initial?.enabled ?? true;
     _loadModes();
   }
@@ -88,10 +90,25 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
 
   void _toggleWeekday(int weekday) {
     setState(() {
-      if (_weekdays.contains(weekday)) {
-        _weekdays.remove(weekday);
-      } else {
-        _weekdays.add(weekday);
+      if (_isRepeating) {
+        if (_weekdays.contains(weekday)) {
+          _weekdays.remove(weekday);
+        } else {
+          _weekdays.add(weekday);
+        }
+        return;
+      }
+
+      _weekdays = {weekday};
+    });
+  }
+
+  void _setRepeating(bool value) {
+    setState(() {
+      _isRepeating = value;
+      if (!value && _weekdays.length > 1) {
+        final sorted = _weekdays.toList()..sort();
+        _weekdays = {sorted.first};
       }
     });
   }
@@ -139,6 +156,7 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
       hour: _hour,
       minute: _minute,
       enabled: _enabled,
+      isRepeating: _isRepeating,
       createdAt: widget.initial?.createdAt,
     );
 
@@ -227,10 +245,36 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   _Section(
-                    title: '반복 요일',
-                    child: RoutineWeekdayPicker(
-                      selected: _weekdays,
-                      onToggle: _toggleWeekday,
+                    title: '요일',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        RoutineWeekdayPicker(
+                          selected: _weekdays,
+                          onToggle: _toggleWeekday,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _isRepeating ? '매주 반복' : '한 번만',
+                                style: AppTextStyles.bodyS.copyWith(
+                                  color: AppColors.gray600,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              AppToggle(
+                                value: _isRepeating,
+                                onChanged: _setRepeating,
+                                size: AppToggleSize.large,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -244,7 +288,9 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
                   const SizedBox(height: AppSpacing.lg),
                   _ToggleRow(
                     title: '알림 받기',
-                    caption: '선택한 요일·시간에 리프레시 알림을 보내요.',
+                    caption: _isRepeating
+                        ? '선택한 요일·시간에 매주 리프레시 알림을 보내요.'
+                        : '선택한 요일·시간에 한 번만 리프레시 알림을 보내요.',
                     value: _enabled,
                     onChanged: (value) => setState(() => _enabled = value),
                   ),
