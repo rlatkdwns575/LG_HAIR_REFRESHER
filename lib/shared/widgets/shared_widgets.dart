@@ -14,7 +14,6 @@ export 'app_chip_tab_bar.dart';
 export 'app_confirm_dialog.dart';
 export 'app_list_item.dart';
 export 'app_metric_help_icon.dart';
-export 'app_page_indicator.dart';
 export 'app_radio.dart';
 export 'app_recommend_card.dart';
 export 'app_recommend_featured_card.dart';
