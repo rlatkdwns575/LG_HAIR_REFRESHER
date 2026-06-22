@@ -5,7 +5,6 @@ export 'app_fixed_bottom_button_area.dart';
 export 'app_box_button.dart';
 export 'app_calendar_day_strip.dart';
 export 'app_calendar_item.dart';
-export 'app_calendar_top_header.dart';
 export 'app_calendar_week_strip.dart';
 export 'app_capsule_button.dart';
 export 'app_capsule_icon_button.dart';
