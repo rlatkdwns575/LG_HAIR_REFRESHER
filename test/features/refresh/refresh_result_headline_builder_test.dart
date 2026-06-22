@@ -19,7 +19,7 @@ void main() {
 
       final headline = RefreshResultHeadlineBuilder.forMode(mode);
 
-      expect(headline.before, 'LG DX 정상인소유지로 남아 있던 냄새와 먼지가');
+      expect(headline.before, '외출 후 남아 있던 냄새와 먼지가');
       expect(headline.after, '줄어들었어요.');
     });
 
@@ -36,7 +36,7 @@ void main() {
 
       final headline = RefreshResultHeadlineBuilder.forMode(mode);
 
-      expect(headline.before, '먼지 케어로 남아 있던 먼지가');
+      expect(headline.before, '외출 전에 쌓인 먼지가');
     });
 
     test('모드명 + 냄새 케어 멘트', () {
@@ -52,7 +52,7 @@ void main() {
 
       final headline = RefreshResultHeadlineBuilder.forMode(mode);
 
-      expect(headline.before, '습도 케어로 남아 있던 냄새가');
+      expect(headline.before, '날씨에 쌓인 냄새가');
     });
 
     test('향기 전용 모드', () {
@@ -68,7 +68,7 @@ void main() {
 
       final headline = RefreshResultHeadlineBuilder.forMode(mode);
 
-      expect(headline.before, '출근 전 향기 케어 모드로 은은한 향기 케어가');
+      expect(headline.before, '은은한 향기 케어가');
       expect(headline.after, '완료되었어요.');
     });
   });

@@ -119,7 +119,7 @@ void main() {
           dust: outcome.scores.dustAfter,
         ),
       );
-      expect(outcome.result.headlineBefore, '복합 케어로 남아 있던 냄새와 먼지가');
+      expect(outcome.result.headlineBefore, '외출 후 남아 있던 냄새와 먼지가');
     });
 
     test('odor-only mode generates odor scores only', () {

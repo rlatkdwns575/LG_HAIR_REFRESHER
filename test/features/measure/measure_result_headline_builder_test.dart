@@ -23,7 +23,7 @@ void main() {
       );
 
       expect(headline.isHighlighted, isTrue);
-      expect(headline.before, '출근 전 향기 케어 모드로 남은 냄새와 먼지를 정리해 ');
+      expect(headline.before, '출근 전 향기 케어 모드로\n남은 냄새와 먼지를 정리해 ');
       expect(headline.highlight, '안심할 수 있는 상태');
       expect(headline.after, '를 되찾아보세요.');
     });

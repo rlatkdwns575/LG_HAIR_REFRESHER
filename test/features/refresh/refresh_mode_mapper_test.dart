@@ -33,7 +33,7 @@ void main() {
       expect(mode.icon, Icons.directions_walk_outlined);
       expect(mode.description, contains('먼지'));
       expect(mode.description, contains('냄새'));
-      expect(mode.tags, ['먼지 제거 일반관리', '냄새 제거 집중관리']);
+      expect(mode.tags, ['먼지 일반관리', '냄새 집중관리']);
       expect(mode.isCustom, isFalse);
     });
 
@@ -68,7 +68,7 @@ void main() {
 
       expect(mode.category, '기타');
       expect(mode.icon, Icons.auto_awesome_outlined);
-      expect(mode.tags, ['향 케어 간편관리']);
+      expect(mode.tags, ['향기 간편관리']);
     });
   });
 
@@ -92,7 +92,7 @@ void main() {
       expect(mode.createdByUser, isTrue);
       expect(mode.id, 'custom-uuid');
       expect(mode.name, '나만의 모드');
-      expect(mode.tags, ['냄새 제거 일반관리', '향 케어 간편관리']);
+      expect(mode.tags, ['냄새 일반관리', '향기 간편관리']);
     });
 
     test('preserves selected category for custom mode', () {
