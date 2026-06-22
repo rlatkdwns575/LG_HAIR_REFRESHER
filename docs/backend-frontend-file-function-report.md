@@ -4,6 +4,13 @@
 
 이 문서는 `lib/` 기준으로 각 Dart 파일이 맡는 역할, 사용한 주요 라이브러리, 핵심 클래스/함수를 백엔드 연결 부분과 프론트 부분으로 나눠 정리합니다.
 
+현재 반영된 변경:
+
+- `lib/shared/widgets/`에서 이전 미사용 후보였던 여러 위젯 파일이 삭제되었습니다.
+- `shared_widgets.dart`는 현재 존재하는 shared widget만 export하도록 정리되어 있습니다.
+- `Assets/images/home/LOGO.png`, `Assets/images/home/LOGO2.png`는 현재 폴더에 없습니다.
+- `supabase/` 로컬 폴더는 없습니다. RLS·테이블 정책은 Supabase 대시보드에서 관리하며, API 권한 오류 메시지도 로컬 SQL 파일을 안내하지 않습니다.
+
 ## 1. 먼저 알아야 할 라이브러리
 
 | 라이브러리 | 어디에 쓰이나 | 초보자 설명 |
@@ -168,9 +175,8 @@
 | `lib/features/measure/ui/widgets/measure_result_header.dart` | 결과 화면 상단 header. | `MeasureResultHeader` |
 | `lib/features/measure/ui/widgets/measure_result_headline.dart` | 결과 headline 문장 렌더링. | model alias import, `MeasureResultHeadline` |
 | `lib/features/measure/ui/widgets/measure_result_refresh_need_summary.dart` | 리프레시 필요도 요약. | `MeasureResultRefreshNeedSummary` |
-| `lib/features/measure/ui/widgets/measure_result_smell_type_row.dart` | 냄새 유형 badge 목록. 현재 직접 사용처는 약합니다. | `AppBadge`, `Wrap` |
+| `lib/features/measure/ui/widgets/measure_result_visual.dart` | 냄새·먼지 조합별 진단 결과 그래픽 표시. | `MeasureResultVisualMapper`, `Image.asset` |
 | `lib/features/measure/ui/widgets/measure_result_status_row.dart` | 냄새/먼지 등 결과 상태 row. | `MeasureResultStatusItem`, `_StatusItem` |
-| `lib/features/measure/ui/widgets/measure_result_visual.dart` | 측정 결과 이미지 표시. | `MeasureResultVisualMapper`, `Image.asset` |
 | `lib/features/measure/ui/widgets/measure_step_indicator.dart` | 준비 단계 indicator. | `MeasureStepIndicator`, `_StepDot` |
 
 ### 3.5 Refresh 화면
@@ -245,11 +251,9 @@
 | `lib/shared/widgets/app_battery_status.dart` | 배터리 퍼센트와 상태 아이콘 표시. | `AppBatteryStatus`, `Image.asset` |
 | `lib/shared/widgets/app_bottom_button_bar.dart` | 하단 1개/2개 버튼 bar. | `AppBottomButtonBar`, `AppBottomButtonBarType` |
 | `lib/shared/widgets/app_box_button.dart` | 박스 형태 버튼. | `AppBoxButton`, `AppBoxButtonSize`, `AppBoxButtonVariant` |
-| `lib/shared/widgets/app_box_mini_button.dart` | 작은 박스 버튼. 현재 직접 사용처는 약합니다. | `AppBoxMiniButton` |
 | `lib/shared/widgets/app_brand_logo.dart` | SVG 브랜드 로고 표시. | `SvgPicture.asset`, `AppBrandLogo` |
 | `lib/shared/widgets/app_calendar_day_strip.dart` | 일 단위 캘린더 strip. | `AppCalendarDayStrip`, `AppCalendarDayCell` |
 | `lib/shared/widgets/app_calendar_item.dart` | 캘린더 항목 카드. | `AppCalendarItem` |
-| `lib/shared/widgets/app_calendar_top_header.dart` | 캘린더 상단 header. 현재 직접 사용처는 약합니다. | `AppCalendarTopHeader` |
 | `lib/shared/widgets/app_calendar_week_strip.dart` | 주 단위 캘린더 strip. | `AppCalendarWeekStrip`, `AppCalendarWeekCell` |
 | `lib/shared/widgets/app_capsule_button.dart` | 캡슐 형태 텍스트 버튼. | `AppCapsuleButton` |
 | `lib/shared/widgets/app_capsule_icon_button.dart` | 캡슐 형태 아이콘 버튼. | `AppCapsuleIconButton` |
@@ -260,21 +264,15 @@
 | `lib/shared/widgets/app_fixed_bottom_button_area.dart` | 하단 고정 버튼 영역. | `AppFixedBottomButtonArea`, `AppBottomButtonLayout` |
 | `lib/shared/widgets/app_list_item.dart` | 설정/목록 row item. | `AppListItem`, `AppListItemVariant` |
 | `lib/shared/widgets/app_metric_help_icon.dart` | 지표 설명 tooltip 아이콘. | `AppMetricHelpIcon`, `SvgPicture.string` |
-| `lib/shared/widgets/app_page_indicator.dart` | 페이지 indicator. 현재 직접 사용처는 약합니다. | `AppPageIndicator` |
 | `lib/shared/widgets/app_radio.dart` | generic radio UI. | `AppRadio<T>` |
 | `lib/shared/widgets/app_recommend_card.dart` | 추천 카드. | `AppRecommendCard`, `GradientBoxBorder` |
-| `lib/shared/widgets/app_recommend_featured_card.dart` | 강조 추천 카드. 현재 직접 사용처는 약합니다. | `AppRecommendFeaturedCard`, `Image.asset` |
-| `lib/shared/widgets/app_refresh_card.dart` | 리프레시 카드 공통 컴포넌트. 현재 직접 사용처는 약합니다. | `AppRefreshCard`, `AppRefreshCardVariant` |
-| `lib/shared/widgets/app_result_card.dart` | 결과 카드 공통 컴포넌트. 현재 직접 사용처는 약합니다. | `AppResultCard`, `AppResultCardTag` |
 | `lib/shared/widgets/app_search_text_field.dart` | 검색 입력창. | `AppSearchTextField` |
 | `lib/shared/widgets/app_section_divider.dart` | 상세 화면 divider와 horizontal padding helper. | `AppSectionDivider`, `DetailPageHorizontalPadding` |
 | `lib/shared/widgets/app_section_title.dart` | 섹션 제목. | `AppSectionTitle` |
-| `lib/shared/widgets/app_segmented_tab_bar.dart` | segmented tab bar. 현재 직접 사용처는 약합니다. | `AppSegmentedTabBar` |
 | `lib/shared/widgets/app_text_field.dart` | 공통 텍스트 필드. | `AppTextField`, `AppTextFieldState` |
 | `lib/shared/widgets/app_text_link_button.dart` | 텍스트 링크 버튼. | `AppTextLinkButton` |
 | `lib/shared/widgets/app_toggle.dart` | 토글 스위치 UI. | `AppToggle`, `AppToggleSize` |
-| `lib/shared/widgets/app_top_header.dart` | AppBar 형태 header. 현재 직접 사용처는 약합니다. | `AppTopHeader` |
-| `lib/shared/widgets/shared_widgets.dart` | shared widget barrel export. 현재 직접 import는 적습니다. | `export ...` |
+| `lib/shared/widgets/shared_widgets.dart` | shared widget barrel export. 현재 존재하는 shared widget 파일만 한 번에 export합니다. | `export ...` |
 
 ## 4. 공통 모델/순수 로직 파일
 
@@ -434,7 +432,4 @@
 | --- | --- |
 | `lib/core/services/app_env.dart` | `.env`를 asset으로 읽기 때문에 운영 secret 노출 위험이 있습니다. |
 | `lib/features/auth/data/auth_dev_credentials.dart` | 개발용 계정 정보가 실제 로그인 버튼에서 쓰입니다. 운영 전 제거/분리 검토가 필요합니다. |
-| `lib/core/services/notification_service.dart` | 현재 작업 트리에서 수정됨 상태입니다. 기존 변경을 덮어쓰면 안 됩니다. |
-| `lib/shared/widgets/shared_widgets.dart` | barrel export지만 현재 직접 import가 적습니다. 팀 규칙 확인 후 유지/정리 판단이 필요합니다. |
-| `lib/features/measure/ui/widgets/measure_result_smell_type_row.dart` | 현재 직접 사용처가 약한 UI 후보입니다. |
-
+| `lib/shared/widgets/shared_widgets.dart` | barrel export 파일입니다. 현재 export 대상은 존재하는 파일로 정리되어 있습니다. |

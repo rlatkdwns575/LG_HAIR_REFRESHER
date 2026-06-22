@@ -208,7 +208,7 @@ class RefreshSessionApiException implements Exception {
   final String message;
 
   static const permissionDeniedHint =
-      'Supabase SQL Editor에서 supabase/dev_read_policies.sql을 실행해주세요.';
+      '로그인 후 다시 시도하거나 Supabase 대시보드에서 테이블 RLS 정책을 확인해주세요.';
 
   static String fromPostgrest(PostgrestException error) {
     final message = error.message;

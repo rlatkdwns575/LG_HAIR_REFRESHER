@@ -15,11 +15,13 @@ class CalendarEventsApiException implements Exception {
   String toString() => message;
 
   static const permissionDeniedHint =
-      'Supabase SQL Editor에서 supabase/calendar_events_policies.sql을 실행해주세요.';
+      '로그인 후 다시 시도하거나 Supabase 대시보드에서 테이블 RLS 정책을 확인해주세요.';
 
   static String fromPostgrest(PostgrestException error) {
     final message = error.message;
-    if (message.contains('permission denied') || error.code == '42501') {
+    if (message.contains('permission denied') ||
+        error.code == '42501' ||
+        message.contains('row-level security')) {
       return 'CALENDAR_EVENTS 테이블 권한이 없습니다. $permissionDeniedHint';
     }
     return message;
