@@ -11,14 +11,19 @@ class RoutineAlarmScheduler {
   /// 저장된 모든 루틴 알림을 OS에 다시 등록합니다.
   ///
   /// 앱 cold start·재부팅 후에도 설정한 시간에 알림이 뜨도록 합니다.
-  static Future<void> rescheduleAll({RoutineLocalStore? localStore}) async {
+  static Future<void> rescheduleAll({
+    RoutineLocalStore? localStore,
+    bool requestPermissionIfNeeded = true,
+  }) async {
     final store = localStore ?? const RoutineLocalStore();
     final routines = await store.loadAll();
     if (routines.isEmpty) {
       return;
     }
 
-    final granted = await NotificationService.requestPermission();
+    final granted = requestPermissionIfNeeded
+        ? await NotificationService.requestPermission()
+        : await NotificationService.hasPermission();
     if (!granted) {
       if (kDebugMode) {
         debugPrint('RoutineAlarmScheduler: notification permission denied');
@@ -29,7 +34,10 @@ class RoutineAlarmScheduler {
     for (final routine in routines) {
       try {
         if (routine.enabled) {
-          await schedule(routine);
+          await _schedule(
+            routine,
+            requestPermissionIfNeeded: requestPermissionIfNeeded,
+          );
         } else {
           await cancel(routine);
         }
@@ -43,12 +51,21 @@ class RoutineAlarmScheduler {
   }
 
   static Future<bool> schedule(Routine routine) async {
+    return _schedule(routine, requestPermissionIfNeeded: true);
+  }
+
+  static Future<bool> _schedule(
+    Routine routine, {
+    required bool requestPermissionIfNeeded,
+  }) async {
     final id = routine.id;
     if (id == null || routine.weekdays.isEmpty) {
       return false;
     }
 
-    final granted = await NotificationService.requestPermission();
+    final granted = requestPermissionIfNeeded
+        ? await NotificationService.requestPermission()
+        : await NotificationService.hasPermission();
     if (!granted) {
       return false;
     }

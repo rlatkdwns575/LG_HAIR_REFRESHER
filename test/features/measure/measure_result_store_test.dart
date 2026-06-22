@@ -9,7 +9,7 @@ void main() {
     });
 
     test('setPending and consume return stored result', () {
-      const pending = MeasureResult.sampleStable;
+      final pending = MeasureResult.sampleStable;
       MeasureResultStore.instance.setPending(pending);
 
       expect(MeasureResultStore.instance.peek(), pending);
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('consume without pending and explicit fallback uses fallback', () {
-      const fallback = MeasureResult.sampleStable;
+      final fallback = MeasureResult.sampleStable;
       expect(MeasureResultStore.instance.consume(fallback: fallback), fallback);
     });
   });

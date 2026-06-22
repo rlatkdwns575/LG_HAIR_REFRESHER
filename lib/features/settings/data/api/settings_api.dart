@@ -183,7 +183,10 @@ class SettingsApi {
         if (row != null) {
           merged.addAll(Map<String, dynamic>.from(row));
         }
-      } on PostgrestException {}
+      } on PostgrestException {
+        // Older schemas may not expose every scent column yet.
+        continue;
+      }
     }
     return merged;
   }

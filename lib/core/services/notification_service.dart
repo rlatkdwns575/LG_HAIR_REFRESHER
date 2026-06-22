@@ -125,6 +125,25 @@ class NotificationService {
     return true;
   }
 
+  /// Checks notification permission without opening a system permission prompt.
+  static Future<bool> hasPermission() async {
+    if (!_supportsLocalNotifications) {
+      return false;
+    }
+    await initialize();
+
+    if (Platform.isAndroid) {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      return await android?.areNotificationsEnabled() ?? true;
+    }
+
+    // Avoid requesting iOS notification permission during app cold start.
+    return true;
+  }
+
   /// 매주 [weekday](1=월~7=일) [hour]:[minute]에 반복되는 알림을 예약합니다.
   static Future<void> scheduleWeekly({
     required int id,

@@ -29,6 +29,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
@@ -42,6 +43,10 @@ android {
             ndk {
                 debugSymbolLevel = "NONE"
             }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

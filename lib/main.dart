@@ -12,7 +12,7 @@ Future<void> main() async {
   DeviceCalendarPlugin();
   await SupabaseService.initialize();
   await NotificationService.initialize();
-  await RoutineAlarmScheduler.rescheduleAll();
+  await RoutineAlarmScheduler.rescheduleAll(requestPermissionIfNeeded: false);
 
   runApp(const LgHairRefresherApp());
 }
