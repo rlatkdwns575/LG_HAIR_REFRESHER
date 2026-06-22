@@ -25,8 +25,20 @@ class NotificationService {
 
   static FlutterLocalNotificationsPlugin get plugin => _plugin;
 
+  /// 로컬 알림은 Android/iOS 전용 (Windows/macOS/Linux 데스크톱 빌드 제외).
+  static bool get _supportsLocalNotifications {
+    if (kIsWeb) {
+      return false;
+    }
+    return Platform.isAndroid || Platform.isIOS;
+  }
+
   static Future<void> initialize() async {
     if (_initialized) {
+      return;
+    }
+    if (!_supportsLocalNotifications) {
+      _initialized = true;
       return;
     }
 
@@ -79,6 +91,9 @@ class NotificationService {
 
   /// 알림·정확한 예약 권한을 요청합니다. 허용되면 true.
   static Future<bool> requestPermission() async {
+    if (!_supportsLocalNotifications) {
+      return false;
+    }
     await initialize();
 
     if (Platform.isIOS) {
@@ -119,6 +134,9 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (!_supportsLocalNotifications) {
+      return;
+    }
     await initialize();
 
     final scheduledDate = _nextInstanceOf(weekday, hour, minute);
@@ -148,6 +166,9 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (!_supportsLocalNotifications) {
+      return;
+    }
     await initialize();
 
     final scheduledDate = _nextInstanceOf(weekday, hour, minute);
@@ -168,11 +189,17 @@ class NotificationService {
   }
 
   static Future<void> cancel(int id) async {
+    if (!_supportsLocalNotifications) {
+      return;
+    }
     await initialize();
     await _plugin.cancel(id: id);
   }
 
   static Future<void> cancelAll() async {
+    if (!_supportsLocalNotifications) {
+      return;
+    }
     await initialize();
     await _plugin.cancelAll();
   }
