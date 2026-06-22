@@ -55,7 +55,30 @@ add_subdirectory("runner")
 
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
-include(flutter/generated_plugins.cmake)
+#
+# flutter_local_notifications_windows는 VS ATL( atlbase.h )이 필요합니다.
+# 추천 알림은 Android/iOS 전용이므로 Windows 빌드에서 제외합니다.
+# flutter pub get 후 플러그인 목록이 바뀌면 generated_plugins.cmake와 동기화하세요.
+set(FLUTTER_PLUGIN_LIST
+  app_links
+  url_launcher_windows
+)
+set(FLUTTER_FFI_PLUGIN_LIST
+  jni
+)
+set(PLUGIN_BUNDLED_LIBRARIES)
+
+foreach(plugin ${FLUTTER_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${plugin}/windows plugins/${plugin})
+  target_link_libraries(${BINARY_NAME} PRIVATE ${plugin}_plugin)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${plugin}_plugin>)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${plugin}_bundled_libraries})
+endforeach(plugin)
+
+foreach(ffi_plugin ${FLUTTER_FFI_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${ffi_plugin}/windows plugins/${ffi_plugin})
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${ffi_plugin}_bundled_libraries})
+endforeach(ffi_plugin)
 
 
 # === Installation ===
