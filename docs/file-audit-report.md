@@ -136,7 +136,7 @@
 
 미사용 의심:
 
-- `ui/widgets/measure_result_smell_type_row.dart`는 현재 `lib`/`test`에서 직접 import되지 않습니다. 화면 디자인에서 빠진 잔여 위젯일 수 있으므로 삭제 전 디자이너/기획 확인이 필요합니다.
+- `measure_result_smell_type_row.dart`는 삭제되었습니다.
 
 ### `lib/features/refresh/`
 
@@ -299,15 +299,15 @@ Flutter가 각 OS 앱을 만들 때 필요한 네이티브 프로젝트입니다
 
 이 파일들은 앱 소스가 아니라 로컬 빌드/IDE 산출물입니다.
 
-## 6. `docs/`, `scripts/`, `supabase/`
+## 6. `docs/`, `scripts/`
 
 | 경로 | 역할 | 삭제 판단 |
 | --- | --- | --- |
 | `docs/decisions/` | 구조/백엔드 선택 이유를 적은 ADR 문서입니다. | 유지, 한글 복구 |
 | `docs/conventions/` | Flutter 작업 규칙 문서입니다. | 유지, 한글 복구 |
-| `docs/sql/refresh_recommend_alarms.sql` | 추천 알림 관련 SQL 문서/스키마입니다. | 유지 |
-| `supabase/calendar_events_policies.sql` | Supabase RLS/policy SQL입니다. | 유지 |
 | `scripts/*.mjs` | Figma export/분석 보조 스크립트입니다. 현재 앱 실행에는 직접 필요 없지만 디자인 자산 작업에는 유용합니다. | 보류 |
+
+> `supabase/` 로컬 폴더와 `docs/sql/refresh_recommend_alarms.sql` 등 레포 SQL 스크립트는 제거되었습니다. DB 스키마·RLS는 Supabase 대시보드에서 관리합니다.
 
 ## 7. 사용하지 않는 파일 후보
 
@@ -344,7 +344,6 @@ Flutter가 각 OS 앱을 만들 때 필요한 네이티브 프로젝트입니다
 - `lib/shared/widgets/app_segmented_tab_bar.dart`
 - `lib/shared/widgets/app_top_header.dart`
 - `lib/shared/widgets/shared_widgets.dart`
-- `lib/features/measure/ui/widgets/measure_result_smell_type_row.dart`
 
 삭제 전 확인 질문:
 
