@@ -5,6 +5,8 @@ import '../../shared/widgets/app_text.dart';
 import '../../core/constants/route_paths.dart';
 import '../layout/app_layout.dart';
 import '../theme/app_colors.dart';
+import '../../core/services/auth_router_notifier.dart';
+import 'auth_redirect.dart';
 import '../../features/auth/data/model/sign_up_draft.dart';
 import '../../features/auth/ui/page/email_login_screen.dart';
 import '../../features/auth/ui/page/login_screen.dart';
@@ -37,9 +39,15 @@ import '../../features/settings/ui/page/device_manage_page.dart';
 import '../../features/settings/ui/page/local_calendar_settings_page.dart';
 import '../../features/settings/ui/page/settings_page.dart';
 
+final authRouterNotifier = AuthRouterNotifier();
+
+void initializeAppRouterAuth() => authRouterNotifier.bind();
+
 final appRouter = GoRouter(
   initialLocation: AppRoutePaths.login,
   debugLogDiagnostics: false,
+  refreshListenable: authRouterNotifier,
+  redirect: (context, state) => authRedirect(authRouterNotifier, state),
   errorBuilder: (context, state) => AppMaxWidthPageShell(
     backgroundColor: AppColors.background,
     child: _RouteErrorPage(error: state.error),

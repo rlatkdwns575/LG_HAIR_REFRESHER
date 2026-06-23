@@ -14,6 +14,7 @@ import '../../../../shared/widgets/app_list_item.dart';
 import '../../../../core/services/local_calendar_service.dart';
 import '../../../../shared/models/local_calendar_status.dart';
 import '../../../auth/data/api/auth_api.dart';
+import '../../../home/data/home_shortcut_store.dart';
 import '../../data/api/settings_api.dart';
 import '../../data/model/settings_device_detail.dart';
 import '../../data/model/settings_user_summary.dart';
@@ -82,6 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       await _authApi.signOut();
+      HomeShortcutStore.instance.resetSessionCache();
       if (!mounted) {
         return;
       }

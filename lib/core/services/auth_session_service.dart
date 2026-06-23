@@ -5,8 +5,12 @@ import 'supabase_service.dart';
 class AuthSessionService {
   const AuthSessionService._();
 
-  static String? get currentUserId =>
-      SupabaseService.client.auth.currentUser?.id;
+  static String? get currentUserId {
+    if (!SupabaseService.isInitialized) {
+      return null;
+    }
+    return SupabaseService.client.auth.currentUser?.id;
+  }
 
   /// 로그인 사용자 ID를 우선 사용하고, 없으면 개발용 `DEV_USER_ID`로 대체합니다.
   static String resolveUserId({String? override}) {
