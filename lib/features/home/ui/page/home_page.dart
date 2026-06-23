@@ -156,6 +156,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     } catch (_) {}
 
+    await HomeShortcutStore.instance.loadForCurrentUser();
+
     if (!mounted) {
       return;
     }
@@ -321,7 +323,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return;
     }
 
-    HomeShortcutStore.instance.setFavorite(selected);
+    await HomeShortcutStore.instance.setFavorite(selected);
     setState(() {});
   }
 
@@ -364,7 +366,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return;
     }
 
-    HomeShortcutStore.instance.setFavorite(selected);
+    await HomeShortcutStore.instance.setFavorite(selected);
     setState(() {});
   }
 

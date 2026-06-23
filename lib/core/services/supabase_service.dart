@@ -7,6 +7,8 @@ class SupabaseService {
 
   static bool _initialized = false;
 
+  static bool get isInitialized => _initialized;
+
   static SupabaseClient get client => Supabase.instance.client;
 
   static Future<void> initialize() async {
