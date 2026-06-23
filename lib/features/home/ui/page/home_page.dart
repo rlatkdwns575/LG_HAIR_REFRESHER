@@ -342,11 +342,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     context.pushRefreshDetail(mode: mode);
   }
 
-  // 즐겨찾기 수정 UI — HomeQuickRefreshRow.onFavoriteEditPressed 연결 시 활성화
-  // ignore: unused_element
   Future<void> _handleFavoriteEdit() async {
     final current = HomeShortcutStore.instance.favoriteMode;
     if (current == null) {
+      return;
+    }
+
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: '즐겨찾기 항목을 편집하시겠습니까?',
+      message: '다른 리프레시 모드로 변경할 수 있어요.',
+      primaryLabel: '편집하기',
+      secondaryLabel: '취소',
+    );
+    if (!mounted || confirmed != true) {
       return;
     }
 
@@ -406,6 +415,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             slots: _quickSlots,
                             isScentCartridgeAttached: _isScentCartridgeAttached,
                             onFavoriteAddPressed: _handleFavoriteAdd,
+                            onFavoriteEditPressed: _handleFavoriteEdit,
                             onScentUnavailable: () =>
                                 showRefreshScentUnavailableSnackBar(context),
                             onModePressed: (mode) => context

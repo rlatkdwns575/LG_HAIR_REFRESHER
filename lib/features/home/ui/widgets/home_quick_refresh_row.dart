@@ -70,7 +70,7 @@ class HomeQuickRefreshRow extends StatelessWidget {
           mode: mode,
           leadingBadgeLabel: isFavorite ? '즐겨찾기' : '자주쓰는',
           enabled: _isModeEnabled(mode),
-          onEditPressed: isFavorite ? onFavoriteEditPressed : null,
+          onLongPressed: isFavorite ? onFavoriteEditPressed : null,
           onPressed: () => _handleModePressed(mode),
         );
     }
@@ -146,14 +146,14 @@ class _RefreshModeQuickCard extends StatelessWidget {
     required this.mode,
     required this.onPressed,
     this.leadingBadgeLabel,
-    this.onEditPressed,
+    this.onLongPressed,
     this.enabled = true,
   });
 
   final HomeQuickRefreshMode mode;
   final VoidCallback? onPressed;
   final String? leadingBadgeLabel;
-  final VoidCallback? onEditPressed;
+  final VoidCallback? onLongPressed;
   final bool enabled;
 
   @override
@@ -166,6 +166,7 @@ class _RefreshModeQuickCard extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onPressed,
+            onLongPress: onLongPressed,
             borderRadius: BorderRadius.circular(AppRadius.lg),
             child: Ink(
               padding: const EdgeInsets.all(HomeQuickRefreshRow.cardPadding),
@@ -187,7 +188,6 @@ class _RefreshModeQuickCard extends StatelessWidget {
                       _BadgeRow(
                         durationLabel: mode.durationLabel,
                         leadingBadgeLabel: leadingBadgeLabel,
-                        onEditPressed: onEditPressed,
                       ),
                       const SizedBox(height: 4),
                       Expanded(
@@ -231,17 +231,12 @@ class _RefreshModeQuickCard extends StatelessWidget {
 
 /// Figma Frame 4955 — caption 배지 + `소요시간 N분` 한 줄.
 class _BadgeRow extends StatelessWidget {
-  const _BadgeRow({
-    required this.durationLabel,
-    this.leadingBadgeLabel,
-    this.onEditPressed,
-  });
+  const _BadgeRow({required this.durationLabel, this.leadingBadgeLabel});
 
   static const badgeGap = 4.0;
 
   final String durationLabel;
   final String? leadingBadgeLabel;
-  final VoidCallback? onEditPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -254,32 +249,7 @@ class _BadgeRow extends StatelessWidget {
             const SizedBox(width: badgeGap),
           ],
           _DurationBadge(durationLabel: durationLabel),
-          if (onEditPressed != null) ...[
-            const Spacer(),
-            _FavoriteEditButton(onPressed: onEditPressed),
-          ],
         ],
-      ),
-    );
-  }
-}
-
-class _FavoriteEditButton extends StatelessWidget {
-  const _FavoriteEditButton({this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-        child: Padding(
-          padding: const EdgeInsets.all(2),
-          child: Icon(Icons.edit_outlined, size: 14, color: AppColors.gray500),
-        ),
       ),
     );
   }
