@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_box_button.dart';
 import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_toggle.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../data/api/routine_alarm_scheduler.dart';
 import '../../data/api/routine_api.dart';
 import '../../data/model/routine.dart';
@@ -178,7 +179,21 @@ class _RoutineRegisterPageState extends State<RoutineRegisterPage> {
         return;
       }
       if (_enabled && !scheduled) {
-        _showMessage('루틴은 저장됐지만 알림 권한이 없어 알림은 꺼져 있어요.');
+        _showMessage(
+          '루틴은 저장됐지만 알림을 예약하지 못했어요. '
+          '알림 권한과「알람 및 리마인더」설정을 확인해주세요.',
+        );
+      } else if (_enabled) {
+        final readiness = await NotificationService.checkScheduleReadiness();
+        if (!mounted) {
+          return;
+        }
+        if (readiness.needsExactAlarmSettings) {
+          _showMessage(
+            '알림은 예약됐지만, 앱 종료 후에도 울리게 하려면 '
+            '설정에서「알람 및 리마인더」를 허용해주세요.',
+          );
+        }
       }
       Navigator.of(context).pop(true);
     } on RoutineApiException catch (error) {
