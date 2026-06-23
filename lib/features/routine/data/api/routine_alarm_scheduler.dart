@@ -75,9 +75,10 @@ class RoutineAlarmScheduler {
       return true;
     }
 
+    var allSucceeded = true;
     if (routine.isRepeating) {
       for (final weekday in routine.weekdays) {
-        await NotificationService.scheduleWeekly(
+        final scheduled = await NotificationService.scheduleWeekly(
           id: _notificationId(id, weekday),
           title: routine.modeName ?? '리프레시 루틴',
           body: _body(routine),
@@ -85,10 +86,11 @@ class RoutineAlarmScheduler {
           hour: routine.hour,
           minute: routine.minute,
         );
+        allSucceeded = allSucceeded && scheduled;
       }
     } else {
       final weekday = routine.weekdays.first;
-      await NotificationService.scheduleOnce(
+      allSucceeded = await NotificationService.scheduleOnce(
         id: _notificationId(id, weekday),
         title: routine.modeName ?? '리프레시 루틴',
         body: _body(routine),
@@ -97,7 +99,7 @@ class RoutineAlarmScheduler {
         minute: routine.minute,
       );
     }
-    return true;
+    return allSucceeded;
   }
 
   static Future<void> cancel(Routine routine) async {
