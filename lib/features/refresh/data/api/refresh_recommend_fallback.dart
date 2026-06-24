@@ -1,4 +1,5 @@
 import '../../../../shared/recommendation/refresh_recommend_input.dart';
+import '../../../../shared/recommendation/refresh_recommend_measure_rules.dart';
 import '../../../home/data/model/environment_snapshot.dart';
 import '../model/refresh_mode.dart';
 
@@ -10,6 +11,22 @@ class RefreshRecommendFallback {
     required List<RefreshMode> candidates,
     required RefreshRecommendInput context,
   }) {
+    if (context.includesMeasure && context.measure != null) {
+      final measure = context.measure!;
+      final filtered = RefreshRecommendMeasureRules.filterForMeasure(
+        measure,
+        candidates,
+      );
+      final pool = filtered.isNotEmpty ? filtered : candidates;
+      final fromMeasure = RefreshRecommendMeasureRules.pickFromMeasure(
+        measure,
+        pool,
+      );
+      if (fromMeasure != null) {
+        return fromMeasure;
+      }
+    }
+
     return pickModeFromEnvironment(
       candidates: candidates,
       environment: context.environment,

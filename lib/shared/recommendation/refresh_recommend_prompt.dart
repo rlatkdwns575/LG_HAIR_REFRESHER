@@ -18,7 +18,11 @@ class RefreshRecommendPrompt {
   static String modeSystemInstruction(RefreshRecommendBasis basis) {
     final basisRule = switch (basis) {
       RefreshRecommendBasis.measure =>
-        '측정 점수(냄새·먼지·종합 오염)를 최우선으로 반영하고, 날씨·일정은 보조 신호로 사용하세요.',
+        '측정 점수(냄새·먼지·종합 오염)를 최우선으로 반영하고, 날씨·일정은 보조 신호로 사용하세요.\n'
+            'hair_odor_score가 hair_dust_score보다 높으면 냄새 중심(odor_yn) 모드를, '
+            'hair_dust_score가 더 높으면 먼지 중심(dust_yn) 모드를 우선 선택하세요.\n'
+            'hair_odor_score가 60 이상이면 odor_yn=true 모드만, hair_dust_score가 60 이상이면 dust_yn=true 모드만 선택하세요.\n'
+            'scent_yn만 true이고 odor_yn·dust_yn이 false인 향기 전용 모드는 선택하지 마세요.',
       RefreshRecommendBasis.weatherAndSchedule =>
         '날씨와 오늘 일정을 균형 있게 반영해 가장 적합한 모드를 선택하세요.',
       RefreshRecommendBasis.weatherOnly =>

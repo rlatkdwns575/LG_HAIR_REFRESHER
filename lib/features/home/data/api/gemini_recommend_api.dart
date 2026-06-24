@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../../../core/constants/gemini_models.dart';
 import '../../../../core/services/app_env.dart';
 import '../../../../shared/recommendation/refresh_recommend_input.dart';
 import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
@@ -9,13 +10,8 @@ import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
 class GeminiRecommendApi {
   const GeminiRecommendApi();
 
-  static const _models = [
-    'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-2.5-flash',
-  ];
-  static const _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models';
+  static const _models = GeminiModels.recommendFallbackOrder;
+  static const _baseUrl = GeminiModels.generateContentBaseUrl;
   static const _minMessageLength = 25;
 
   Future<String> generateMessage(

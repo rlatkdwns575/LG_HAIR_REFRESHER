@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../features/home/data/api/gemini_recommend_api.dart';
 import '../../features/home/data/api/weather_recommend_fallback.dart';
 import '../../features/refresh/data/api/refresh_api.dart';
@@ -8,7 +6,9 @@ import '../../features/refresh/data/api/refresh_recommend_fallback.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
 import '../../features/refresh/data/refresh_mode_catalog.dart';
 import 'refresh_recommend_cache.dart';
+import 'refresh_recommend_candidates.dart';
 import 'refresh_recommend_context_resolver.dart';
+import 'refresh_recommend_measure_rules.dart';
 import 'refresh_recommend_result.dart';
 
 /// 통합 Gemini 추천 — 모든 화면의 단일 진입점.
@@ -47,23 +47,37 @@ class RefreshRecommendService {
 
     final presets = await refreshApi.fetchPresetModes();
     RefreshPresetModeStore.instance.setPresets(presets);
-    if (presets.isEmpty) {
+    final candidates = RefreshRecommendCandidates.withoutScent(presets);
+    if (candidates.isEmpty) {
       return null;
     }
+
+    final measure = context.measure;
+    final filteredCandidates = context.includesMeasure && measure != null
+        ? RefreshRecommendMeasureRules.filterForMeasure(measure, candidates)
+        : candidates;
+    final modeCandidates = filteredCandidates.isNotEmpty
+        ? filteredCandidates
+        : candidates;
 
     RefreshMode? mode;
     try {
       mode = await refreshRecommendApi.recommendMode(
-        candidates: presets,
+        candidates: modeCandidates,
         context: context,
       );
     } catch (_) {}
 
+    if (context.includesMeasure && measure != null) {
+      mode = RefreshRecommendMeasureRules.ensureValid(mode, measure, presets);
+    }
+
     mode ??= RefreshRecommendFallback.pickMode(
-      candidates: presets,
+      candidates: modeCandidates,
       context: context,
     );
-    mode ??= presets.first;
+    mode ??= RefreshRecommendCandidates.pickDefault(presets);
+    mode ??= RefreshRecommendCandidates.fallbackWhenEmpty();
 
     String message;
     try {
@@ -107,15 +121,10 @@ class RefreshRecommendService {
 
   /// 프리셋 없을 때 UI용 최소 fallback 모드.
   static RefreshMode fallbackMode() {
-    return const RefreshMode(
-      id: 'fallback-refresh',
-      name: '리프레시',
-      description: '모드를 불러오지 못했습니다.',
-      category: RefreshModeTabs.afterOuting,
-      durationSeconds: 300,
-      icon: Icons.bolt_outlined,
-      odorYn: true,
-      dustYn: true,
-    );
+    final presets = RefreshPresetModeStore.instance.presets;
+    if (presets.isNotEmpty) {
+      return RefreshRecommendCandidates.resolveDefault(presets);
+    }
+    return RefreshRecommendCandidates.fallbackWhenEmpty();
   }
 }

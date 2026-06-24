@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../../../core/constants/gemini_models.dart';
 import '../../../../core/services/app_env.dart';
 import '../../../../shared/recommendation/refresh_recommend_input.dart';
 import '../../../../shared/recommendation/refresh_recommend_prompt.dart';
@@ -10,13 +11,8 @@ import '../model/refresh_mode.dart';
 class RefreshRecommendApi {
   const RefreshRecommendApi();
 
-  static const _models = [
-    'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-2.5-flash',
-  ];
-  static const _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models';
+  static const _models = GeminiModels.recommendFallbackOrder;
+  static const _baseUrl = GeminiModels.generateContentBaseUrl;
 
   Future<RefreshMode?> recommendMode({
     required List<RefreshMode> candidates,
@@ -49,7 +45,7 @@ class RefreshRecommendApi {
           ],
         },
       ],
-      'generationConfig': {'temperature': 0.3, 'maxOutputTokens': 256},
+      'generationConfig': {'temperature': 0.2, 'maxOutputTokens': 256},
     });
 
     for (final model in _models) {

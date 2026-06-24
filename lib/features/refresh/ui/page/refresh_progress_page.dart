@@ -14,8 +14,10 @@ import '../../../../shared/widgets/app_fixed_bottom_button_area.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../data/model/refresh_mode.dart';
 import '../../data/model/refresh_progress_session.dart';
+import '../../data/refresh_execution_config.dart';
 import '../../data/refresh_mode_availability.dart';
 import '../../data/refresh_mode_catalog.dart';
+import '../../../../shared/recommendation/refresh_recommend_candidates.dart';
 import '../../data/refresh_result_store.dart';
 import '../refresh_scent_unavailable.dart';
 import '../widgets/refresh_progress_ring.dart';
@@ -35,9 +37,8 @@ class RefreshProgressPage extends StatefulWidget {
 class _RefreshProgressPageState extends State<RefreshProgressPage> {
   late final RefreshProgressSession _session;
   late final RefreshMode _executedMode;
-  late int _totalRemainingSeconds;
-  late int _stepRemainingSeconds;
-  late int _activeStepIndex;
+  late final int _displayTotalSeconds;
+  int _elapsedTicks = 0;
 
   Timer? _timer;
   bool _isPaused = false;
@@ -60,9 +61,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     final mode = widget.mode ?? _resolveFallbackMode();
     _executedMode = mode;
     _session = RefreshProgressSession.fromMode(mode);
-    _totalRemainingSeconds = _session.totalDurationSeconds;
-    _activeStepIndex = 0;
-    _stepRemainingSeconds = _session.steps.first.durationSeconds;
+    _displayTotalSeconds = _session.totalDurationSeconds;
     _startTimer();
     unawaited(_validateScentCartridge(mode));
   }
@@ -84,18 +83,13 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
   RefreshMode _resolveFallbackMode() {
     final modes = getAllRefreshModes();
     if (modes.isNotEmpty) {
-      return modes.first;
+      final resolved = RefreshRecommendCandidates.pickDefault(modes);
+      if (resolved != null) {
+        return resolved;
+      }
     }
 
-    return const RefreshMode(
-      id: 'fallback-refresh',
-      name: '리프레시',
-      description: '모드를 불러오지 못했습니다.',
-      category: RefreshModeTabs.beforeOuting,
-      durationSeconds: 180,
-      icon: Icons.bolt_outlined,
-      dustYn: true,
-    );
+    return RefreshRecommendCandidates.fallbackWhenEmpty();
   }
 
   @override
@@ -106,27 +100,20 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
 
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+    _timer = Timer.periodic(
+      RefreshExecutionConfig.tickInterval,
+      (_) => _tick(),
+    );
   }
 
   void _tick() {
-    if (_isPaused || _totalRemainingSeconds <= 0) {
+    if (_isPaused || _elapsedTicks >= RefreshExecutionConfig.totalTicks) {
       return;
     }
 
-    setState(() {
-      _totalRemainingSeconds--;
-      _stepRemainingSeconds--;
+    setState(() => _elapsedTicks++);
 
-      if (_stepRemainingSeconds <= 0 &&
-          _activeStepIndex < _session.steps.length - 1) {
-        _activeStepIndex++;
-        _stepRemainingSeconds =
-            _session.steps[_activeStepIndex].durationSeconds;
-      }
-    });
-
-    if (_totalRemainingSeconds <= 0) {
+    if (_elapsedTicks >= RefreshExecutionConfig.totalTicks) {
       _onComplete();
     }
   }
@@ -148,15 +135,23 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
     });
   }
 
-  RefreshProgressStep get _currentStep => _session.steps[_activeStepIndex];
-
-  double get _progress {
-    final total = _session.totalDurationSeconds;
-    if (total == 0) {
-      return 0;
-    }
-    return 1 - (_totalRemainingSeconds / total);
+  RefreshProgressStep get _currentStep {
+    final index = _activeStepIndex;
+    return _session.steps[index];
   }
+
+  int get _activeStepIndex => RefreshExecutionConfig.activeStepIndex(
+    steps: _session.steps,
+    elapsedTicks: _elapsedTicks,
+  );
+
+  int get _displayRemainingSeconds =>
+      RefreshExecutionConfig.displayRemainingSeconds(
+        displayTotalSeconds: _displayTotalSeconds,
+        elapsedTicks: _elapsedTicks,
+      );
+
+  double get _progress => RefreshExecutionConfig.progress(_elapsedTicks);
 
   String _formatClock(int seconds) {
     final minutes = seconds ~/ 60;
@@ -221,7 +216,7 @@ class _RefreshProgressPageState extends State<RefreshProgressPage> {
         Center(
           child: RefreshProgressRing(
             progress: _progress,
-            remainingLabel: _formatClock(_totalRemainingSeconds),
+            remainingLabel: _formatClock(_displayRemainingSeconds),
             dimmed: _isPaused,
           ),
         ),
