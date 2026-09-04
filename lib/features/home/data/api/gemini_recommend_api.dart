@@ -24,7 +24,7 @@ class GeminiRecommendApi {
         'parts': [
           {
             'text': RefreshRecommendPrompt.messageSystemInstruction(
-              context.basis,
+              context,
             ).trim(),
           },
         ],

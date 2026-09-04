@@ -5,6 +5,7 @@ import 'package:lg_hair_refresher/features/refresh/data/api/refresh_recommend_fa
 import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_schedule_snapshot.dart';
 
 void main() {
   final candidates = [
@@ -67,6 +68,34 @@ void main() {
             humidityPercent: 75,
             isRaining: false,
             isSnowing: false,
+          ),
+        ),
+      );
+
+      expect(mode?.id, 'after-1');
+    });
+
+    test('지난 일정이 있으면 외출 후 카테고리를 우선한다', () {
+      final mode = RefreshRecommendFallback.pickMode(
+        candidates: candidates,
+        context: RefreshRecommendInput(
+          basis: RefreshRecommendBasis.weatherAndSchedule,
+          environment: const EnvironmentSnapshot(
+            temperatureCelsius: 22,
+            humidityPercent: 45,
+            isRaining: false,
+            isSnowing: false,
+          ),
+          schedule: RefreshRecommendScheduleSnapshot(
+            todayEventCount: 1,
+            todayEvents: [
+              RefreshRecommendScheduleEventSnapshot(
+                title: '회의',
+                eventType: 'importantMeeting',
+                timing: 'after',
+                startsAt: DateTime(2026, 6, 18, 9),
+              ),
+            ],
           ),
         ),
       );

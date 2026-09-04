@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../features/refresh/data/model/refresh_mode.dart';
 
-/// Gemini·규칙 기반 추천에 사용할 후보 모드 필터.
+/// 규칙 기반 추천에 사용할 후보 모드 필터.
 class RefreshRecommendCandidates {
   const RefreshRecommendCandidates._();
 

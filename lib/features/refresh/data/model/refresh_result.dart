@@ -26,6 +26,7 @@ class RefreshResult {
     this.odorAfterScore,
     this.dustBeforeScore,
     this.dustAfterScore,
+    this.executedModeName,
     this.recommendedMode,
     this.detailLinkLabel = '리프레시 결과 자세히 보기',
     this.showChangeChart = true,
@@ -45,6 +46,7 @@ class RefreshResult {
   final int? odorAfterScore;
   final int? dustBeforeScore;
   final int? dustAfterScore;
+  final String? executedModeName;
   final RefreshMode? recommendedMode;
   final String detailLinkLabel;
   final bool showChangeChart;
@@ -105,6 +107,7 @@ class RefreshResult {
         beforeLevel: RefreshPollutionLevel.veryHigh,
         afterLevel: RefreshPollutionLevel.normal,
       ),
+      executedModeName: '외출 후 집중 리프레시 모드',
       recommendedMode: resolveScentCareMode(),
     );
   }

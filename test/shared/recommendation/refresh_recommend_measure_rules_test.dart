@@ -7,6 +7,7 @@ import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart'
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_measure_rules.dart';
+import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_schedule_snapshot.dart';
 
 void main() {
   final scentOnly = RefreshMode(
@@ -166,28 +167,80 @@ void main() {
       expect(picked?.id, bothCare.id);
     });
 
-    test('ensureValid replaces both-care when odor is clearly higher', () {
-      final odorFocused = record(odor: 80, dust: 65);
-      final corrected = RefreshRecommendMeasureRules.ensureValid(
-        bothCare,
-        odorFocused,
-        allModes,
-      );
+    test(
+      'pickFromMeasure prefers weather category among focused modes when raining',
+      () {
+        final odorWeather = RefreshMode(
+          id: 'odor-weather',
+          name: '비 냄새 케어',
+          description: '냄새',
+          category: RefreshModeTabs.weather,
+          durationSeconds: 300,
+          icon: Icons.water_drop_outlined,
+          odorYn: true,
+          scentYn: false,
+        );
+        final odorFocused = record(odor: 80, dust: 40);
+        final picked = RefreshRecommendMeasureRules.pickFromMeasure(
+          odorFocused,
+          [...allModes, odorWeather],
+          environment: const EnvironmentSnapshot(
+            temperatureCelsius: 18,
+            humidityPercent: 80,
+            isRaining: true,
+            isSnowing: false,
+          ),
+        );
 
-      expect(corrected?.id, odorOnly.id);
-    });
+        expect(picked?.id, odorWeather.id);
+      },
+    );
 
-    test('ensureValid replaces invalid Gemini pick with rule-based mode', () {
-      final highBoth = record(odor: 80, dust: 80);
-      final corrected = RefreshRecommendMeasureRules.ensureValid(
-        scentOnly,
-        highBoth,
-        allModes,
-      );
+    test(
+      'pickFromMeasure prefers beforeOuting when next event is upcoming',
+      () {
+        final odorBefore = RefreshMode(
+          id: 'odor-before',
+          name: '외출 전 냄새 케어',
+          description: '냄새',
+          category: RefreshModeTabs.beforeOuting,
+          durationSeconds: 300,
+          icon: Icons.directions_walk_outlined,
+          odorYn: true,
+          scentYn: false,
+        );
+        final odorFocused = record(odor: 80, dust: 40);
+        final picked = RefreshRecommendMeasureRules.pickFromMeasure(
+          odorFocused,
+          [...allModes, odorBefore],
+          environment: const EnvironmentSnapshot(
+            temperatureCelsius: 22,
+            humidityPercent: 45,
+            isRaining: false,
+            isSnowing: false,
+          ),
+          schedule: RefreshRecommendScheduleSnapshot(
+            todayEventCount: 1,
+            nextEvent: RefreshRecommendScheduleEventSnapshot(
+              title: '회의',
+              eventType: 'importantMeeting',
+              timing: 'before',
+              startsAt: DateTime(2026, 6, 18, 19),
+            ),
+            todayEvents: [
+              RefreshRecommendScheduleEventSnapshot(
+                title: '회의',
+                eventType: 'importantMeeting',
+                timing: 'before',
+                startsAt: DateTime(2026, 6, 18, 19),
+              ),
+            ],
+          ),
+        );
 
-      expect(corrected?.id, bothCare.id);
-      expect(corrected?.scentYn, isFalse);
-    });
+        expect(picked?.id, odorBefore.id);
+      },
+    );
   });
 
   group('RefreshRecommendFallback with measure', () {

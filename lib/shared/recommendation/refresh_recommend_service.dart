@@ -1,22 +1,19 @@
 import '../../features/home/data/api/gemini_recommend_api.dart';
 import '../../features/home/data/api/weather_recommend_fallback.dart';
 import '../../features/refresh/data/api/refresh_api.dart';
-import '../../features/refresh/data/api/refresh_recommend_api.dart';
 import '../../features/refresh/data/api/refresh_recommend_fallback.dart';
 import '../../features/refresh/data/model/refresh_mode.dart';
 import '../../features/refresh/data/refresh_mode_catalog.dart';
 import 'refresh_recommend_cache.dart';
 import 'refresh_recommend_candidates.dart';
 import 'refresh_recommend_context_resolver.dart';
-import 'refresh_recommend_measure_rules.dart';
 import 'refresh_recommend_result.dart';
 
-/// 통합 Gemini 추천 — 모든 화면의 단일 진입점.
+/// 통합 추천 — 모드는 규칙, 문구만 Gemini.
 class RefreshRecommendService {
   RefreshRecommendService({
     RefreshRecommendContextResolver? contextResolver,
     this.refreshApi = const RefreshApi(),
-    this.refreshRecommendApi = const RefreshRecommendApi(),
     this.geminiRecommendApi = const GeminiRecommendApi(),
   }) : contextResolver = contextResolver ?? RefreshRecommendContextResolver();
 
@@ -24,12 +21,11 @@ class RefreshRecommendService {
 
   final RefreshRecommendContextResolver contextResolver;
   final RefreshApi refreshApi;
-  final RefreshRecommendApi refreshRecommendApi;
   final GeminiRecommendApi geminiRecommendApi;
 
   RefreshRecommendCache get _cache => RefreshRecommendCache.instance;
 
-  /// 캐시·Gemini를 통해 모드+문구를 반환합니다.
+  /// 규칙으로 모드를 고르고, Gemini로 안내 문구를 만듭니다.
   Future<RefreshRecommendResult?> resolve({
     bool forceRefresh = false,
     String? userId,
@@ -52,28 +48,8 @@ class RefreshRecommendService {
       return null;
     }
 
-    final measure = context.measure;
-    final filteredCandidates = context.includesMeasure && measure != null
-        ? RefreshRecommendMeasureRules.filterForMeasure(measure, candidates)
-        : candidates;
-    final modeCandidates = filteredCandidates.isNotEmpty
-        ? filteredCandidates
-        : candidates;
-
-    RefreshMode? mode;
-    try {
-      mode = await refreshRecommendApi.recommendMode(
-        candidates: modeCandidates,
-        context: context,
-      );
-    } catch (_) {}
-
-    if (context.includesMeasure && measure != null) {
-      mode = RefreshRecommendMeasureRules.ensureValid(mode, measure, presets);
-    }
-
-    mode ??= RefreshRecommendFallback.pickMode(
-      candidates: modeCandidates,
+    var mode = RefreshRecommendFallback.pickMode(
+      candidates: candidates,
       context: context,
     );
     mode ??= RefreshRecommendCandidates.pickDefault(presets);

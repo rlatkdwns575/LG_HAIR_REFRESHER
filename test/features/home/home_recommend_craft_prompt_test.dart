@@ -15,7 +15,10 @@ void main() {
 
     test('message system instruction includes CRAFT sections', () {
       final instruction = RefreshRecommendPrompt.messageSystemInstruction(
-        RefreshRecommendBasis.weatherOnly,
+        RefreshRecommendInput(
+          basis: RefreshRecommendBasis.weatherOnly,
+          environment: environment,
+        ),
       );
 
       expect(instruction, contains('Context:'));
@@ -25,13 +28,13 @@ void main() {
       expect(instruction, contains('Tone:'));
     });
 
-    test('mode user prompt includes environment json fields', () {
-      final prompt = RefreshRecommendPrompt.modeUserPrompt(
-        candidates: const [],
+    test('message user prompt includes environment json fields', () {
+      final prompt = RefreshRecommendPrompt.messageUserPrompt(
         context: RefreshRecommendInput(
           basis: RefreshRecommendBasis.weatherOnly,
           environment: environment,
         ),
+        recommendedModeName: '외출 후 케어',
       );
 
       expect(prompt, contains('temperature_celsius'));

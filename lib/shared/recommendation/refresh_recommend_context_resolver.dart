@@ -54,18 +54,13 @@ class RefreshRecommendContextResolver {
       );
     }
 
-    final basis = resolveBasis(
+    return buildInput(
+      environment: environment,
       latestMeasure: latestMeasure,
       refreshedAfterMeasure: refreshedAfter,
       schedule: schedule,
       now: resolvedNow,
       measureWindow: measureWindow,
-    );
-    return buildInput(
-      basis: basis,
-      environment: environment,
-      latestMeasure: latestMeasure,
-      schedule: schedule,
     );
   }
 
@@ -106,7 +101,21 @@ class RefreshRecommendContextResolver {
     );
   }
 
-  /// 측정·일정·시간 조건으로 추천 근거를 결정합니다.
+  /// 측정이 점수 결정에 쓰일 수 있는지 (2시간 이내 + 미리프레시).
+  static bool isMeasureValid({
+    required MeasureResultRecord? latestMeasure,
+    required bool refreshedAfterMeasure,
+    required DateTime now,
+    Duration measureWindow = const Duration(hours: 2),
+  }) {
+    if (latestMeasure == null || refreshedAfterMeasure) {
+      return false;
+    }
+    final age = now.difference(latestMeasure.createdAt.toLocal());
+    return age <= measureWindow;
+  }
+
+  /// 문구·UI 라벨용 주근거. 입력 자체는 유효 신호를 모두 포함합니다.
   static RefreshRecommendBasis resolveBasis({
     required MeasureResultRecord? latestMeasure,
     required bool refreshedAfterMeasure,
@@ -114,11 +123,13 @@ class RefreshRecommendContextResolver {
     required DateTime now,
     Duration measureWindow = const Duration(hours: 2),
   }) {
-    if (latestMeasure != null && !refreshedAfterMeasure) {
-      final age = now.difference(latestMeasure.createdAt.toLocal());
-      if (age <= measureWindow) {
-        return RefreshRecommendBasis.measure;
-      }
+    if (isMeasureValid(
+      latestMeasure: latestMeasure,
+      refreshedAfterMeasure: refreshedAfterMeasure,
+      now: now,
+      measureWindow: measureWindow,
+    )) {
+      return RefreshRecommendBasis.measure;
     }
 
     if (schedule.hasEventsToday) {
@@ -129,28 +140,36 @@ class RefreshRecommendContextResolver {
   }
 
   static RefreshRecommendInput buildInput({
-    required RefreshRecommendBasis basis,
     required EnvironmentSnapshot environment,
     required MeasureResultRecord? latestMeasure,
     required RefreshRecommendScheduleSnapshot schedule,
+    required bool refreshedAfterMeasure,
+    required DateTime now,
+    Duration measureWindow = const Duration(hours: 2),
+    RefreshRecommendBasis? basis,
   }) {
-    return switch (basis) {
-      RefreshRecommendBasis.measure => RefreshRecommendInput(
-        basis: basis,
-        environment: environment,
-        measure: latestMeasure,
-        schedule: schedule.hasEventsToday ? schedule : null,
-      ),
-      RefreshRecommendBasis.weatherAndSchedule => RefreshRecommendInput(
-        basis: basis,
-        environment: environment,
-        schedule: schedule,
-      ),
-      RefreshRecommendBasis.weatherOnly => RefreshRecommendInput(
-        basis: basis,
-        environment: environment,
-      ),
-    };
+    final measureValid = isMeasureValid(
+      latestMeasure: latestMeasure,
+      refreshedAfterMeasure: refreshedAfterMeasure,
+      now: now,
+      measureWindow: measureWindow,
+    );
+    final resolvedBasis =
+        basis ??
+        resolveBasis(
+          latestMeasure: latestMeasure,
+          refreshedAfterMeasure: refreshedAfterMeasure,
+          schedule: schedule,
+          now: now,
+          measureWindow: measureWindow,
+        );
+
+    return RefreshRecommendInput(
+      basis: resolvedBasis,
+      environment: environment,
+      measure: measureValid ? latestMeasure : null,
+      schedule: schedule.hasEventsToday ? schedule : null,
+    );
   }
 
   Future<EnvironmentSnapshot> _loadEnvironment() async {

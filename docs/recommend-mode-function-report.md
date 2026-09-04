@@ -12,18 +12,18 @@
 RefreshRecommendService.resolve()
 ```
 
-위 함수가 추천에 필요한 데이터를 모으고, 후보 리프레시 모드를 조회한 뒤, Gemini 추천과 fallback 추천을 순서대로 시도합니다.
+위 함수가 추천에 필요한 데이터를 모으고, 규칙으로 모드를 고른 뒤 Gemini로 안내 문구만 생성합니다.
 
 추천 모드 결정 순서:
 
 ```text
 1. 추천 cache 확인
-2. 추천 입력 context 생성
+2. 날씨 + (유효 측정) + (오늘 일정)을 모두 수집
 3. Supabase에서 프리셋 리프레시 모드 조회
-4. Gemini로 mode_id 선택 시도
-5. Gemini 실패 시 규칙 기반 fallback 선택
-6. 그래도 없으면 첫 번째 프리셋 모드 사용
-7. 추천 문구 생성
+4. 규칙으로 모드 확정 (측정 점수 우선, 날씨·일정은 카테고리 보조)
+5. 그래도 없으면 기본 프리셋
+6. Gemini로 추천 문구 생성 (제공된 신호만 언급)
+7. 문구 실패 시 규칙 문구
 8. 추천 결과 cache 저장
 ```
 
@@ -35,11 +35,10 @@ RefreshRecommendService.resolve()
 | `lib/shared/recommendation/refresh_recommend_context_resolver.dart` | 측정 결과, 날씨, 일정 정보를 모아 추천 기준을 결정합니다. |
 | `lib/shared/recommendation/refresh_recommend_input.dart` | Gemini/fallback에 넘길 추천 입력 데이터 모델입니다. |
 | `lib/shared/recommendation/refresh_recommend_basis.dart` | 추천 근거 enum입니다. 측정/일정+날씨/날씨 기준을 구분합니다. |
-| `lib/shared/recommendation/refresh_recommend_prompt.dart` | Gemini에 보낼 prompt를 생성합니다. |
+| `lib/shared/recommendation/refresh_recommend_prompt.dart` | Gemini 문구 prompt를 생성합니다. |
 | `lib/shared/recommendation/refresh_recommend_result.dart` | 최종 추천 결과 모델입니다. 추천 모드, 문구, 근거, 환경, cache signature를 담습니다. |
 | `lib/shared/recommendation/refresh_recommend_cache.dart` | 추천 결과를 1시간 동안 cache합니다. |
-| `lib/features/refresh/data/api/refresh_recommend_api.dart` | Gemini에 후보 모드 목록을 보내고 추천 `mode_id`를 받아옵니다. |
-| `lib/features/refresh/data/api/refresh_recommend_fallback.dart` | Gemini 실패 시 날씨 기반 규칙으로 모드를 고릅니다. |
+| `lib/features/refresh/data/api/refresh_recommend_fallback.dart` | 측정·날씨·일정 규칙으로 모드를 고릅니다. |
 | `lib/features/home/data/api/gemini_recommend_api.dart` | 추천 모드에 대한 안내 문구를 Gemini로 생성합니다. |
 | `lib/features/home/data/api/weather_recommend_fallback.dart` | Gemini 문구 생성 실패 시 fallback 문구를 만듭니다. |
 | `lib/features/measure/data/api/measure_refresh_recommend_service.dart` | 측정 결과 화면에서 추천 모드를 붙여 `MeasureResult`를 만듭니다. |
@@ -102,15 +101,17 @@ isRaining: false
 isSnowing: false
 ```
 
-### 4.2 추천 근거 결정 규칙
+### 4.2 추천 근거 라벨과 입력 포함 규칙
 
-`resolveBasis()` 기준:
+`resolveBasis()`는 **문구·UI 라벨**용입니다. 입력 JSON은 유효한 신호를 모두 넣습니다.
 
-| 조건 | 추천 근거 |
-| --- | --- |
-| 최신 측정 결과가 있음 + 측정 후 리프레시를 아직 안 함 + 측정 결과가 2시간 이내 | `RefreshRecommendBasis.measure` |
-| 위 조건이 아니고 오늘 일정이 있음 | `RefreshRecommendBasis.weatherAndSchedule` |
-| 위 조건이 모두 아님 | `RefreshRecommendBasis.weatherOnly` |
+| 조건 | 입력에 포함 | 라벨 (`basis`) |
+| --- | --- | --- |
+| 최신 측정 + 아직 리프레시 안 함 + 2시간 이내 | 날씨 + 측정 + (오늘 일정 있으면 일정) | `measure` |
+| 위가 아니고 오늘 일정 있음 | 날씨 + 일정 | `weatherAndSchedule` |
+| 그 외 | 날씨만 | `weatherOnly` |
+
+측정이 만료됐거나 리프레시 이후면 점수에는 쓰지 않지만, 날씨·일정은 그대로 씁니다.
 
 코드 흐름:
 
@@ -146,17 +147,15 @@ Future<RefreshRecommendResult?> resolve({
 ### 5.1 동작 순서
 
 ```text
-1. contextResolver.resolve()로 추천 입력 context 생성
+1. contextResolver.resolve()로 날씨·유효 측정·오늘 일정을 함께 담은 context 생성
 2. context.buildSignature()로 cache key 생성
 3. forceRefresh가 아니면 cache 확인
 4. RefreshApi.fetchPresetModes()로 후보 모드 조회
-5. RefreshRecommendApi.recommendMode()로 Gemini 추천 시도
-6. 실패하면 RefreshRecommendFallback.pickMode() 사용
-7. 그래도 없으면 presets.first 사용
-8. GeminiRecommendApi.generateMessage()로 추천 문구 생성
-9. 문구 생성 실패 시 WeatherRecommendFallback.message() 사용
-10. RefreshRecommendResult 생성
-11. cache 저장 후 반환
+5. RefreshRecommendFallback.pickMode()로 모드 확정
+6. GeminiRecommendApi.generateMessage()로 추천 문구 생성
+7. 문구 생성 실패 시 WeatherRecommendFallback.message() 사용
+8. RefreshRecommendResult 생성
+9. cache 저장 후 반환
 ```
 
 ### 5.2 후보 모드가 없을 때
@@ -172,78 +171,29 @@ Supabase에서 리프레시 모드를 하나도 못 가져오면 추천 결과�
 ### 5.3 추천 모드 선택 우선순위
 
 ```dart
-RefreshMode? mode;
-
-mode = await refreshRecommendApi.recommendMode(...);
-
-mode ??= RefreshRecommendFallback.pickMode(...);
-mode ??= presets.first;
+RefreshMode? mode = RefreshRecommendFallback.pickMode(...);
+mode ??= RefreshRecommendCandidates.pickDefault(presets);
 ```
 
-즉, Gemini가 가장 우선이고, 그다음 규칙 기반 fallback, 마지막은 첫 번째 프리셋입니다.
+모드는 규칙으로만 고릅니다. Gemini는 확정된 모드 이름으로 문구만 생성합니다.
+날씨·일정은 같은 점수대 후보 안에서 카테고리(외출 전/후/날씨)를 고르는 데 사용합니다.
 
-## 6. Gemini 추천 모드 선택 함수
+## 6. Gemini 역할
 
-파일: `lib/features/refresh/data/api/refresh_recommend_api.dart`
+Gemini는 추천 문구 생성에만 사용합니다. 모드 `mode_id` 선택은 하지 않습니다.
+
+파일: `lib/features/home/data/api/gemini_recommend_api.dart`
 
 핵심 함수:
 
 ```dart
-Future<RefreshMode?> recommendMode({
-  required List<RefreshMode> candidates,
-  required RefreshRecommendInput context,
+Future<String> generateMessage(
+  RefreshRecommendInput context, {
+  required String recommendedModeName,
 })
 ```
 
-### 6.1 Gemini에 보내는 것
-
-Gemini에는 두 가지가 들어갑니다.
-
-| 입력 | 생성 함수 |
-| --- | --- |
-| 시스템 지시문 | `RefreshRecommendPrompt.modeSystemInstruction(context.basis)` |
-| 사용자 prompt | `RefreshRecommendPrompt.modeUserPrompt(candidates, context)` |
-
-후보 모드는 `RefreshMode.toRecommendJson()` 결과로 전달됩니다.
-
-Gemini에게 요구하는 출력 형식:
-
-```json
-{"mode_id":"<uuid>"}
-```
-
-### 6.2 사용하는 Gemini 모델
-
-순서대로 시도합니다.
-
-```dart
-gemini-2.0-flash
-gemini-2.0-flash-lite
-gemini-2.5-flash
-```
-
-상태 코드가 `429` 또는 `404`면 다음 모델을 시도합니다.
-
-### 6.3 응답 파싱
-
-함수:
-
-```dart
-String? _parseModeId(String responseBody)
-```
-
-파싱 순서:
-
-```text
-1. Gemini response JSON 파싱
-2. candidates 첫 번째 응답 확인
-3. finishReason이 MAX_TOKENS면 실패 처리
-4. parts의 text 추출
-5. text가 JSON이면 mode_id 추출
-6. JSON 파싱 실패 시 UUID 정규식으로 mode_id 추출
-```
-
-찾은 `mode_id`가 후보 모드 id와 같으면 해당 `RefreshMode`를 반환합니다.
+제공된 입력 JSON과 이미 확정된 모드 이름만 넣고 한국어 안내 문구를 받습니다.
 
 ## 7. Gemini prompt 생성 함수
 
@@ -253,10 +203,8 @@ String? _parseModeId(String responseBody)
 
 | 함수 | 역할 |
 | --- | --- |
-| `modeSystemInstruction` | Gemini가 어떤 기준으로 모드를 골라야 하는지 지시합니다. |
-| `modeUserPrompt` | 후보 모드 JSON과 추천 입력 JSON을 붙여 보냅니다. |
 | `messageSystemInstruction` | 추천 문구 작성 규칙을 지시합니다. |
-| `messageUserPrompt` | 추천 근거와 추천 모드 이름을 넣어 문구 생성을 요청합니다. |
+| `messageUserPrompt` | 제공된 입력 JSON과 추천 모드 이름을 넣어 문구 생성을 요청합니다. |
 
 ### 7.1 추천 기준별 Gemini 지시
 
@@ -287,7 +235,7 @@ static RefreshMode? pickMode(...)
 static RefreshMode? pickModeFromEnvironment(...)
 ```
 
-Gemini가 실패하거나 유효한 `mode_id`를 못 주면 이 규칙을 사용합니다.
+모드는 이 규칙으로만 고릅니다. Gemini는 관여하지 않습니다.
 
 ### fallback 규칙
 
@@ -315,9 +263,8 @@ return first beforeOuting mode ?? candidates.first;
 
 주의:
 
-- fallback은 측정 점수를 직접 보지 않습니다.
-- `RefreshRecommendFallback.pickMode()`는 context를 받지만 실제 선택은 현재 `context.environment`만 사용합니다.
-- 측정 기반 추천에서 Gemini가 실패하면, fallback은 측정 점수가 아니라 날씨 기반으로 동작합니다.
+- 측정이 유효하면 fallback도 점수 규칙을 먼저 보고, 날씨·일정은 카테고리 보조로 씁니다.
+- 측정이 없으면 비/눈 → `weather`, 지난 일정 → `afterOuting`, 습도 70% → `afterOuting`, 그 외 `beforeOuting`입니다.
 
 ## 9. 추천 문구 생성 함수
 
@@ -460,8 +407,7 @@ HomePage
 -> RefreshRecommendService.resolve()
 -> RefreshRecommendContextResolver.resolve()
 -> RefreshApi.fetchPresetModes()
--> RefreshRecommendApi.recommendMode()
--> RefreshRecommendFallback.pickMode() if needed
+-> RefreshRecommendFallback.pickMode()
 -> GeminiRecommendApi.generateMessage()
 -> WeatherRecommendFallback.message() if needed
 -> RefreshRecommendResult
@@ -492,7 +438,7 @@ Local calendar sync
 
 | 리스크 | 설명 |
 | --- | --- |
-| Gemini 실패 시 측정 점수 fallback 미반영 | 측정 기반 추천에서 Gemini가 실패하면 fallback은 날씨만 봅니다. 고오염 냄새/먼지 점수를 직접 반영하지 않습니다. |
+| Gemini 실패 시 측정 점수 fallback 미반영 | 측정이 유효하면 점수로 모드를 먼저 확정합니다. 날씨·일정은 카테고리 보조입니다. |
 | prompt 문자열 인코딩 깨짐 | 일부 prompt와 fallback 문구의 한글이 깨져 있어 추천 품질에 영향을 줄 수 있습니다. |
 | 후보 모드 품질 의존 | Gemini는 후보 JSON 안에서만 고릅니다. Supabase 프리셋 모드가 부족하거나 flag가 부정확하면 추천 품질이 낮아집니다. |
 | cache stale 가능성 | cache TTL은 1시간입니다. 날씨나 측정 상태가 바뀌어도 signature가 같으면 cache를 재사용합니다. |

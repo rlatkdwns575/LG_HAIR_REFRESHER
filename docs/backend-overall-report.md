@@ -258,8 +258,7 @@ Refresh는 리프레시 모드 목록, 커스텀 모드, 실행 세션, 결과 �
 | `api/refresh_api.dart` | 프리셋 리프레시 모드 조회 |
 | `api/custom_mode_api.dart` | 사용자 커스텀 모드 저장/조회/삭제 |
 | `api/refresh_mode_mapper.dart` | Supabase row를 `RefreshMode`로 변환 |
-| `api/refresh_recommend_api.dart` | Gemini로 추천 mode_id 선택 |
-| `api/refresh_recommend_fallback.dart` | Gemini 실패 시 규칙 기반 추천 |
+| `api/refresh_recommend_fallback.dart` | 측정·날씨·일정 규칙으로 추천 모드 선택 |
 | `api/refresh_session_api.dart` | 리프레시 세션 저장/조회 |
 | `api/refresh_session_result_generator.dart` | 리프레시 실행 전후 결과 생성 |
 
@@ -335,7 +334,7 @@ RefreshProgressPage
 RefreshRecommendService.resolve()
 -> RefreshRecommendContextResolver.resolve()
 -> RefreshApi.fetchPresetModes()
--> RefreshRecommendApi.recommendMode()
+-> RefreshRecommendFallback.pickMode()
 -> RefreshRecommendFallback.pickMode()
 -> GeminiRecommendApi.generateMessage()
 -> WeatherRecommendFallback.message()
@@ -501,7 +500,6 @@ Supabase row Map
 
 | 파일 | 역할 |
 | --- | --- |
-| `refresh_recommend_api.dart` | Gemini에게 추천 mode_id 요청 |
 | `gemini_recommend_api.dart` | Gemini에게 추천 문구 요청 |
 | `refresh_recommend_prompt.dart` | Gemini prompt 생성 |
 | `app_env.dart` | Gemini API key 로드 |

@@ -1,4 +1,3 @@
-import '../../../../shared/recommendation/refresh_recommend_basis.dart';
 import '../../../../shared/recommendation/refresh_recommend_input.dart';
 import '../model/environment_snapshot.dart';
 
@@ -15,14 +14,22 @@ class WeatherRecommendFallback {
       return _legacyMessage(context.environment);
     }
 
-    final opening = switch (context.basis) {
-      RefreshRecommendBasis.measure => '측정 결과와 오늘 환경을 보면,',
-      RefreshRecommendBasis.weatherAndSchedule => '오늘 일정과 날씨를 보면,',
-      RefreshRecommendBasis.weatherOnly =>
-        '오늘 날씨가 ${_weatherClause(context.environment)} 날이니,',
-    };
+    final opening = _opening(context);
 
     return '$opening\n$modeName 리프레시 모드를 추천해요.';
+  }
+
+  static String _opening(RefreshRecommendInput context) {
+    if (context.includesMeasure && context.includesSchedule) {
+      return '측정 결과와 오늘 일정·날씨를 보면,';
+    }
+    if (context.includesMeasure) {
+      return '측정 결과와 오늘 환경을 보면,';
+    }
+    if (context.includesSchedule) {
+      return '오늘 일정과 날씨를 보면,';
+    }
+    return '오늘 날씨가 ${_weatherClause(context.environment)} 날이니,';
   }
 
   static String _weatherClause(EnvironmentSnapshot environment) {
