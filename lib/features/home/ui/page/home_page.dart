@@ -8,7 +8,6 @@ import '../../../../app/navigation/app_system_insets.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../shared/widgets/app_common_top_header.dart';
 import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../shared/models/scent_cartridge_status.dart';
 import '../../../../shared/recommendation/refresh_recommend_cache.dart';
@@ -374,11 +373,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.homeBackground,
-      appBar: AppCommonTopHeader(
-        variant: AppCommonTopHeaderVariant.gnb,
-        title: _dashboardData.deviceName,
-        onSettings: context.pushSettings,
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -393,6 +387,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   HomeDeviceStatusSection(
                     data: _dashboardData,
                     onDeviceManagePressed: context.pushDeviceManage,
+                    onSettingsPressed: context.pushSettings,
                   ),
                   AppMaxWidthPageShell(
                     backgroundColor: AppColors.homeBackground,

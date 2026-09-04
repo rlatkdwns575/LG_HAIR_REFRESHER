@@ -20,7 +20,26 @@ void main() {
       expect(detail.historyCompletedAt, isNull);
     });
 
-    test('uses fallback mode name when recommendedMode is null', () {
+    test('uses executed mode name instead of scent recommendation', () {
+      final detail = RefreshResultDetailMapper.fromRefreshResult(
+        RefreshResult(
+          dustRemovalPercent: 87,
+          odorRemovalPercent: 92,
+          overallImprovementPercent: 40.9,
+          headlineBefore: '외출 후 남아 있던 냄새와 먼지가',
+          headlineAfter: '줄어들었어요.',
+          disclaimer: 'disclaimer',
+          dustChange: RefreshResult.sample.dustChange,
+          odorChange: RefreshResult.sample.odorChange,
+          executedModeName: '먼지 케어',
+          recommendedMode: RefreshResult.sample.recommendedMode,
+        ),
+      );
+
+      expect(detail.modeName, '먼지 케어');
+    });
+
+    test('uses fallback mode name when executed mode name is missing', () {
       final detail = RefreshResultDetailMapper.fromRefreshResult(
         RefreshResult(
           dustRemovalPercent: 87,

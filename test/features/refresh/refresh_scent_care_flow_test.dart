@@ -79,6 +79,7 @@ void main() {
         mode: dustMode,
       );
 
+      expect(result.executedModeName, '먼지 케어');
       expect(result.recommendedMode, scentCarePreset);
       expect(result.showScentCareRecommendation, isTrue);
     });

@@ -268,9 +268,9 @@ class RefreshResultDetailMapper {
   }
 
   static String _modeNameFromResult(RefreshResult result) {
-    final modeName = result.recommendedMode?.name;
-    if (modeName != null && modeName.isNotEmpty) {
-      return modeName;
+    final executedName = result.executedModeName?.trim();
+    if (executedName != null && executedName.isNotEmpty) {
+      return executedName;
     }
     if (result.isScentCareResult) {
       return '향기 케어';

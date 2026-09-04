@@ -103,19 +103,6 @@ class RefreshMode {
   String get durationLabel =>
       CareDurationSplit.formatKoreanTime(durationSeconds);
 
-  Map<String, dynamic> toRecommendJson() => {
-    'mode_id': id,
-    'display_name': name,
-    'category': category,
-    'duration_seconds': durationSeconds,
-    'odor_yn': odorYn,
-    'dust_yn': dustYn,
-    'scent_yn': scentYn,
-    if (odorStrength != null) 'odor_strength': odorStrength,
-    if (dustStrength != null) 'dust_strength': dustStrength,
-    if (scentStrength != null) 'scent_strength': scentStrength,
-  };
-
   RefreshMode copyWith({
     String? id,
     String? name,

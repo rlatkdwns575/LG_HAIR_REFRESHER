@@ -2,6 +2,8 @@ import '../../../refresh/data/api/refresh_api.dart';
 import '../../../refresh/data/model/refresh_mode.dart';
 import '../../../refresh/data/refresh_mode_catalog.dart';
 import '../../../../shared/recommendation/refresh_recommend_service.dart';
+import '../../../../shared/recommendation/refresh_recommend_candidates.dart';
+import '../../../../shared/recommendation/refresh_recommend_measure_rules.dart';
 import '../measure_result_headline_builder.dart';
 import 'measure_diagnosis_generator.dart';
 import '../model/measure_result.dart';
@@ -52,7 +54,8 @@ class MeasureRefreshRecommendService {
       now: now,
     );
 
-    final recommendedMode = recommendation?.mode ?? _fallbackMode(presets);
+    final recommendedMode =
+        recommendation?.mode ?? _fallbackMode(presets, record);
     final recommendReason =
         recommendation?.message ??
         '현재 헤어 상태와 환경을 고려해 ${recommendedMode.name}을 추천해요.';
@@ -71,19 +74,17 @@ class MeasureRefreshRecommendService {
     );
   }
 
-  static RefreshMode _fallbackMode(List<RefreshMode> presets) {
-    if (presets.isEmpty) {
-      return RefreshRecommendService.fallbackMode();
-    }
-
-    for (final mode in presets) {
-      if (mode.category == RefreshModeTabs.afterOuting &&
-          mode.odorYn &&
-          mode.dustYn) {
-        return mode;
-      }
-    }
-
-    return presets.first;
+  static RefreshMode _fallbackMode(
+    List<RefreshMode> presets,
+    MeasureResultRecord record,
+  ) {
+    final candidates = RefreshRecommendCandidates.withoutScent(presets);
+    final filtered = RefreshRecommendMeasureRules.filterForMeasure(
+      record,
+      candidates,
+    );
+    final pool = filtered.isNotEmpty ? filtered : candidates;
+    return RefreshRecommendMeasureRules.pickFromMeasure(record, pool) ??
+        RefreshRecommendCandidates.resolveDefault(presets);
   }
 }

@@ -35,7 +35,7 @@ class RefreshSessionResultGenerator {
           RefreshSessionResultGenerator.defaultScentPollutionScore;
       final headline = RefreshResultHeadlineBuilder.forMode(mode);
       return RefreshSessionOutcome(
-        result: _buildScentOnlyResult(headline),
+        result: _buildScentOnlyResult(headline, executedModeName: mode.name),
         scores: RefreshSessionScores(
           pollutionBefore: pollutionScore,
           pollutionAfter: pollutionScore,
@@ -104,6 +104,7 @@ class RefreshSessionResultGenerator {
       headlineBefore: headline.before,
       headlineAfter: headline.after,
       disclaimer: '',
+      executedModeName: mode.name,
       dustChange: RefreshResultChange(
         label: '먼지',
         beforeLevel: pollutionLevelFromScore(dustBefore ?? dustBeforeMin),
@@ -210,8 +211,9 @@ class RefreshSessionResultGenerator {
   }
 
   static RefreshResult _buildScentOnlyResult(
-    ({String before, String after}) headline,
-  ) {
+    ({String before, String after}) headline, {
+    required String executedModeName,
+  }) {
     return RefreshResult(
       dustRemovalPercent: 0,
       odorRemovalPercent: 0,
@@ -219,6 +221,7 @@ class RefreshSessionResultGenerator {
       headlineBefore: headline.before,
       headlineAfter: headline.after,
       disclaimer: '',
+      executedModeName: executedModeName,
       dustChange: const RefreshResultChange(
         label: '먼지',
         beforeLevel: RefreshPollutionLevel.good,

@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_text_link_button.dart';
 import '../../data/home_assets.dart';
 import '../../data/model/home_dashboard_data.dart';
 import '../../data/model/home_filter_status.dart';
+import 'home_device_hero_header.dart';
 
 /// Figma 홈 img · 360×293.5 · status top:280(14px overlap) · content top:368.
 ///
@@ -17,11 +18,13 @@ class HomeDeviceStatusSection extends StatefulWidget {
   const HomeDeviceStatusSection({
     required this.data,
     this.onDeviceManagePressed,
+    this.onSettingsPressed,
     super.key,
   });
 
   final HomeDashboardData data;
   final VoidCallback? onDeviceManagePressed;
+  final VoidCallback? onSettingsPressed;
 
   static const baseHeroHeight = 368.0;
   static const baseImageHeight = 293.5;
@@ -131,6 +134,15 @@ class _HomeDeviceStatusSectionState extends State<HomeDeviceStatusSection> {
                     alignment: Alignment.topCenter,
                     width: constraints.maxWidth,
                     height: metrics.imageHeight,
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: HomeDeviceHeroHeader(
+                    title: widget.data.deviceName,
+                    onSettingsPressed: widget.onSettingsPressed,
                   ),
                 ),
                 Positioned(

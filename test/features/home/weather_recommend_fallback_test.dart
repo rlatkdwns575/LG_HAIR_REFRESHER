@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/home/data/api/weather_recommend_fallback.dart';
 import 'package:lg_hair_refresher/features/home/data/model/environment_snapshot.dart';
+import 'package:lg_hair_refresher/features/measure/data/model/measure_result_record.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
 
@@ -30,9 +31,20 @@ void main() {
       expect(message, contains('외출 후 케어 리프레시 모드를 추천해요'));
     });
 
-    test('builds measure basis opening', () {
+    test('builds measure opening when measure is present', () {
       final message = WeatherRecommendFallback.message(
-        input(environment, basis: RefreshRecommendBasis.measure),
+        RefreshRecommendInput(
+          basis: RefreshRecommendBasis.measure,
+          environment: environment,
+          measure: MeasureResultRecord(
+            measureId: 'm-1',
+            userDeviceId: 'd-1',
+            createdAt: DateTime(2026, 6, 18),
+            hairDustScore: 70,
+            hairOdorScore: 65,
+            totalPollutionScore: 68,
+          ),
+        ),
         recommendedModeName: '외출 후 케어',
       );
 

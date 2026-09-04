@@ -63,8 +63,7 @@
 | 파일 | 기능 | 주요 라이브러리/함수 |
 | --- | --- | --- |
 | `lib/features/home/data/api/weather_api.dart` | 외부 날씨 API를 호출해 현재 환경 데이터를 만듭니다. | `http.get`, `jsonDecode`, `AppEnv.weatherApiKey`, `WeatherApiException` |
-| `lib/features/home/data/api/gemini_recommend_api.dart` | Gemini API로 홈/추천 문구를 생성합니다. | `http.post`, `jsonEncode`, `jsonDecode`, `AppEnv.geminiApiKey`, `_postGenerateContent`, `_extractText` |
-| `lib/features/refresh/data/api/refresh_recommend_api.dart` | 리프레시 추천용 Gemini API 호출을 담당합니다. | `http.post`, `AppEnv.geminiApiKey`, `_postGenerateContent`, `RefreshRecommendApi` |
+| `lib/features/home/data/api/gemini_recommend_api.dart` | Gemini API로 홈/추천 문구를 생성합니다. | `http.post`, `jsonEncode`, `jsonDecode`, `AppEnv.geminiApiKey`, `_postGenerateContent`, `_parseMessage` |
 
 ### 2.4 기기/로컬 저장소 연결
 
@@ -90,14 +89,14 @@
 | `lib/features/measure/data/api/measure_result_mapper.dart` | DB 측정 기록을 화면 결과/기록 상세 모델로 변환합니다. | `MeasureResultMapper` |
 | `lib/features/measure/data/api/measure_schedule_classifier_api.dart` | 캘린더 일정 내용을 보고 측정 타이밍/카테고리를 분류합니다. | `MeasureScheduleClassifierApi` |
 | `lib/features/refresh/data/api/refresh_mode_mapper.dart` | Supabase 리프레시 모드 row를 `RefreshMode`로 변환합니다. | `RefreshModeMapper` |
-| `lib/features/refresh/data/api/refresh_recommend_fallback.dart` | Gemini 실패 시 규칙 기반 리프레시 모드를 추천합니다. | `RefreshRecommendFallback` |
+| `lib/features/refresh/data/api/refresh_recommend_fallback.dart` | 측정·날씨·일정 규칙으로 리프레시 모드를 고릅니다. | `RefreshRecommendFallback` |
 | `lib/features/refresh/data/api/refresh_session_result_generator.dart` | 리프레시 실행 후 냄새/먼지 제거율 같은 결과 값을 생성합니다. | `RefreshSessionResultGenerator`, `sampleRemoval` |
 | `lib/features/history/data/api/history_measure_mapper.dart` | 측정 결과 row를 history 기록 모델로 변환합니다. | `HistoryMeasureMapper` |
 | `lib/features/history/data/api/history_session_mapper.dart` | 리프레시 세션 row를 history 기록 모델로 변환합니다. | `HistorySessionMapper` |
 | `lib/features/history/data/api/history_report_builder.dart` | 여러 기록을 오늘/최근/월간/누적 리포트로 가공합니다. | `HistoryReportBuilder` |
 | `lib/features/settings/data/api/settings_device_mapper.dart` | Supabase 기기/소모품 row를 설정 화면 모델로 변환합니다. | `SettingsDeviceMapper` |
 | `lib/shared/recommendation/refresh_recommend_context_resolver.dart` | 날씨, 측정, 리프레시 세션을 모아 추천 입력 context를 만듭니다. | `WeatherApi`, `MeasureApi`, `RefreshSessionApi` |
-| `lib/shared/recommendation/refresh_recommend_service.dart` | Gemini 추천, fallback, 캐시를 묶은 통합 추천 진입점입니다. | `RefreshRecommendService`, `RefreshRecommendCache`, `GeminiRecommendApi` |
+| `lib/shared/recommendation/refresh_recommend_service.dart` | 규칙 모드 선택, Gemini 문구, 캐시를 묶은 통합 추천 진입점입니다. | `RefreshRecommendService`, `RefreshRecommendCache`, `GeminiRecommendApi` |
 | `lib/shared/recommendation/refresh_recommend_prompt.dart` | Gemini에 보낼 prompt 문자열을 만듭니다. | `jsonEncode`, `RefreshRecommendPrompt` |
 | `lib/shared/recommendation/refresh_recommend_cache.dart` | 같은 입력에 대한 추천 결과를 메모리에 캐시합니다. | `RefreshRecommendCache` |
 

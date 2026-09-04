@@ -17,8 +17,7 @@ class RefreshRecommendInput {
   final MeasureResultRecord? measure;
   final RefreshRecommendScheduleSnapshot? schedule;
 
-  bool get includesMeasure =>
-      basis == RefreshRecommendBasis.measure && measure != null;
+  bool get includesMeasure => measure != null;
 
   bool get includesSchedule => schedule != null && schedule!.hasEventsToday;
 

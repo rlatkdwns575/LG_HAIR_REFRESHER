@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lg_hair_refresher/features/home/data/model/environment_snapshot.dart';
 import 'package:lg_hair_refresher/features/measure/data/model/measure_result_record.dart';
-import 'package:lg_hair_refresher/features/refresh/data/model/refresh_mode.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_basis.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_input.dart';
 import 'package:lg_hair_refresher/shared/recommendation/refresh_recommend_prompt.dart';
@@ -16,36 +14,8 @@ void main() {
     isSnowing: false,
   );
 
-  final candidates = [
-    RefreshMode(
-      id: 'mode-1',
-      name: '외출 후 케어',
-      description: 'desc',
-      category: RefreshModeTabs.afterOuting,
-      durationSeconds: 300,
-      icon: Icons.bolt_outlined,
-      odorYn: true,
-      dustYn: true,
-    ),
-  ];
-
   group('RefreshRecommendPrompt', () {
-    test('mode system instruction varies by basis', () {
-      expect(
-        RefreshRecommendPrompt.modeSystemInstruction(
-          RefreshRecommendBasis.measure,
-        ),
-        contains('측정 점수'),
-      );
-      expect(
-        RefreshRecommendPrompt.modeSystemInstruction(
-          RefreshRecommendBasis.weatherOnly,
-        ),
-        contains('환경 JSON'),
-      );
-    });
-
-    test('mode user prompt includes measure json when present', () {
+    test('message user prompt includes measure json when present', () {
       final context = RefreshRecommendInput(
         basis: RefreshRecommendBasis.measure,
         environment: environment,
@@ -59,14 +29,15 @@ void main() {
         ),
       );
 
-      final prompt = RefreshRecommendPrompt.modeUserPrompt(
-        candidates: candidates,
+      final prompt = RefreshRecommendPrompt.messageUserPrompt(
         context: context,
+        recommendedModeName: '외출 후 케어',
       );
 
       expect(prompt, contains('측정 결과 JSON'));
       expect(prompt, contains('hair_dust_score'));
       expect(prompt, contains('환경 JSON'));
+      expect(prompt, contains('외출 후 케어'));
     });
 
     test('message user prompt includes schedule json when present', () {

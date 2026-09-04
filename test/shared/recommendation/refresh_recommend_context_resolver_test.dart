@@ -84,27 +84,44 @@ void main() {
   });
 
   group('RefreshRecommendContextResolver.buildInput', () {
-    test('measure basis includes measure json section', () {
+    test('valid measure keeps weather, schedule, and measure together', () {
       final record = recentRecord();
       final input = RefreshRecommendContextResolver.buildInput(
-        basis: RefreshRecommendBasis.measure,
         environment: environment,
         latestMeasure: record,
+        refreshedAfterMeasure: false,
         schedule: scheduleWithEvents,
+        now: now,
       );
 
+      expect(input.basis, RefreshRecommendBasis.measure);
       expect(input.includesMeasure, isTrue);
       expect(input.includesSchedule, isTrue);
       expect(input.buildSignature(), contains('measure'));
       expect(input.buildSignature(), contains('m-1'));
     });
 
-    test('weatherOnly basis excludes measure and schedule', () {
+    test('stale measure is dropped but schedule and weather remain', () {
       final input = RefreshRecommendContextResolver.buildInput(
-        basis: RefreshRecommendBasis.weatherOnly,
+        environment: environment,
+        latestMeasure: recentRecord(age: const Duration(hours: 3)),
+        refreshedAfterMeasure: false,
+        schedule: scheduleWithEvents,
+        now: now,
+      );
+
+      expect(input.basis, RefreshRecommendBasis.weatherAndSchedule);
+      expect(input.includesMeasure, isFalse);
+      expect(input.includesSchedule, isTrue);
+    });
+
+    test('weatherOnly excludes measure and schedule when both absent', () {
+      final input = RefreshRecommendContextResolver.buildInput(
         environment: environment,
         latestMeasure: null,
+        refreshedAfterMeasure: false,
         schedule: scheduleEmpty,
+        now: now,
       );
 
       expect(input.includesMeasure, isFalse);
